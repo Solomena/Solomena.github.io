@@ -152,6 +152,94 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-hexo本地图片显示" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/06/01/hexo%E6%9C%AC%E5%9C%B0%E5%9B%BE%E7%89%87%E6%98%BE%E7%A4%BA/">hexo本地图片显示</a>
+    </h1>
+  
+
+        
+        <a href="/2020/06/01/hexo%E6%9C%AC%E5%9C%B0%E5%9B%BE%E7%89%87%E6%98%BE%E7%A4%BA/" class="archive-article-date">
+  	<time datetime="2020-06-01T12:22:12.581Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-06-01</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="hexo-本地图片不显示问题解决"><a href="#hexo-本地图片不显示问题解决" class="headerlink" title="hexo 本地图片不显示问题解决"></a>hexo 本地图片不显示问题解决</h1><p>最近刚刚部署好博客，简单写完一篇博客发现部署到本地和远程服务器以后，本地插入的图片无法显示。</p>
+<p>于是网上找资料啥的，但是遇到了各种问题。现在简单记录下，希望以后对有遇到同样问题的朋友有所帮助。</p>
+<p>1.首先第一步我们需要修改文件博客根目录下的<code>_config.yml</code> 文件里的<code>post_asset_folder:</code>这个选项设置为<code>true</code></p>
+<p>2.修改之后，当我们再终端使用hexo n “hexo指令” 以后，会在_post 文件下生成如下的文件。</p>
+<p><img src="/2020/06/01/hexo%E6%9C%AC%E5%9C%B0%E5%9B%BE%E7%89%87%E6%98%BE%E7%A4%BA/1png.png" alt="1png"></p>
+<p>也就是说会多生成一个文件夹，这个文件夹用来存放这个md文件中需要插入的图片。当然我们也可以自己建立md文件和这样的文件夹，而不是在终端输入hexo n “filename”。这样的效果是一样的。</p>
+<p>3.安装hexo-asset-image，用来上传本地图片的插件。</p>
+<p>这里网上资料有两个版本，</p>
+<p>npm install <a href="https://github.com/CodeFalling/hexo-asset-image" target="_blank" rel="noopener">https://github.com/CodeFalling/hexo-asset-image</a> –save                         这个对应0.0.5版本</p>
+<p>npm install hexo-asset-image –save                           对应1.0.0版本</p>
+<p>两个版本对应的映射关系不同，第一次我安装的是1.0.0版本，但是安装出错了，最后安装了0.0.5版本</p>
+<p>然后在安装的过程中出现了错误</p>
+<p><img src="/2020/06/01/hexo%E6%9C%AC%E5%9C%B0%E5%9B%BE%E7%89%87%E6%98%BE%E7%A4%BA/2.png" alt="2"></p>
+<p>查询资料，是npm版本不对，然后更新了npm版本到最新版本</p>
+<p>npm install npm -g</p>
+<p>然后重新打开终端，再次下载hexo-asset-image文件，然后成功了（这个过程多试试几次，楼主一开始还是出错，然后试过几次 最后成功了）</p>
+<p>4.这时候本地md文件插入图片要改变格式</p>
+<p>原本是这样的格式</p>
+<p><img src="/2020/06/01/hexo%E6%9C%AC%E5%9C%B0%E5%9B%BE%E7%89%87%E6%98%BE%E7%A4%BA/3.png" alt="3"></p>
+<p>现在需要变成</p>
+<p><img src="/2020/06/01/hexo%E6%9C%AC%E5%9C%B0%E5%9B%BE%E7%89%87%E6%98%BE%E7%A4%BA/4.png" alt="4"></p>
+<p>也就是说<strong>首先去掉前面的路径，然后将‘\“变成”/“</strong></p>
+<p>5.这时候部署到本地后你就会发现图片可以显示了。但是这时候我突然又出现问题了，hexo d后报错了，无法远程部署了。然后重新安装hexo-deployer-git也报错</p>
+<p><img src="/2020/06/01/hexo%E6%9C%AC%E5%9C%B0%E5%9B%BE%E7%89%87%E6%98%BE%E7%A4%BA/5.png" alt="5"></p>
+<p>查询了很多，然后试了好多方法。最后是将本地博客木鹿下package-lock.json文件先删除,然后再安装hexo-deployer-git，这时候可以hexo d了。</p>
+<p>弄完表示心很累，记录一下，能帮助后面遇到相同问题的朋友。</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2020/06/01/hexo%E6%9C%AC%E5%9C%B0%E5%9B%BE%E7%89%87%E6%98%BE%E7%A4%BA/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-hexo指令" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -185,7 +273,7 @@
 <p><strong>hexo deploy</strong></p>
 <p>#可以简写为hexo d 将本地的数据部署到远程服务器，如本博客就是使用该命令将文件部署到在远程github上</p>
 <p><strong>hexo server</strong></p>
-<p>#可以缩写成hexo s，表示启动服务器，默认情况下，访问网站为：<a href="http://localhost:4000，这时候就可以在本地网页上打开博客了">http://localhost:4000，这时候就可以在本地网页上打开博客了</a></p>
+<p>#可以缩写成hexo s，表示启动服务器，默认情况下，访问网站为 <a href="http://localhost:4000" target="_blank" rel="noopener">http://localhost:4000</a>  ,这时候就可以在本地网页上打开博客了</p>
 <p><img src="/2020/06/01/hexo%E6%8C%87%E4%BB%A4/hexo_s.png" alt="hexo_s"></p>
 
       
