@@ -152,6 +152,743 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-MySQL" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/06/04/MySQL/">MySQL面试题</a>
+    </h1>
+  
+
+        
+        <a href="/2020/06/04/MySQL/" class="archive-article-date">
+  	<time datetime="2020-06-04T07:55:51.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-06-04</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>1.MySQL索引采用B+树的原因</p>
+<p>​    首先MySQL中的数据一般是放在磁盘中的，读取数据的时候肯定会有访问磁盘的操作。而磁盘的定位是非常消耗时间的，树的深度越深，对应的定位次数也就越多，而B-/B+树因为“矮胖”,可以减少访问的层数，从而减少I/O支出。而B+树在提高了磁盘IO性能的同时，也解决了B-树遍历元素效率低下的问题。（B+树只要遍历叶子节点就可以实现整棵树的遍历。在内存中直接遍历是很快的，而B树的话需要跨层中序遍历，涉及到I/O操作，所以慢）</p>
+<p>2.MyISAM与InnoDB的区别</p>
+<p>常见的Mysql存储引擎就MyISAM，InnoDB,Memory,NDB。之前MyISAM是默认的数据引擎，但从MySQL-5.5.5版本开始，InnoDB成为默认的数据引擎。</p>
+<table>
+<thead>
+<tr>
+<th>名称</th>
+<th align="center">MyISAM</th>
+<th align="center">InnoDB</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>事务</td>
+<td align="center">不支持</td>
+<td align="center">支持事务</td>
+</tr>
+<tr>
+<td>外键</td>
+<td align="center">不支持</td>
+<td align="center">支持外键</td>
+</tr>
+<tr>
+<td>行表锁</td>
+<td align="center">表锁，即使操作一条记录也会锁住整个表，不适合高并发的操作</td>
+<td align="center">行锁，操作时只锁某一行，不对其他行有影响，适合高并发的操作</td>
+</tr>
+<tr>
+<td>缓存</td>
+<td align="center">只缓存索引，不缓存真实数据</td>
+<td align="center">不仅缓存索引还要缓存真实数据，对内存要求较高，而且内存大小对性能有决定性的影响</td>
+</tr>
+<tr>
+<td>聚集索引</td>
+<td align="center">是非聚集索引，数据文件是分离的，索引保存的是数据文件的指针，主键索引和辅助索引是独立的</td>
+<td align="center">是聚集索引，数据文件和索引绑在一起，必须要有主键，通过主键索引效率很高。辅助索引需要两次查询，先查询到主键，再通过主键查询到数据，如果主键太大，其他索引也会很大。</td>
+</tr>
+<tr>
+<td>全文索引</td>
+<td align="center">支持全文索引</td>
+<td align="center">不支持</td>
+</tr>
+<tr>
+<td>总行数</td>
+<td align="center">用一个变量保存表的总行数，查总行数速度很快</td>
+<td align="center">不保存表的总行数，执行 select count(*) from table 时需要全表扫描</td>
+</tr>
+<tr>
+<td>表空间</td>
+<td align="center">小</td>
+<td align="center">大</td>
+</tr>
+<tr>
+<td>关注点</td>
+<td align="center">性能</td>
+<td align="center">事务</td>
+</tr>
+</tbody></table>
+<p>总结：</p>
+<ul>
+<li>InnoDB 存储引擎提供了具有提交、回滚、崩溃恢复能力的事务安全，与 MyISAM 比 InnoDB 写的效率差一些，并且会占用更多的磁盘空间以保留数据和索引</li>
+<li>MyISAM 不支持事务、也不支持外键，优势是访问的速度快。对事务的完整性没有要求、以 SELECT 和 INSERT 为主的应用可以使用这个存储引擎</li>
+</ul>
+<p>3.最左前缀原则</p>
+<p>​    例如对于下面这一张表</p>
+<p><img src="/2020/06/04/MySQL/1.png" alt="1"></p>
+<p>​    如果我们按照name字段建立索引的话，采用B+树的结构，大概的索引结构如下</p>
+<p><img src="/2020/06/04/MySQL/2.png" alt="2"></p>
+<p>​    如果我们要进行模糊查找，查找name 以“张”开头的所有人的ID，即 sql 语句为</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select ID from table where name like &#39;张%&#39;</span><br></pre></td></tr></table></figure>
+
+<p>​    由于在B+树结构的索引中，索引项是按照索引定义里面出现的字段顺序排序的，索引在查找的时候，可以快速定位到 ID 为 100的张一，然后直接向右遍历所有 “张” 开头的人，直到条件不满足为止。</p>
+<p>​    也就是说，我们找到第一个满足条件的人之后，直接向右遍历就可以了，由于索引是有序的，所有满足条件的人都会聚集在一起。</p>
+<p>​    而这种定位到最左边，然后向右遍历寻找，就是我们所说的<strong>最左前缀原则</strong>。</p>
+<p>4.主键索引和非主键索引的区别</p>
+<p><img src="/2020/06/04/MySQL/%E4%B8%BB%E9%94%AE%E7%B4%A2%E5%BC%95%E5%92%8C%E9%9D%9E%E4%B8%BB%E9%94%AE%E7%B4%A2%E5%BC%95.png" alt="主键索引和非主键索引"></p>
+<p>​    其中R代表一整行的值</p>
+<p>​    从图中不难看出，主键索引和非主键索引的区别是：非主键索引的叶子节点存放的是<strong>主键的值</strong>，而主键索引的叶子节点存放的是<strong>整行数据</strong>，其中非主键索引也被称为<strong>二级索引</strong>，而主键索引也被称为<strong>聚簇索引</strong>。</p>
+<p>​    根据这两种结构我们来进行下查询，看看他们在查询上有什么区别。</p>
+<p>​    1、如果查询语句是 select * from table where ID = 100,即主键查询的方式，则只需要搜索 ID 这棵 B+树。</p>
+<p>​    2、如果查询语句是 select * from table where k = 1，即非主键的查询方式，则先搜索k索引树，得到ID=100,再到ID索引树搜索一次，这个过程也被称为<strong>回表</strong>。</p>
+<p>5.为什么用B+树做索引而不用哈希表做索引</p>
+<p>​    （1）哈希表是把索引字段映射成对应的哈希码然后再存放在对应的位置，这样的话，如果我们要进行模糊查找的话，显然哈希表这种结构是不支持的，只能遍历这个表。而B+树则可以通过最左前缀原则快速找到对应的数据。</p>
+<p>​    （2）如果我们要进行范围查找，例如查找ID为100 ~ 400的人，哈希表同样不支持，只能遍历全表。</p>
+<p>​    （3）索引字段通过哈希映射成哈希码，如果很多字段都刚好映射到相同值的哈希码的话，那么形成的索引结构将会是一条很长的链表，这样的话，查找的时间就会大大增加。</p>
+<p>6.为什么采用主键自增的索引</p>
+<p>​        对于这颗主键索引的树</p>
+<p><img src="/2020/06/04/MySQL/4.png" alt="img"></p>
+<p>​        如果我们插入 ID = 650 的一行数据，那么直接在最右边插入就可以了</p>
+<p><img src="/2020/06/04/MySQL/5.png" alt="img"></p>
+<p>​        但是如果插入的是 ID = 350 的一行数据，由于 B+ 树是有序的，那么需要将下面的叶子节点进行移动，腾出位置来插入 ID = 350 的数据，这样就会比较消耗时间，如果刚好 R4 所在的数据页已经满了，需要进行<strong>页分裂</strong>操作，这样会更加糟糕。</p>
+<p>​        但是，如果我们的主键是自增的，每次插入的 ID 都会比前面的大，那么我们每次只需要在后面插入就行， 不需要移动位置、分裂等操作，这样可以提高性能。也就是为什么建议使用主键自增的索引。</p>
+<p>7.索引分类</p>
+<ul>
+<li><p>l<strong>普通索引</strong></p>
+</li>
+<li><p><strong>唯一索引</strong>：唯一索引不允许两行具有相同的索引值，索引值可以为nul</p>
+</li>
+<li><p><strong>主键索引</strong>：为表定义一个主键将自动创建主键索引，主键索引是唯一索引的特殊类型。主键索引要求主键中的每个值是唯一的，并且不能为空</p>
+</li>
+<li><p><strong>聚集索引</strong>(Clustered)：表中各行数据的物理存储顺序与键值的逻辑（索引）顺序相同，每个表只能有一个</p>
+</li>
+<li><p><strong>非聚集索引</strong>(Non-clustered)：非聚集索引指定表的逻辑顺序。数据存储在一个位置，索引存储在另一个位置，索引中包含指向数据存储位置的指针。可以有多个，小于249个。</p>
+<p>​        比如字典中，用‘拼音’查汉字，就是聚集索引。因为正文中字都是按照拼音排序的。而用‘偏旁部首’查汉字，就是非聚集索引，因为正文中的字并不是按照偏旁部首排序的，我们通过检字表得到正文中的字在索引中的映射，然后通过映射找到所需要的字。</p>
+</li>
+</ul>
+<p>8.事务的特性</p>
+<p>​    事务有四大特性——ACID</p>
+<p><strong>原子性</strong>（Atomicity）：意思就是说一个事务应当作为一个不可分割的最小单位，整个事务的操作要么全部执行成功要么全部执行失败（回滚）,像原子一样不可分割。</p>
+<p><strong>一致性</strong>（Consistency）:事务总是从一个一致性的状态跳到另外一个一致性的状态，也就是说一个事务执行之前和执行之后都必须处于一致性状态。拿转账来说，假设用户A和用户B两者的钱加起来一共是5000，那么不管A和B之间如何转账，转几次账，事务结束后两个用户的钱相加起来应该还得是5000，这就是事务的一致性。</p>
+<p><strong>隔离性</strong>（Isolation）:通常来说，一个事务的操作对于其他的事务是不可见的，也就是一般而言事务都是独立的。这具体和数据库的隔离级别有关。</p>
+<p><strong>持久性</strong>（Durability）：持久性是指一个事务一旦被提交了，那么对数据库中的数据的改变就是永久性的，即便是在数据库系统遇到故障的情况下也不会丢失提交事务的操作。</p>
+<p>​    </p>
+<p>9.MySQL的事务隔离级别和对应的问题</p>
+<p>数据库事务对应4个隔离级别</p>
+<p>（1）Read uncommitted（读取未提交的内容）【级别最低，什么都避免不了】</p>
+<p>​        最低的隔离级别，允许读取尚未提交的数据变更，可能会导致脏读、幻读或不可重复读。</p>
+<p>（2）Read committed（读取提交的内容）【可避免脏读】</p>
+<p>​        这是大多数数据库系统的默认隔离级别（但不是MySQL默认的），允许读取并发事务已经提交的数据，可以阻止脏读，但是幻读或不可重复读仍有可能发生。</p>
+<p>（3）Repeatable read（可重读）【可避免脏读，不可重复读】</p>
+<p>​        这是<strong>MySQL的默认事务隔离级别</strong>，对同一字段的多次读取结果都是一致的，除非数据是被本身事务自己所修改，可以阻止脏读和不可重复读，但幻读仍有可能发生。</p>
+<p>（4）Serializable（可串行化）【可避免脏读，不可重复读，幻读】</p>
+<p>​        这是数据库的最高隔离级别，它通过强制事务排序，使之不可能相互冲突，从而解决幻读问题。简而言之，就是在每个读的数据行上加上共享锁。在这个级别，可能会导致大量的超时现象和锁竞争。</p>
+<p><strong>并发事务处理带来的问题</strong></p>
+<p>​        脏读(Dirty Reads)：事务A读取了事务B更新的数据，然后B回滚操作，那么A读取到的数据是脏数据</p>
+<p>​        不可重复读（Non-Repeatable Reads)：事务 A 多次读取同一数据，事务B在事务A多次读取的过程中，对数据作了更新并提交，导致事务A多次读取同一数据时，结果不一致。</p>
+<p>​        幻读（Phantom Reads)：幻读与不可重复读类似。它发生在一个事务A读取了几行数据，接着另一个并发事务B插入了一些数据时。在随后的查询中，事务A就会发现多了一些原本不存在的记录，就好像发生了幻觉一样，所以称为幻读。</p>
+<p><strong>幻读和不可重复读的区别：</strong></p>
+<ul>
+<li><p><strong>不可重复读的重点是修改</strong>：在同一事务中，同样的条件，第一次读的数据和第二次读的数据不一样。（因为中间有其他事务提交了修改）</p>
+</li>
+<li><p><strong>幻读的重点在于新增或者删除</strong>：在同一事务中，同样的条件,，第一次和第二次读出来的记录数不一样。（因为中间有其他事务提交了插入/删除）</p>
+</li>
+</ul>
+<p><strong>并发事务处理带来的问题的解决办法：</strong></p>
+<p>“脏读” 、 “不可重复读”和“幻读” ，其实都是数据库读一致性问题，必须由数据库提供一定的事务隔离机制来解决：</p>
+<ul>
+<li><p>一种是加锁：在读取数据前，对其加锁，阻止其他事务对数据进行修改。</p>
+</li>
+<li><p>另一种是数据多版本并发控制（MultiVersion Concurrency Control，简称 <strong>MVCC</strong>），也称为多版本数据库：不用加任何锁， 通过一定机制生成一个数据请求时间点的一致性数据快照 （Snapshot)， 并用这个快照来提供一定级别 （语句级或事务级） 的一致性读取。从用户的角度来看，好象是数据库可以提供同一数据的多个版本。 MVCC只在 Read Committed 和 Repeatable Read两个隔离级别下工作。</p>
+<p>(tips:有关MVCC的详情可看<a href="https://blog.csdn.net/Waves___/article/details/105295060" target="_blank" rel="noopener">https://blog.csdn.net/Waves___/article/details/105295060</a>)</p>
+</li>
+</ul>
+<p>10.SQL的优化</p>
+<p>（1）尽量避免全表扫描，首先考虑在where以及order by涉及的列上建立索引，这样能过滤好多数据。</p>
+<p>（2）避免在where子句中对字段进行null值判断，否则会导致引擎放弃索引而进行全表扫描</p>
+<p>（3）避免在where子句中使用！=或者&lt; &gt;操作符，否则会导致引擎放弃索引而进行全表扫描</p>
+<p>（4）避免在where子句中使用or来连接条件，若果一个字段有索引，一个字段没有索引，否则会导致引擎放弃使用索引而进行全表扫描</p>
+<p>（5）like模糊全匹配，in 和 not in都要慎用，会导致全表扫描</p>
+<p>11.三个范式</p>
+<blockquote>
+<p>第一范式（1NF）：数据库表中的字段都是单一属性的，不可再分。这个单一属性由基本类型构成，包括整型、实数、字符型、逻辑型、日期型等。</p>
+<p>第二范式（2NF）：数据库表中不存在非关键字段对任一候选关键字段的部分函数依赖（部分函数依赖指的是存在组合关键字中的某些字段决定非关键字段的情况），也即所有非关键字段都完全依赖于任意一组候选关键字。</p>
+<p>第三范式（3NF）：在第二范式的基础上，数据表中如果不存在非关键字段对任一候选关键字段的传递函数依赖则符合第三范式。所谓传递函数依赖，指的是如 果存在”A → B → C”的决定关系，则C传递函数依赖于A。因此，满足第三范式的数据库表应该不存在如下依赖关系：关键字段 → 非关键字段 x → 非关键字段y</p>
+</blockquote>
+<p>内容解读：</p>
+<ul>
+<li><p>首先要明确的是：<strong>满足着第三范式，那么就一定满足第二范式、满足着第二范式就一定满足第一范式</strong></p>
+</li>
+<li><p>第一范式：<strong>字段是最小的的单元不可再分</strong></p>
+</li>
+<li><ul>
+<li>学生信息组成学生信息表，有年龄、性别、学号等信息组成。这些字段都不可再分，所以它是满足第一范式的</li>
+</ul>
+</li>
+<li><p>第二范式：满足第一范式,<strong>表中的字段必须完全依赖于全部主键而非部分主键。</strong></p>
+</li>
+<li><ul>
+<li><strong>其他字段组成的这行记录和主键表示的是同一个东西，而主键是唯一的，它们只需要依赖于主键，也就成了唯一的</strong></li>
+<li>学号为1024的同学，姓名为Timi，年龄是24岁。姓名和年龄字段都依赖着学号主键。</li>
+</ul>
+</li>
+<li><p>第三范式：满足第二范式，<strong>非主键外的所有字段必须互不依赖</strong></p>
+</li>
+<li><ul>
+<li><strong>就是数据只在一个地方存储，不重复出现在多张表中，可以认为就是消除传递依赖</strong></li>
+<li>比如，我们大学分了很多系（中文系、英语系、计算机系……），这个系别管理表信息有以下字段组成：系编号，系主任，系简介，系架构。那我们能不能在学生信息表添加系编号，系主任，系简介，系架构字段呢？不行的，因为这样就冗余了，非主键外的字段形成了依赖关系(依赖到学生信息表了)！正确的做法是：学生表就只能增加一个系编号字段。</li>
+</ul>
+</li>
+</ul>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">数据库</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2020/06/04/MySQL/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-Spring" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/06/03/Spring/">Spring</a>
+    </h1>
+  
+
+        
+        <a href="/2020/06/03/Spring/" class="archive-article-date">
+  	<time datetime="2020-06-03T02:54:10.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-06-03</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><strong>1.Spring介绍</strong></p>
+<p>Spring是一个轻量级的IoC和AOP容器框架，是为Java应用程序提供基础性服务的一套框架，目的是用于简化企业应用程序的开发，它使得开发者只需要关心业务需求。常见的配置方式有三种：基于XML的配置、基于注解的配置、基于Java的配置。</p>
+<p>Spring模块主要由以下构成：</p>
+<p><img src="/2020/06/03/Spring/Spring.jpg" alt="Spring核心模块"></p>
+<p>Spring Core：核心类库，提供IOC服务；</p>
+<p>Spring Context：提供框架式的Bean访问方式，以及企业级功能（JNDI、定时任务等）；</p>
+<p>Spring AOP：AOP服务；</p>
+<p>Spring DAO：对JDBC的抽象，简化了数据访问异常的处理；</p>
+<p>Spring ORM：对现有的ORM框架的支持；</p>
+<p>Spring Web：提供了基本的面向Web的综合特性，例如多方文件上传；</p>
+<p>Spring MVC：提供面向Web应用的Model-View-Controller实现。</p>
+<p>Spring的优点：</p>
+<p>（1）spring属于低侵入式设计，代码的污染极低</p>
+<p>（2）spring的DI机制将对象之间的依赖交由框架处理，减低组件的耦合性</p>
+<p>（3）Spring提供了AOP技术，支持将一些通用任务，如安全、事务、日志、权限等进行集中式管理，从而提供更好的复用</p>
+<p>（4）spring对于主流的应用框架提供了集成支持</p>
+<p><strong>2.IoC介绍</strong></p>
+<p>​    IoC(Inversion of Control)控制反转，它是一种设计思想，在java开发中，将你设计好的对象交给容器控制器控制，而不是主动地用代码进行对象的创建。</p>
+<p>​    DI（Dependency Injection）依赖注入，就是由IOC容器在运行期间，动态地将某种依赖关系注入到对象之中。所以，依赖注入(DI)和控制反转(IOC)是从不同的角度的描述的同一件事情，就是指通过引入IOC容器，利用依赖关系注入的方式，实现对象之间的解耦。</p>
+<p>​    最直观的表达就是，IOC让对象的创建不用去new了，可以由spring自动生产，使用java的反射机制，根据配置文件在运行时动态的去创建对象以及管理对象，并调用对象的方法的。</p>
+<p>​    使用IoC的4种注入方式：构造器注入、setter方法注入、注解注入、接口注入</p>
+<p>​        </p>
+<p><strong>3.AOP介绍</strong></p>
+<p>​    AOP（Aspect Oriented Programming）面向切面编程，是面向对象开发的一种补充，它允许开发人员在不改变原有的逻辑的基础上，增加一些额外的功能。例如，开发人员可以在不改变原来业务逻辑模型的基础可以进行动态的增加日志，安全或异常处理功能。</p>
+<p>​    AOP实现的关键在于代理模式，AOP代理主要分为<strong>静态代理和动态代理</strong>。静态代理的代表为AspectJ；动态代理则以Spring AOP为代表。**</p>
+<p>​    （1）AspectJ是静态代理的增强，所谓静态代理，所谓静态也就是在程序运行前就已经存在代理类的字节码文件，代理类和委托类的关系在运行前就确定了。</p>
+<p>​    （2）Spring AOP使用的动态代理，动态代理类的源码是在程序运行期间由JVM根据反射等机制动态的生成，所以不存在代理类的字节码文件。代理类和委托类的关系是在程序运行时确定。 </p>
+<p>​    Spring AOP的动态代理主要由两种方式，JDK动态代理和CGLib动态代理</p>
+<p>（1）JDK动态代理只提供接口的代理，不支持类的代理。核心InvocationHandler接口和Proxy类，InvocationHandler 通过invoke()方法反射来调用目标类中的代码，动态地将横切逻辑和业务编织在一起；接着Proxy利用 InvocationHandler动态创建一个符合某一接口的的实例,  生成目标类的代理对象。</p>
+<p> （2）如果代理类没有实现 InvocationHandler 接口，那么Spring AOP会选择使用CGLIB来动态代理目标类。CGLIB（Code Generation Library），是一个代码生成的类库，可以在运行时动态的生成指定类的一个子类对象，并覆盖其中特定方法并添加增强代码，从而实现AOP。CGLIB是通过继承的方式做的动态代理，因此如果某个类被标记为final，那么它是无法使用CGLIB做动态代理的。</p>
+<table>
+<thead>
+<tr>
+<th>名称</th>
+<th>特征</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>静态代理</td>
+<td>简单，是动态代理的理论基础。代理模式中常见</td>
+</tr>
+<tr>
+<td>JDK动态代理</td>
+<td>需要有顶层接口才能使用。利用反射完成。使用动态字节码技。是mybaits的mapeer文件代理模式</td>
+</tr>
+<tr>
+<td>CGLib动态代理</td>
+<td>可以直接代理类，不能对final类进行继承。使用动态字节码技术</td>
+</tr>
+</tbody></table>
+<p><strong>4.BeanFactory和ApplicationContext的区别</strong></p>
+<p>​     BeanFactory和ApplicationContext是Spring的两大核心接口，都可以当做Spring的容器。其中ApplicationContext是BeanFactory的子接口。</p>
+<p><img src="/2020/06/03/Spring/%E6%8E%A5%E5%8F%A3.png" alt="接口"></p>
+<p>（1）BeanFactory：是Spring里面最底层的接口，包含了各种Bean的定义，读取bean配置文档，管理bean的加载、实例化，控制bean的生命周期，维护bean之间的依赖关系。ApplicationContext接口作为BeanFactory的派生，除了提供BeanFactory所具有的功能外，还提供了更完整的框架功能：</p>
+<p>​        ①继承MessageSource，因此支持国际化。</p>
+<p>​        ②统一的资源文件访问方式。</p>
+<p>​        ③提供在监听器中注册bean的事件。</p>
+<p>​        ④同时加载多个配置文件。</p>
+<p>​        ⑤载入多个（有继承关系）上下文 ，使得每一个上下文都专注于一个特定的层次，比如应用的web层。</p>
+<p>（2）① <strong>BeanFactroy采用的是延迟加载形式来注入Bean的，</strong>即只有在使用到某个Bean时(调用getBean())，才对该Bean进行加载实例化。这样，我们就不能发现一些存在的Spring的配置问题。如果Bean的某一个属性没有注入，BeanFacotry加载后，直至第一次使用调用getBean方法才会抛出异常。</p>
+<pre><code>② **ApplicationContext，它是在容器启动时，一次性创建了所有的Bean**。这样，在容器启动时，我们就可以发现Spring中存在的配置错误，这样有利于检查所依赖属性是否注入。 ApplicationContext启动后预载入所有的单实例Bean，通过预载入单实例bean ,确保当你需要的时候，你就不用等待，因为它们已经创建好了。</code></pre><p>​     ③相对于基本的BeanFactory，ApplicationContext 唯一的不足是占用内存空间。当应用程序配置Bean较多时，程序启动较慢。</p>
+<p>（3）BeanFactory通常以编程的方式被创建，ApplicationContext还能以声明的方式创建，如使用ContextLoader。</p>
+<p>（4）BeanFactory和ApplicationContext都支持BeanPostProcessor、BeanFactoryPostProcessor的使用，但两者之间的区别是：BeanFactory需要手动注册，而ApplicationContext则是自动注册。</p>
+<p><strong>5.Spring Bean的生命周期</strong></p>
+<p><img src="/2020/06/03/Spring/bean.jpg" alt="bean"></p>
+<p>首先说一下Servlet的生命周期：实例化，初始init，接收请求service，销毁destroy；</p>
+<p> Spring上下文中的Bean生命周期也类似，总结起来就4个：<strong>实例化 -&gt; 属性赋值 -&gt; 初始化 -&gt; 销毁</strong> 但是扩展开来分为以下几个</p>
+<p>如下：</p>
+<p>（1）实例化Bean：</p>
+<p>对于BeanFactory容器，当客户向容器请求一个尚未初始化的bean时，或初始化bean的时候需要注入另一个尚未初始化的依赖时，容器就会调用createBean进行实例化。对于ApplicationContext容器，当容器启动结束后，通过获取BeanDefinition对象中的信息，实例化所有的bean。</p>
+<p>（2）设置对象属性（依赖注入）：</p>
+<p>实例化后的对象被封装在BeanWrapper对象中，紧接着Spring根据BeanDefinition中的信息 以及 通过BeanWrapper提供的设置属性的接口完成依赖注入。</p>
+<p>（3）处理Aware接口：</p>
+<p>接着，Spring会检测该对象是否实现了xxxAware接口，并将相关的xxxAware实例注入给Bean：</p>
+<p>①如果这个Bean已经实现了BeanNameAware接口，会调用它实现的setBeanName(String beanId)方法，此处传递的就是Spring配置文件中Bean的id值；</p>
+<p>②如果这个Bean已经实现了BeanFactoryAware接口，会调用它实现的setBeanFactory()方法，传递的是Spring工厂自身。</p>
+<p>③如果这个Bean已经实现了ApplicationContextAware接口，会调用setApplicationContext(ApplicationContext)方法，传入Spring上下文；</p>
+<p>（4）BeanPostProcessor：</p>
+<p>如果想对Bean进行一些自定义的处理，那么可以让Bean实现了BeanPostProcessor接口，那将会调用postProcessBeforeInitialization(Object obj, String s)方法。</p>
+<p>（5）InitializingBean 与 init-method：</p>
+<p>如果Bean在Spring配置文件中配置了 init-method 属性，则会自动调用其配置的初始化方法。</p>
+<p>（6）如果这个Bean实现了BeanPostProcessor接口，将会调用postProcessAfterInitialization(Object obj, String s)方法；由于这个方法是在Bean初始化结束时调用的，所以可以被应用于内存或缓存技术；</p>
+<p>以上几个步骤完成后，Bean就已经被正确创建了，之后就可以使用这个Bean了。</p>
+<p>（7）DisposableBean：</p>
+<p>当Bean不再需要时，会经过清理阶段，如果Bean实现了DisposableBean这个接口，会调用其实现的destroy()方法；</p>
+<p>（8）destroy-method：</p>
+<p>最后，如果这个Bean的Spring配置中配置了destroy-method属性，会自动调用其配置的销毁方法。</p>
+<p><strong>6.解释Spring支持的几种bean的作用域</strong></p>
+<p>Spring容器中的bean可以分为5个范围，后三种只有在Web应用中使用Spring时，作用域才有效</p>
+<p>（1）singleton：单例模式，bean默认的作用域，每个容器中只有一个bean的实例，单例的模式由BeanFactory自身来维护。</p>
+<p>（2）prototype：原型模式，为每一个bean请求提供一个实例。</p>
+<p>（3）request：对于每次 HTTP 请求，使用 request 定义的 bean 都将产生一个新实例，即每次 HTTP 请求将会产生不同的 bean 实例。在请求完成以后，bean会失效并被垃圾回收器回收。</p>
+<p>（4）session：与request范围类似，同一个 Session 共享一个 bean 实例。</p>
+<p>（5）global-session：全局作用域，同 session 作用域不同的是，所有的session共享一个Bean实例。</p>
+<p><strong>7.Spring的自动装配</strong></p>
+<p>基于xml配置文件的方式：</p>
+<p>​    在spring框架xml 配置文件中 &lt; bean&gt;节点的 autowire 参数可以控制 bean 自动装配的方式,总共5种方式</p>
+<ul>
+<li><p>default - 默认的方式和 “no” 方式一样</p>
+</li>
+<li><p>no - 不自动装配，需要使用 &lt; ref/&gt;节点或参数</p>
+</li>
+<li><p>byName - 通过bean的名称进行自动装配，如果一个bean的 property 与另一bean 的name 相同，就进行自动装配</p>
+</li>
+<li><p>byType - 根通过参数的数据类型进行自动装配</p>
+</li>
+<li><p>constructor - 根据构造函数进行装配，并且构造函数的参数通过byType进行装配。</p>
+</li>
+<li><p>autodetect：自动探测，如果有构造方法，通过 construct的方式自动装配，否则使用 byType的方式自动装配。</p>
+</li>
+</ul>
+<p>基于注解的方式：</p>
+<p>​    使用@Autowired注解来自动装配指定的bean。在使用@Autowired注解之前需要在Spring配置文件进行配置&lt;context:annotation-config /&gt;。在启动spring IoC时，容器自动装载了一个AutowiredAnnotationBeanPostProcessor后置处理器，当容器扫描到@Autowied、@Resource或@Inject时，就会在IoC容器自动查找需要的bean，并装配给该对象的属性。在使用@Autowired时，首先在容器中查询对应类型的bean：</p>
+<p>​    如果查询结果刚好为一个，就将该bean装配给@Autowired指定的数据；</p>
+<p>​    如果查询的结果不止一个，那么@Autowired会根据名称来查找；</p>
+<p>​    如果上述查找的结果为空，那么会抛出异常。解决方法时，使用required=false。</p>
+<p>注：@Autowired和@Resource之间的区别</p>
+<p>(1) @Autowired默认是按照类型装配注入的，默认情况下它要求依赖对象必须存在（可以设置它required属性为false）。</p>
+<p>(2) @Resource默认是按照名称来装配注入的，只有当找不到与名称匹配的bean才会按照类型来装配注入。</p>
+<p><strong>8.Spring框架中用到的设计模式</strong></p>
+<p>（1）工厂模式：BeanFactory就是简单工厂模式的体现，用来创建对象的实例；</p>
+<p>（2）单例模式：Bean默认为单例模式。</p>
+<p>（3）代理模式：Spring的AOP功能用到了JDK的动态代理和CGLIB字节码生成技术；</p>
+<p>（4）模板方法：用来解决代码重复的问题。比如. RestTemplate, JmsTemplate, JpaTemplate。</p>
+<p>（5）观察者模式：定义对象键一种一对多的依赖关系，当一个对象的状态发生改变时，所有依赖于它的对象都会得到通知被制动更新，如Spring中listener的实现–ApplicationListener。</p>
+<p><strong>9.Spring事务的实现方式和实现原理</strong></p>
+<p>​     Spring事务的本质其实就是数据库对事务的支持，没有数据库的事务支持，spring是无法提供事务功能的。真正的数据库层的事务提交和回滚是通过binlog或者redo log实现的。</p>
+<p>（1）Spring事务的种类：</p>
+<p>spring支持编程式事务管理和声明式事务管理两种方式：</p>
+<p>​     ①编程式事务管理使用TransactionTemplate。</p>
+<p>​     ②声明式事务管理建立在AOP之上的。其本质是通过AOP功能，对方法前后进行拦截，将事务处理的功能编织到拦截的方法中，也就是在目标方法开始之前加入一个事务，在执行完目标方法之后根据执行情况提交或者回滚事务。</p>
+<blockquote>
+<p>   声明式事务最大的优点就是不需要在业务逻辑代码中掺杂事务管理的代码，只需在配置文件中做相关的事务规则声明或通过@Transactional注解的方式，便可以将事务规则应用到业务逻辑中。</p>
+<p>   声明式事务管理要优于编程式事务管理，这正是spring倡导的非侵入式的开发方式，使业务代码不受污染，只要加上注解就可以获得完全的事务支持。唯一不足地方是，最细粒度只能作用到方法级别，无法做到像编程式事务那样可以作用到代码块级别。</p>
+</blockquote>
+<p>（2）spring的事务传播行为：</p>
+<p>​        spring事务的传播行为说的是，当多个事务同时存在的时候，spring如何处理这些事务的行为(新建事务?在事务中执行?把事务挂起?报异常?) 。根据处理方式，事务的传播机制有7种。</p>
+<p>​    ① PROPAGATION_REQUIRED：如果当前没有事务，就创建一个新事务，如果当前存在事务，就加入该事务，该设置是最常用的设置。</p>
+<p>​    ② PROPAGATION_SUPPORTS：支持当前事务，如果当前存在事务，就加入该事务，如果当前不存在事务，就以非事务执行。‘</p>
+<p>​    ③ PROPAGATION_MANDATORY：支持当前事务，如果当前存在事务，就加入该事务，如果当前不存在事务，就抛出异常。</p>
+<p>​    ④ PROPAGATION_REQUIRES_NEW：创建新事务，无论当前存不存在事务，都创建新事务。</p>
+<p>​    ⑤ PROPAGATION_NOT_SUPPORTED：以非事务方式执行操作，如果当前存在事务，就把当前事务挂起。</p>
+<p>​    ⑥ PROPAGATION_NEVER：以非事务方式执行，如果当前存在事务，则抛出异常。</p>
+<p>​    ⑦ PROPAGATION_NESTED：如果当前存在事务，则在嵌套事务内执行。如果当前没有事务，则按REQUIRED属性执行。</p>
+<p>​     如果想事务一起执行可以用Required满足大部分场景，如果不想让执行的子事务的结果影响到父事务的提交可以将子事务设置为RequiresNew</p>
+<p>（3）Spring中的隔离级别：</p>
+<p>​    ① ISOLATION_DEFAULT：这是个 PlatfromTransactionManager 默认的隔离级别，使用数据库默认的事务隔离级别。</p>
+<p>​    ② ISOLATION_READ_UNCOMMITTED：读未提交，允许另外一个事务可以看到这个事务未提交的数据。</p>
+<p>​    ③ ISOLATION_READ_COMMITTED：读已提交，保证一个事务修改的数据提交后才能被另一事务读取，而且能看到该事务对已有记录的更新。</p>
+<p>​    ④ ISOLATION_REPEATABLE_READ：可重复读，保证一个事务修改的数据提交后才能被另一事务读取，但是不能看到该事务对已有记录的更新。</p>
+<p>​    ⑤ ISOLATION_SERIALIZABLE：一个事务在执行的过程中完全看不到其他事务对数据库所做的更新。</p>
+<p><strong>10.Spring框架中不同类型的事件</strong></p>
+<p>Spring 提供了以下5种标准的事件：</p>
+<p>（1）上下文更新事件（ContextRefreshedEvent）：在调用ConfigurableApplicationContext 接口中的refresh()方法时被触发。</p>
+<p>（2）上下文开始事件（ContextStartedEvent）：当容器调用ConfigurableApplicationContext的Start()方法开始/重新开始容器时触发该事件。</p>
+<p>（3）上下文停止事件（ContextStoppedEvent）：当容器调用ConfigurableApplicationContext的Stop()方法停止容器时触发该事件。</p>
+<p>（4）上下文关闭事件（ContextClosedEvent）：当ApplicationContext被关闭时触发该事件。容器被关闭时，其管理的所有单例Bean都被销毁。</p>
+<p>（5）请求处理事件（RequestHandledEvent）：在Web应用中，当一个http请求（request）结束触发该事件。</p>
+<p>如果一个bean实现了ApplicationListener接口，当一个ApplicationEvent 被发布以后，bean会自动被通知。</p>
+<p><strong>11、解释一下Spring AOP里面的几个名词</strong></p>
+<p>（1）切面（Aspect）：被抽取的公共模块，可能会横切多个对象。 在Spring AOP中，切面可以使用通用类（基于模式的风格） 或者在普通类中以 @AspectJ 注解来实现。</p>
+<p>（2）连接点（Join point）：指方法，在Spring AOP中，一个连接点 总是 代表一个方法的执行。 </p>
+<p>（3）通知（Advice）：在切面的某个特定的连接点（Join point）上执行的动作。通知有各种类型，其中包括“around”、“before”和“after”等通知。许多AOP框架，包括Spring，都是以拦截器做通知模型， 并维护一个以连接点为中心的拦截器链。</p>
+<p>（4）切入点（Pointcut）：切入点是指 我们要对哪些Join point进行拦截的定义。通过切入点表达式，指定拦截的方法，比如指定拦截add<em>、search</em>。</p>
+<p>（5）引入（Introduction）：（也被称为内部类型声明（inter-type declaration））。声明额外的方法或者某个类型的字段。Spring允许引入新的接口（以及一个对应的实现）到任何被代理的对象。例如，你可以使用一个引入来使bean实现 IsModified 接口，以便简化缓存机制。</p>
+<p>（6）目标对象（Target Object）： 被一个或者多个切面（aspect）所通知（advise）的对象。也有人把它叫做 被通知（adviced） 对象。 既然Spring AOP是通过运行时代理实现的，这个对象永远是一个 被代理（proxied） 对象。</p>
+<p>（7）织入（Weaving）：指把增强应用到目标对象来创建新的代理对象的过程。Spring是在运行时完成织入。</p>
+<p>切入点（pointcut）和连接点（join point）匹配的概念是AOP的关键，这使得AOP不同于其它仅仅提供拦截功能的旧技术。 切入点使得定位通知（advice）可独立于OO层次。 例如，一个提供声明式事务管理的around通知可以被应用到一组横跨多个对象中的方法上（例如服务层的所有业务操作）。<br><img src="/2020/06/03/Spring/AOP.png" alt="AOP"></p>
+<p><strong>12.Spring通知的类型</strong></p>
+<p>（1）前置通知（Before advice）：在某连接点（join point）之前执行的通知，但这个通知不能阻止连接点前的执行（除非它抛出一个异常）。</p>
+<p>（2）返回后通知（After returning advice）：在某连接点（join point）正常完成后执行的通知：例如，一个方法没有抛出任何异常，正常返回。 </p>
+<p>（3）抛出异常后通知（After throwing advice）：在方法抛出异常退出时执行的通知。 </p>
+<p>（4）后通知（After (finally) advice）：当某连接点退出的时候执行的通知（不论是正常返回还是异常退出）。 </p>
+<p>（5）环绕通知（Around Advice）：包围一个连接点（join point）的通知，如方法调用。这是最强大的一种通知类型。 环绕通知可以在方法调用前后完成自定义的行为。它也会选择是否继续执行连接点或直接返回它们自己的返回值或抛出异常来结束执行。 环绕通知是最常用的一种通知类型。大部分基于拦截的AOP框架，例如Nanning和JBoss4，都只提供环绕通知。 </p>
+<p>同一个aspect，不同advice的执行顺序：</p>
+<p>①没有异常情况下的执行顺序：</p>
+<p>around before advice<br>before advice<br>target method 执行<br>around after advice<br>after advice<br>afterReturning</p>
+<p>②有异常情况下的执行顺序：</p>
+<p>around before advice<br>before advice<br>target method 执行<br>around after advice<br>after advice<br>afterThrowing:异常发生<br>java.lang.RuntimeException: 异常发生</p>
+<p>参考文献</p>
+<p><a href="https://blog.csdn.net/a745233700/article/details/80959716" target="_blank" rel="noopener">https://blog.csdn.net/a745233700/article/details/80959716</a></p>
+<p><a href="https://www.jianshu.com/p/1dec08d290c1" target="_blank" rel="noopener">https://www.jianshu.com/p/1dec08d290c1</a></p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">框架</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2020/06/03/Spring/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-SpringMVC" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/06/03/SpringMVC/">springMVC</a>
+    </h1>
+  
+
+        
+        <a href="/2020/06/03/SpringMVC/" class="archive-article-date">
+  	<time datetime="2020-06-03T01:38:49.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-06-03</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><strong>1.什么是Spring MVC?</strong></p>
+<p>​        Spring MVC是一个基于MVC架构的用来简化web应用程序开发的应用开发框架,通过把Model, View, Controller分离，将web层进行职责解耦，把复杂的web应用分成逻辑清晰的几部分，简化开发，减少出错，方便组内开发人员之间的配合。</p>
+<p><strong>2.SpringMVC的执行流程？</strong></p>
+<p>流程图如下所示</p>
+<p><img src="/2020/06/03/SpringMVC/SpringMVC%E6%B5%81%E7%A8%8B%E5%9B%BE.png" alt="SpringMVC流程图"></p>
+<p>（1）用户发送url请求到前端控制器DispatcherServlet;</p>
+<p>（2）DIspatcherServlet收到请求后，调用HandlerMapping处理映射器，请求获取handler</p>
+<p>（3）HandlerMapping根据url找到具体的处理器，生成处理器对象以及处理器拦截器（如果有的话）一并返回给DispatcherServlet;</p>
+<p>（4）DispatcherServlet调用HandlerAdapter处理器适配器</p>
+<p>（5）HandlerAdapter经过适配调用后执行具体的Handler处理器（Handler是指包含了我们请求的Controller类和Method方法的对象）</p>
+<p>（6）Handler处理器执行完后返回ModelAndView</p>
+<p>（7）HandlerAdapter将Handler执行结果ModelAndView返回给DispatcherServlet</p>
+<p>（8）DispatcherServlet将ModelAndView传给ViewResolver视图解析器进行解析</p>
+<p>（9）视图解析器解析完后返回具体的View给DispatcherServlet</p>
+<p>（10）DispatcherServlet对View进行视图渲染（将模型数据填充到request域中）</p>
+<p>（11）DispatcherServlet响应用户</p>
+<p><strong>3.SpringMVC的主要组件</strong></p>
+<p>（1）前端控制器 DispatcherServlet（不需要程序员开发）</p>
+<p>作用：接收请求、响应结果，相当于转发器，有了DispatcherServlet 就减少了其它组件之间的耦合度。</p>
+<p>（2）处理器映射器HandlerMapping（不需要程序员开发）</p>
+<p>作用：根据请求的URL来查找Handler</p>
+<p>（3）处理器适配器HandlerAdapter</p>
+<p>注意：在编写Handler的时候要按照HandlerAdapter要求的规则去编写，这样适配器HandlerAdapter才可以正确的去执行Handler。</p>
+<p>（4）处理器Handler（需要程序员开发）</p>
+<p>（5）视图解析器 ViewResolver（不需要程序员开发）</p>
+<p>作用：进行视图的解析，根据视图逻辑名解析成真正的视图（view）</p>
+<p>（6）视图View（需要程序员开发jsp）</p>
+<p>View是一个接口， 它的实现类支持不同的视图类型（jsp，freemarker，pdf等等）</p>
+<p><strong>4.SpringMVC的优点</strong></p>
+<p>（1）可以支持各种视图，不仅仅局限于JSP,还可以是excel,jpg等</p>
+<p>（2）与Spring框架集成（如IoC容器，AOP等）</p>
+<p>（3）清晰的角色分配：前端控制器(dispatcherServlet) , 请求到处理器映射（handlerMapping), 处理器适配器（HandlerAdapter), 视图解析器（ViewResolver）。</p>
+<p>（4） 支持各种请求资源的映射策略。</p>
+<p><strong>5.SpringMVC设定重定向和转发</strong></p>
+<p>（1）转发：在返回值前面加”forward:”，譬如”forward:user.do?name=method4”</p>
+<p>（2）重定向：在返回值前面加”redirect:”，譬如”redirect:<a href="http://www.baidu.com&quot;" target="_blank" rel="noopener">http://www.baidu.com&quot;</a></p>
+<p><strong>6.SpringMVC常用的注解</strong></p>
+<p>@RequestMapping：用于处理请求 url 映射的注解，可用于类或方法上。用于类上，则表示类中的所有响应请求的方法都是以该地址作为父路径。</p>
+<p>@RequestBody：注解实现接收http请求的json数据，将json转换为java对象。</p>
+<p>@ResponseBody：注解实现将controller方法返回对象转化为json对象响应给客户。</p>
+<p>参考文献：</p>
+<p><a href="https://blog.csdn.net/a745233700/article/details/80963758" target="_blank" rel="noopener">https://blog.csdn.net/a745233700/article/details/80963758</a></p>
+<p><a href="https://blog.csdn.net/qq_28802119/article/details/82993266" target="_blank" rel="noopener">https://blog.csdn.net/qq_28802119/article/details/82993266</a></p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">框架</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2020/06/03/SpringMVC/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-进程" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/06/02/%E8%BF%9B%E7%A8%8B/">进程</a>
+    </h1>
+  
+
+        
+        <a href="/2020/06/02/%E8%BF%9B%E7%A8%8B/" class="archive-article-date">
+  	<time datetime="2020-06-02T08:58:09.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-06-02</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="一-进程和线程的区别"><a href="#一-进程和线程的区别" class="headerlink" title="一.进程和线程的区别"></a>一.进程和线程的区别</h3><p>​       讲到进程，一定会想到线程。那线程和进程区别是什么呢？</p>
+<p>​       <strong>进程是操作系统资源分配的基本单位</strong>，<strong>线程是操作系统调度资源的基本单位</strong>。进程是正在运行的程序的实例，其实就是系统中正在运行的一个应用程序，线程是进程的一个实体。举一个比喻：进程可以比喻成火车，线程是里面的车厢。</p>
+<h3 id="二-进程间的通信"><a href="#二-进程间的通信" class="headerlink" title="二.进程间的通信"></a>二.进程间的通信</h3><p>​       进程之间的交换数据必须通过内核，在内核中开辟一块缓冲区，进程A把数据从用户空间拷到内核缓冲区，进程B再从内核缓冲区把数据读走，内核提供的这种机制称为进程间通信。</p>
+<h4 id="进程间对白：管道和套接字"><a href="#进程间对白：管道和套接字" class="headerlink" title="进程间对白：管道和套接字"></a>进程间对白：管道和套接字</h4><p>1.<strong>管道</strong> </p>
+<p>​         一个进程向存储空间的一端写入信息，另一个进程存储空间的另外一端读取信息，这个就是管道。就像两个人对白的媒介是空气也可以是线缆一样，管道所占的空间既可以是内存也可以是磁盘。</p>
+<p><img src="/2020/06/02/%E8%BF%9B%E7%A8%8B/1.png" alt="进程间通信"></p>
+<p>　　例如在Linux下，我们通过Shell命令输入两个命令，中间通过符号“|”来创建两个命令之间的管道：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sort &lt; file1 | grep zou</span><br></pre></td></tr></table></figure>
+
+<p>​      上面一个命令表示：对file1的内容首先进行排序，排序完成后的结果将作为grep的输入，在结果里面找出所有包括字符串zou的文本行。也就是说，在两个任务“排序“（sort）和”查找”（grep）之间创建了一个管道，数据从sort流向了grep。</p>
+<p>2.<strong>Socket</strong></p>
+<p>   套接字是支持TCP/IP的网络通信的基本操作单元，可以看做是不同主机之间的进程进行双向通信的端点。</p>
+<p><img src="/2020/06/02/%E8%BF%9B%E7%A8%8B/2.jpg" alt="套接字"></p>
+<p>​        使用套接字进行通信需要双方均创建一个套接字，其中一方作为服务器方，另外一方作为客户方。服务器方必须首先创建一个服务区套接字，然后在该套接字上进行监听，等待远方的连接请求。客户方也要创建一个套接字，然后向服务器方发送连接请求。服务器套接字在受到连接请求之后，将在服务器方机器上新建一个客户套接字，与远方的客户方套接字形成点到点的通信通道。之后，客户方和服务器方便可以直接通过类似于send和recv的命令在这个创建的套接字管道上进行交流了。</p>
+<p>3.<strong>管道和socket的不足</strong>：</p>
+<p>​       （1）必须首先在通信的进程间建立连接（管道或套接字），这需要消耗系统资源；</p>
+<p>​       （2）通信是自愿的，而管道和套接字需要强制双方进行通信</p>
+<p>​      （3）由于建立连接需要消耗时间，一旦建立就应该尽可能多的通信，如果通信信息量很小，则就是“杀鸡用牛刀”了</p>
+<h4 id="进程电报与旗语：信号与信号量"><a href="#进程电报与旗语：信号与信号量" class="headerlink" title="进程电报与旗语：信号与信号量"></a>进程电报与旗语：信号与信号量</h4><p>1.<strong>信号</strong>:  </p>
+<p>​        类似于我们生活中的电报，如果你想给某人发一封电报，就拟好电文，然后将报文和收报人的信息都交给电报公司。电报公司则将电报发送到收报人所在地的邮局，并通知收报人来取电报。其中，<strong>发报文时无需收报人实现知道，也无需进行任何协调</strong>。如果对方选择不对信号做出响应，则将被OS终止运行。</p>
+<p>　　在计算机中，信号就是一个内核对象或者是一个内核数据结构。发送方将该数据结构的内容填好，并指明该信号的目标进程后，<strong>发出特定的软件中断</strong>（这就是一个发电报的操作）。OS接收到特定的中断请求后，知道是有进程要发送信号，于是到特定的内核数据结构里查找信号接收方，并进行通知。接到通知的进程则对信号进行相应处理。</p>
+<p>2.<strong>信号量</strong>：</p>
+<p>​        信号量来源于铁路的运行：在一条单轨铁路上，任何时候只允许有一列火车行驶在该铁路上，而管理这条铁路的系统就是信号量。任何一列火车必须等到表明该铁路可以行驶的信号后才能进入轨道。当列车进入后，需要将信号改为禁止状态进入来防止别的列车同时进入。而当列车驶出单轨后，则需要将信号变回允许进入状态，这很像以前的旗语。当然，通过联想到我们实际开发中经常用的锁，这就更容易理解了。</p>
+<p>   　在计算机中，信号量实际上就是一个简单整数。一个进程在信号变为0或1的情况下推进，并将信号变为1或0来防止别的进程同时推进。当该进程完成任务后，则将信号再改为0或1，从而允许其他进程执行。从而我们也可以看出，<strong>信号量已经不只是一种通信机制，更是一种同步机制</strong>。</p>
+<h4 id="进程拥抱：共享内存"><a href="#进程拥抱：共享内存" class="headerlink" title="进程拥抱：共享内存"></a>进程拥抱：共享内存</h4><p>​        前面通过对话、发电报、旗语已经满足了多种通信需要，但是当两个进程要共享大量数据时就没法十分满足需求。就如同两个坠入爱河的骚年，它们互相喜欢并想要在一起同居（共享大量数据），这时打电话、发电报、握手对话就显得不够了。这时候，它们需要的就是拥抱，只有紧紧拥抱才能尽可能地共享。</p>
+<p>​    1.<strong>共享内存</strong></p>
+<p><img src="/2020/06/02/%E8%BF%9B%E7%A8%8B/%E5%85%B1%E4%BA%AB%E5%86%85%E5%AD%98.jpg" alt="共享内存"></p>
+<p>​        进程的拥抱就是共享内存，<strong>两个进程共同拥有同一片内存</strong>。对于这片内存中的任何内容，二者均可以访问。要使用共享内存进行通信，进程1首先需要创建一片内存空间作为通信用，而其他进程2则将片内存映射到自己的（虚拟）地址空间。这样，进程1读写自己地址空间中对应共享内存的区域时，就是在和进程2进行通信。</p>
+<p>​    2.<strong>不足之处</strong></p>
+<p>​    （1）使用共享内存机制通信的两个进程必须在同一台物理机上；</p>
+<p>　（2）安全性脆弱，假如一个进程有病毒，会很容易传给另外一个进程</p>
+<h4 id="信件发送：消息队列"><a href="#信件发送：消息队列" class="headerlink" title="信件发送：消息队列"></a>信件发送：消息队列</h4><p>消息队列是一列具有头和尾的消息排列，新来的消息放在队列尾部，而读取消息则从队列头部开始，如下图所示：</p>
+<p><img src="/2020/06/02/%E8%BF%9B%E7%A8%8B/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97.jpg" alt="消息队列"></p>
+<p>这样看来，它和管道十分类似。但是两者还是有区别的</p>
+<p>（1）消息队列无固定的读写进程，任何进程都可以读写；而管道需要制定谁读谁写</p>
+<p>（2）消息队列可以同时支持多个进程，多个进程可以读写消息队列；即所谓的多对多，而管道是点对点</p>
+<p>（3）消息队列只在内存中实现，而管道还可以在磁盘上实现</p>
+<p>参考文献：</p>
+<p><a href="https://blog.csdn.net/lyn_00/article/details/84789508" target="_blank" rel="noopener">https://blog.csdn.net/lyn_00/article/details/84789508</a></p>
+<p><a href="https://www.cnblogs.com/edisonchou/p/5022508.html" target="_blank" rel="noopener">https://www.cnblogs.com/edisonchou/p/5022508.html</a></p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">操作系统</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2020/06/02/%E8%BF%9B%E7%A8%8B/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-java类加载机制" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -218,6 +955,17 @@
     <div class="article-info article-info-index">
       
       
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">JVM</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
       
 
       
@@ -493,6 +1241,17 @@
     <div class="article-info article-info-index">
       
       
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">JVM</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
       
 
       
@@ -783,6 +1542,22 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
             <input type="checkbox" q-on="click:toggleTag(e)" q-attr="checked:showTags">
           </label>
           <ul class="article-tag-list" q-show="showTags">
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">数据库</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">框架</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">JVM</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">操作系统</a>
+              </li>
             
             <div class="clearfix"></div>
           </ul>
