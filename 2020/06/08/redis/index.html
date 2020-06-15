@@ -6,26 +6,25 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>MySQL面试题 | Hexo</title>
+  <title>redis面试汇总 | Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="1.MySQL索引采用B+树的原因 ​    首先MySQL中的数据一般是放在磁盘中的，读取数据的时候肯定会有访问磁盘的操作。而磁盘的定位是非常消耗时间的，树的深度越深，对应的定位次数也就越多，而B-&#x2F;B+树因为“矮胖”,可以减少访问的层数，从而减少I&#x2F;O支出。而B+树在提高了磁盘IO性能的同时，也解决了B-树遍历元素效率低下的问题。（B+树只要遍历叶子节点就可以实现整棵树的遍历。在内存中直接遍历">
+  <meta name="description" content="1.redis支持的数据类型以及使用场景 支持多种类型的数据结构，如字符串（String），散列（Hash），列表（List），集合（Set），有序集合（Sorted Set或者是ZSet）与范围查询，Bitmaps，Hyperloglogs 和地理空间（Geospatial）索引半径查询。其中常见的数据结构类型有以下5种  String ​        这个其实没啥好说的，最常规的set&#x2F;ge">
 <meta property="og:type" content="article">
-<meta property="og:title" content="MySQL面试题">
-<meta property="og:url" content="http://yoursite.com/2020/06/04/MySQL/index.html">
+<meta property="og:title" content="redis面试汇总">
+<meta property="og:url" content="http://yoursite.com/2020/06/08/redis/index.html">
 <meta property="og:site_name" content="Hexo">
-<meta property="og:description" content="1.MySQL索引采用B+树的原因 ​    首先MySQL中的数据一般是放在磁盘中的，读取数据的时候肯定会有访问磁盘的操作。而磁盘的定位是非常消耗时间的，树的深度越深，对应的定位次数也就越多，而B-&#x2F;B+树因为“矮胖”,可以减少访问的层数，从而减少I&#x2F;O支出。而B+树在提高了磁盘IO性能的同时，也解决了B-树遍历元素效率低下的问题。（B+树只要遍历叶子节点就可以实现整棵树的遍历。在内存中直接遍历">
+<meta property="og:description" content="1.redis支持的数据类型以及使用场景 支持多种类型的数据结构，如字符串（String），散列（Hash），列表（List），集合（Set），有序集合（Sorted Set或者是ZSet）与范围查询，Bitmaps，Hyperloglogs 和地理空间（Geospatial）索引半径查询。其中常见的数据结构类型有以下5种  String ​        这个其实没啥好说的，最常规的set&#x2F;ge">
 <meta property="og:locale" content="en_US">
-<meta property="og:image" content="http://yoursite.com/2020/06/04/MySQL/1.png">
-<meta property="og:image" content="http://yoursite.com/2020/06/04/MySQL/2.png">
-<meta property="og:image" content="http://yoursite.com/2020/06/04/MySQL/%E4%B8%BB%E9%94%AE%E7%B4%A2%E5%BC%95%E5%92%8C%E9%9D%9E%E4%B8%BB%E9%94%AE%E7%B4%A2%E5%BC%95.png">
-<meta property="og:image" content="http://yoursite.com/2020/06/04/MySQL/4.png">
-<meta property="og:image" content="http://yoursite.com/2020/06/04/MySQL/5.png">
-<meta property="article:published_time" content="2020-06-04T07:55:51.000Z">
-<meta property="article:modified_time" content="2020-06-10T10:23:30.014Z">
+<meta property="og:image" content="http://yoursite.com/2020/06/08/redis/1.png">
+<meta property="og:image" content="http://yoursite.com/2020/06/08/redis/IO%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8.jpg">
+<meta property="og:image" content="http://yoursite.com/2020/06/08/redis/redis%E6%AD%A3%E5%B8%B8%E7%BC%93%E5%AD%98.jpg">
+<meta property="og:image" content="http://yoursite.com/2020/06/08/redis/%E7%BC%93%E5%AD%98%E9%9B%AA%E5%B4%A9.jpg">
+<meta property="article:published_time" content="2020-06-08T02:43:52.000Z">
+<meta property="article:modified_time" content="2020-06-08T07:32:37.933Z">
 <meta property="article:author" content="John Doe">
-<meta property="article:tag" content="数据库">
+<meta property="article:tag" content="redis">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://yoursite.com/2020/06/04/MySQL/1.png">
+<meta name="twitter:image" content="http://yoursite.com/2020/06/08/redis/1.png">
   
     <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
   
@@ -157,206 +156,139 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-MySQL" class="article article-type-post " itemscope itemprop="blogPost">
+            <article id="post-redis" class="article article-type-post " itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 class="article-title" itemprop="name">
-      MySQL面试题
+      redis面试汇总
     </h1>
   
 
         
-        <a href="/2020/06/04/MySQL/" class="archive-article-date">
-  	<time datetime="2020-06-04T07:55:51.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-06-04</time>
+        <a href="/2020/06/08/redis/" class="archive-article-date">
+  	<time datetime="2020-06-08T02:43:52.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-06-08</time>
 </a>
         
       </header>
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>1.MySQL索引采用B+树的原因</p>
-<p>​    首先MySQL中的数据一般是放在磁盘中的，读取数据的时候肯定会有访问磁盘的操作。而磁盘的定位是非常消耗时间的，树的深度越深，对应的定位次数也就越多，而B-/B+树因为“矮胖”,可以减少访问的层数，从而减少I/O支出。而B+树在提高了磁盘IO性能的同时，也解决了B-树遍历元素效率低下的问题。（B+树只要遍历叶子节点就可以实现整棵树的遍历。在内存中直接遍历是很快的，而B树的话需要跨层中序遍历，涉及到I/O操作，所以慢）</p>
-<p>2.MyISAM与InnoDB的区别</p>
-<p>常见的Mysql存储引擎就MyISAM，InnoDB,Memory,NDB。之前MyISAM是默认的数据引擎，但从MySQL-5.5.5版本开始，InnoDB成为默认的数据引擎。</p>
-<table>
-<thead>
-<tr>
-<th>名称</th>
-<th align="center">MyISAM</th>
-<th align="center">InnoDB</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>事务</td>
-<td align="center">不支持</td>
-<td align="center">支持事务</td>
-</tr>
-<tr>
-<td>外键</td>
-<td align="center">不支持</td>
-<td align="center">支持外键</td>
-</tr>
-<tr>
-<td>行表锁</td>
-<td align="center">表锁，即使操作一条记录也会锁住整个表，不适合高并发的操作</td>
-<td align="center">行锁，操作时只锁某一行，不对其他行有影响，适合高并发的操作</td>
-</tr>
-<tr>
-<td>缓存</td>
-<td align="center">只缓存索引，不缓存真实数据</td>
-<td align="center">不仅缓存索引还要缓存真实数据，对内存要求较高，而且内存大小对性能有决定性的影响</td>
-</tr>
-<tr>
-<td>聚集索引</td>
-<td align="center">是非聚集索引，数据文件是分离的，索引保存的是数据文件的指针，主键索引和辅助索引是独立的</td>
-<td align="center">是聚集索引，数据文件和索引绑在一起，必须要有主键，通过主键索引效率很高。辅助索引需要两次查询，先查询到主键，再通过主键查询到数据，如果主键太大，其他索引也会很大。</td>
-</tr>
-<tr>
-<td>全文索引</td>
-<td align="center">支持全文索引</td>
-<td align="center">不支持</td>
-</tr>
-<tr>
-<td>总行数</td>
-<td align="center">用一个变量保存表的总行数，查总行数速度很快</td>
-<td align="center">不保存表的总行数，执行 select count(*) from table 时需要全表扫描</td>
-</tr>
-<tr>
-<td>表空间</td>
-<td align="center">小</td>
-<td align="center">大</td>
-</tr>
-<tr>
-<td>关注点</td>
-<td align="center">性能</td>
-<td align="center">事务</td>
-</tr>
-</tbody></table>
-<p>总结：</p>
+        <p>1.<strong>redis支持的数据类型以及使用场景</strong></p>
+<p>支持多种类型的数据结构，如字符串（String），散列（Hash），列表（List），集合（Set），有序集合（Sorted Set或者是ZSet）与范围查询，Bitmaps，Hyperloglogs 和地理空间（Geospatial）索引半径查询。<strong>其中常见的数据结构类型有以下5种</strong></p>
 <ul>
-<li>InnoDB 存储引擎提供了具有提交、回滚、崩溃恢复能力的事务安全，与 MyISAM 比 InnoDB 写的效率差一些，并且会占用更多的磁盘空间以保留数据和索引</li>
-<li>MyISAM 不支持事务、也不支持外键，优势是访问的速度快。对事务的完整性没有要求、以 SELECT 和 INSERT 为主的应用可以使用这个存储引擎</li>
+<li><p>String</p>
+<p>​        这个其实没啥好说的，最常规的set/get操作，value可以是String也可以是数字。一般做一些复杂的计数功能的缓存。</p>
+</li>
+<li><p>hash</p>
+<p>​        这里value存放的是结构化的对象，比较方便的就是操作其中的某个字段。博主在做单点登录的时候，就是用这种数据结构存储用户信息，以cookieId作为key，设置30分钟为缓存过期时间，能很好的模拟出类似session的效果。</p>
+</li>
+<li><p>list</p>
+<p>​    使用list的数据结构，可以做简单的消息队列的功能。另外还有一个就是，可以利用Irange命令，做基于redis的分页功能，性能极佳，用户体验好。还有一个场景，很适合–取行情信息。就是个生产者和消费者的场景。list可以很好的完成排队，先进先出的原则。</p>
+</li>
+<li><p>set</p>
+<p>​    因为set堆放的是一堆不重复值的集合，所以可以做全局去重的功能。另外，就是利用交集，并集，差集等操作，可以计算出共同喜好，全部的喜好，自己独有的喜好等功能。</p>
+</li>
+<li><p>sorted set</p>
+<p>​    sorted set多了一个权重参数score,集合中的元素能够按score进行排列。可以做排行榜应用，取TOP N操作。</p>
+</li>
 </ul>
-<p>3.最左前缀原则</p>
-<p>​    例如对于下面这一张表</p>
-<p><img src="/2020/06/04/MySQL/1.png" alt="1"></p>
-<p>​    如果我们按照name字段建立索引的话，采用B+树的结构，大概的索引结构如下</p>
-<p><img src="/2020/06/04/MySQL/2.png" alt="2"></p>
-<p>​    如果我们要进行模糊查找，查找name 以“张”开头的所有人的ID，即 sql 语句为</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select ID from table where name like &#39;张%&#39;</span><br></pre></td></tr></table></figure>
-
-<p>​    由于在B+树结构的索引中，索引项是按照索引定义里面出现的字段顺序排序的，索引在查找的时候，可以快速定位到 ID 为 100的张一，然后直接向右遍历所有 “张” 开头的人，直到条件不满足为止。</p>
-<p>​    也就是说，我们找到第一个满足条件的人之后，直接向右遍历就可以了，由于索引是有序的，所有满足条件的人都会聚集在一起。</p>
-<p>​    而这种定位到最左边，然后向右遍历寻找，就是我们所说的<strong>最左前缀原则</strong>。</p>
-<p>4.主键索引和非主键索引的区别</p>
-<p><img src="/2020/06/04/MySQL/%E4%B8%BB%E9%94%AE%E7%B4%A2%E5%BC%95%E5%92%8C%E9%9D%9E%E4%B8%BB%E9%94%AE%E7%B4%A2%E5%BC%95.png" alt="主键索引和非主键索引"></p>
-<p>​    其中R代表一整行的值</p>
-<p>​    从图中不难看出，主键索引和非主键索引的区别是：非主键索引的叶子节点存放的是<strong>主键的值</strong>，而主键索引的叶子节点存放的是<strong>整行数据</strong>，其中非主键索引也被称为<strong>二级索引</strong>，而主键索引也被称为<strong>聚簇索引</strong>。</p>
-<p>​    根据这两种结构我们来进行下查询，看看他们在查询上有什么区别。</p>
-<p>​    1、如果查询语句是 select * from table where ID = 100,即主键查询的方式，则只需要搜索 ID 这棵 B+树。</p>
-<p>​    2、如果查询语句是 select * from table where k = 1，即非主键的查询方式，则先搜索k索引树，得到ID=100,再到ID索引树搜索一次，这个过程也被称为<strong>回表</strong>。</p>
-<p>5.为什么用B+树做索引而不用哈希表做索引</p>
-<p>​    （1）哈希表是把索引字段映射成对应的哈希码然后再存放在对应的位置，这样的话，如果我们要进行模糊查找的话，显然哈希表这种结构是不支持的，只能遍历这个表。而B+树则可以通过最左前缀原则快速找到对应的数据。</p>
-<p>​    （2）如果我们要进行范围查找，例如查找ID为100 ~ 400的人，哈希表同样不支持，只能遍历全表。</p>
-<p>​    （3）索引字段通过哈希映射成哈希码，如果很多字段都刚好映射到相同值的哈希码的话，那么形成的索引结构将会是一条很长的链表，这样的话，查找的时间就会大大增加。</p>
-<p>6.为什么采用主键自增的索引</p>
-<p>​        对于这颗主键索引的树</p>
-<p><img src="/2020/06/04/MySQL/4.png" alt="img"></p>
-<p>​        如果我们插入 ID = 650 的一行数据，那么直接在最右边插入就可以了</p>
-<p><img src="/2020/06/04/MySQL/5.png" alt="img"></p>
-<p>​        但是如果插入的是 ID = 350 的一行数据，由于 B+ 树是有序的，那么需要将下面的叶子节点进行移动，腾出位置来插入 ID = 350 的数据，这样就会比较消耗时间，如果刚好 R4 所在的数据页已经满了，需要进行<strong>页分裂</strong>操作，这样会更加糟糕。</p>
-<p>​        但是，如果我们的主键是自增的，每次插入的 ID 都会比前面的大，那么我们每次只需要在后面插入就行， 不需要移动位置、分裂等操作，这样可以提高性能。也就是为什么建议使用主键自增的索引。</p>
-<p>7.索引分类</p>
+<p>2.<strong>为什么使用redis</strong></p>
+<p>​        主要是从两个角度去考虑:性能和并发。当然，redis还具备可以做分布式锁等其他功能，但是如果只是为了分布式锁这些其他功能，完全还有其他中间件(如zookpeer等)代替，并不是非要使用redis。因此，这个问题主要从性能和并发两个角度去答。</p>
+<p>​        （1）性能</p>
+<p>​            如下图所示，我们在碰到需要执行耗时特别久，且结果不频繁变动的SQL，就特别适合将运行结果放入缓存。这样，后面的请求就    去缓存中读取，使得请求能够迅速响应。</p>
+<p><img src="/2020/06/08/redis/1.png" alt="1"></p>
+<p>​        （2）并发</p>
+<p>​            在大并发的情况下，所有的请求直接访问数据库，数据库会出现连接异常。这个时候，就需要使用redis做一个缓冲操作，让请求    先访问到redis，而不是直接访问数据库。</p>
+<p>3.<strong>使用redis存在什么问题</strong></p>
+<p>​    （1）缓存和数据库双写一致性问题</p>
+<p>​    （2）缓存穿透，缓存雪崩和缓存击穿问题</p>
+<p>​    （3）缓存的并发竞争问题</p>
+<p>4.<strong>单线程的redis速度为什么那么快</strong></p>
+<p>总结了主要以下5点，加粗的影响最大：</p>
+<p>（1）<strong>纯内存操作</strong>，读写速度非常快</p>
+<p>（2）<strong>单线程操作</strong>，避免了频繁的线程切换的资源消耗，并且不存在资源共享与竞争，不需要考虑锁</p>
+<p>（3）数据存储进行了压缩优化</p>
+<p>（4）使用了高性能数据结构，如Hash,跳表等</p>
+<p>（5）<strong>采用了非阻塞I/O多路复用机制</strong></p>
+<p>​        多路I/O复用模型是利用 select、poll、epoll 可以同时监察多个流的 I/O 事件的能力，在空闲的时候，会把当前线程阻塞掉，当有一个或多个流有 I/O 事件时，就从阻塞态中唤醒，于是程序就会轮询一遍所有的流（epoll 是只轮询那些真正发出了事件的流），并且只依次顺序的处理就绪的流，这种做法就避免了大量的无用操作。</p>
+<p>​        这里“多路”指的是多个网络连接，“复用”指的是复用同一个线程。**采用多路 I/O 复用技术可以让单个线程高效的处理多个连接请求（尽量减少网络 IO 的时间消耗），且 Redis 在内存中操作数据的速度非常快，也就是说内存内的操作不会成为影响Redis性能的瓶颈，主要由以上几点造就了 Redis 具有很高的吞吐量。</p>
+<p><img src="/2020/06/08/redis/IO%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8.jpg" alt="IO多路复用"></p>
+<p>​        参照上图，简单来说，就是。我们的redis-client在操作的时候，会产生具有不同事件类型的socket。在服务端，有一段I/0多路复用程序，将其置入队列之中。然后，文件事件分派器，依次去队列中取，转发到不同的事件处理器中</p>
+<p>5.<strong>redis的过期策略以及内存淘汰机制</strong></p>
+<p>redis过期键的删除策略有三种：</p>
+<p>​    （1）定时删除：在设置键的过期时间的同时，创建一个定时器，达到过期时间，执行键的删除操作</p>
+<p>​    （2）惰性删除：不主动删除过期键，从键空间中获取键时，都检查取得的键是否过期，过期则删除；没过期则返回</p>
+<p>​    （3）定期删除：每隔一段时间对数据库进行一次检查，删除里面的过期键。删除多少过期键、检查多少个数据库，由算法决定。</p>
+<p>redis采用的是<strong>定期删除+惰性删除</strong>策略。</p>
+<p>那为什么不用定时删除策略？</p>
+<p>​        定时删除，用一个定时器俩负责监视key，过期则自动删除。虽然内存及时释放，但是十分消耗CPU资源。在大并发请求下，CPU要将时间应用在处理请求，而不是删除key，因此没有采用这一策略。</p>
+<p>定期删除+惰性删除是如何工作的呢?</p>
+<p>​        定期删除，redis默认每个100ms检查，是否有过期的key,有过期key则删除。需要说明的是，redis不是每个100ms将所有的key检查一次，而是<strong>随机抽取</strong>进行检查(如果每隔100ms,全部key进行检查，redis岂不是卡死)。因此，如果只采用定期删除策略，会导致很多key到时间没有删除。<br>​        于是，惰性删除派上用场。也就是说在你获取某个key的时候，redis会检查一下，这个key如果设置了过期时间那么是否过期了？如果过期了此时就会删除。</p>
+<p>采用定期删除+惰性删除就没其他问题了么?</p>
+<p>​        不是的，如果定期删除没删除key。然后你也没即时去请求key，也就是说惰性删除也没生效。这样，redis的内存会越来越高。那么就应该采用内存淘汰机制。</p>
+<p>内存淘汰机制总共有6种：</p>
+<p>​    （1）noenviction：redis 的默认策略，不回收数据，当达到最大内存时，新增数据返回 error</p>
+<p>​    （2）allkeys-lru：当内存不足以容纳新写入数据时，在键空间中，移除最近最少使用的key。推荐使用，目前项目在用这种。</p>
+<p>​    （3）allkeys-random：当内存不足以容纳新写入数据时，在键空间中，随机移除某个key。应该也没人用吧，你不删最少使用Key,去随机删。</p>
+<p>​    （4）volatile-lru：当内存不足以容纳新写入数据时，在设置了过期时间的键空间中，移除最近最少使用的key。这种情况一般是把redis既当缓存，又做持久化存储的时候才用。不推荐</p>
+<p>​    （5）volatile-random：当内存不足以容纳新写入数据时，在设置了过期时间的键空间中，随机移除某个key。依然不推荐</p>
+<p>​    （6）volatile-ttl：当内存不足以容纳新写入数据时，在设置了过期时间的键空间中，有更早过期时间的key优先移除。不推荐</p>
+<p>注：</p>
 <ul>
-<li><p><strong>普通索引</strong></p>
-</li>
-<li><p><strong>唯一索引</strong>：唯一索引不允许两行具有相同的索引值，索引值可以为nul</p>
-</li>
-<li><p><strong>主键索引</strong>：为表定义一个主键将自动创建主键索引，主键索引是唯一索引的特殊类型。主键索引要求主键中的每个值是唯一的，并且不能为空</p>
-</li>
-<li><p><strong>聚集索引</strong>(Clustered)：表中各行数据的物理存储顺序与键值的逻辑（索引）顺序相同，每个表只能有一个</p>
-</li>
-<li><p><strong>非聚集索引</strong>(Non-clustered)：非聚集索引指定表的逻辑顺序。数据存储在一个位置，索引存储在另一个位置，索引中包含指向数据存储位置的指针。可以有多个，小于249个。</p>
-<p>​        比如字典中，用‘拼音’查汉字，就是聚集索引。因为正文中字都是按照拼音排序的。而用‘偏旁部首’查汉字，就是非聚集索引，因为正文中的字并不是按照偏旁部首排序的，我们通过检字表得到正文中的字在索引中的映射，然后通过映射找到所需要的字。</p>
-</li>
+<li>volatile 是对已设置过期时间的数据集淘汰数据</li>
+<li>allkeys 是从全部数据集淘汰数据</li>
+<li>lru 是 Least Recently Used 的缩写，即最近最少使用</li>
+<li>ttl 指令可以获取键到期的剩余时间(秒)，这里的意思是淘汰最早会过期的数据</li>
+<li>如果没有设置 expire 的key, 不满足先决条件(prerequisites); 那么 volatile-lru, volatile-random 和 volatile-ttl 策略的行为, 和 noeviction(不删除) 基本上一致。</li>
 </ul>
-<p>8.事务的特性</p>
-<p>​    事务有四大特性——ACID</p>
-<p><strong>原子性</strong>（Atomicity）：意思就是说一个事务应当作为一个不可分割的最小单位，整个事务的操作要么全部执行成功要么全部执行失败（回滚）,像原子一样不可分割。</p>
-<p><strong>一致性</strong>（Consistency）:事务总是从一个一致性的状态跳到另外一个一致性的状态，也就是说一个事务执行之前和执行之后都必须处于一致性状态。拿转账来说，假设用户A和用户B两者的钱加起来一共是5000，那么不管A和B之间如何转账，转几次账，事务结束后两个用户的钱相加起来应该还得是5000，这就是事务的一致性。</p>
-<p><strong>隔离性</strong>（Isolation）:通常来说，一个事务的操作对于其他的事务是不可见的，也就是一般而言事务都是独立的。这具体和数据库的隔离级别有关。</p>
-<p><strong>持久性</strong>（Durability）：持久性是指一个事务一旦被提交了，那么对数据库中的数据的改变就是永久性的，即便是在数据库系统遇到故障的情况下也不会丢失提交事务的操作。</p>
-<p>​    </p>
-<p>9.MySQL的事务隔离级别和对应的问题</p>
-<p>数据库事务对应4个隔离级别</p>
-<p>（1）Read uncommitted（读取未提交的内容）【级别最低，什么都避免不了】</p>
-<p>​        最低的隔离级别，允许读取尚未提交的数据变更，可能会导致脏读、幻读或不可重复读。</p>
-<p>（2）Read committed（读取提交的内容）【可避免脏读】</p>
-<p>​        这是大多数数据库系统的默认隔离级别（但不是MySQL默认的），允许读取并发事务已经提交的数据，可以阻止脏读，但是幻读或不可重复读仍有可能发生。</p>
-<p>（3）Repeatable read（可重读）【可避免脏读，不可重复读】</p>
-<p>​        这是<strong>MySQL的默认事务隔离级别</strong>，对同一字段的多次读取结果都是一致的，除非数据是被本身事务自己所修改，可以阻止脏读和不可重复读，但幻读仍有可能发生。</p>
-<p>（4）Serializable（可串行化）【可避免脏读，不可重复读，幻读】</p>
-<p>​        这是数据库的最高隔离级别，它通过强制事务排序，使之不可能相互冲突，从而解决幻读问题。简而言之，就是在每个读的数据行上加上共享锁。在这个级别，可能会导致大量的超时现象和锁竞争。</p>
-<p><strong>并发事务处理带来的问题</strong></p>
-<p>​        脏读(Dirty Reads)：事务A读取了事务B更新的数据，然后B回滚操作，那么A读取到的数据是脏数据</p>
-<p>​        不可重复读（Non-Repeatable Reads)：事务 A 多次读取同一数据，事务B在事务A多次读取的过程中，对数据作了更新并提交，导致事务A多次读取同一数据时，结果不一致。</p>
-<p>​        幻读（Phantom Reads)：幻读与不可重复读类似。它发生在一个事务A读取了几行数据，接着另一个并发事务B插入了一些数据时。在随后的查询中，事务A就会发现多了一些原本不存在的记录，就好像发生了幻觉一样，所以称为幻读。</p>
-<p><strong>幻读和不可重复读的区别：</strong></p>
+<p>6.<strong>redis和数据库双写一致性问题</strong></p>
+<p>分析:一致性问题是分布式常见问题，还可以再分为最终一致性和强一致性。数据库和缓存双写，就必然会存在不一致的问题。答这个问题，先明白一个前提。就是如果对数据有强一致性要求，不能放缓存。我们所做的一切，只能保证最终一致性。另外，我们所做的方案其实从根本上来说，只能说降低不一致发生的概率，无法完全避免。因此，有强一致性要求的数据，不能放缓存。</p>
+<p>首先，采取正确更新策略，先更新数据库，再删缓存。其次，因为可能存在删除缓存失败的问题，提供一个补偿措施即可，例如利用消息队列。</p>
+<p>7.<strong>请讲下redis的缓存穿透，缓存雪崩和缓存击穿</strong></p>
+<p>（1）缓存穿透</p>
+<p>概念：用户想要查询一个数据，发现redis内存数据库没有，也就是缓存没有命中，于是向持久层数据库查询，发现也没有，于是本次查询失败。当用户很多的时候，缓存都没有命中，于是都去请求了持久层数据库。这会给持久层数据库造成很大的压力，这时候就相当于出现了缓存穿透。</p>
+<p>简单来说就是黑客故意去请求缓存中不存在的数据，导致所有的请求都怼到数据库上，从而数据库连接异常。</p>
+<p>解决方案：</p>
 <ul>
-<li><p><strong>不可重复读的重点是修改</strong>：在同一事务中，同样的条件，第一次读的数据和第二次读的数据不一样。（因为中间有其他事务提交了修改）</p>
+<li><p>利用互斥锁，缓存失效的时候，先去获得锁，得到锁了，再去请求数据库。没得到锁，则休眠一段时间重试。</p>
 </li>
-<li><p><strong>幻读的重点在于新增或者删除</strong>：在同一事务中，同样的条件,，第一次和第二次读出来的记录数不一样。（因为中间有其他事务提交了插入/删除）</p>
+<li><p>最常用的是提供一个能迅速判断请求是否有效地拦截机制，比如，利用<strong>布隆过滤器</strong>，内部维护一系列合法有效的key。迅速判断出，请求所携带的Key是否合法有效。如果不合法，则直接返回。</p>
+</li>
+<li><p>简单粗暴的方法：如果一个查询返回的数据为空（不管是数据不存在，还是系统故障），我们仍然把这个空结果进行缓存，但它的过期时间会很短，最长不超过五分钟。</p>
 </li>
 </ul>
-<p><strong>并发事务处理带来的问题的解决办法：</strong></p>
-<p>“脏读” 、 “不可重复读”和“幻读” ，其实都是数据库读一致性问题，必须由数据库提供一定的事务隔离机制来解决：</p>
+<p>（2）缓存雪崩</p>
+<p>概念：即缓存同一时间大面积的失效，这个时候又来了一波请求，结果请求都怼到数据库上，从而导致数据库连接异常。</p>
+<p>缓存正常从Redis中获取，示意图如下：</p>
+<p><img src="/2020/06/08/redis/redis%E6%AD%A3%E5%B8%B8%E7%BC%93%E5%AD%98.jpg" alt="redis正常缓存"></p>
+<p>redis缓存雪崩瞬间示意图如下：</p>
+<p><img src="/2020/06/08/redis/%E7%BC%93%E5%AD%98%E9%9B%AA%E5%B4%A9.jpg" alt="缓存雪崩"></p>
+<p>解决方案：</p>
 <ul>
-<li><p>一种是加锁：在读取数据前，对其加锁，阻止其他事务对数据进行修改。</p>
-</li>
-<li><p>另一种是数据多版本并发控制（MultiVersion Concurrency Control，简称 <strong>MVCC</strong>），也称为多版本数据库：不用加任何锁， 通过一定机制生成一个数据请求时间点的一致性数据快照 （Snapshot)， 并用这个快照来提供一定级别 （语句级或事务级） 的一致性读取。从用户的角度来看，好象是数据库可以提供同一数据的多个版本。 MVCC只在 Read Committed 和 Repeatable Read两个隔离级别下工作。</p>
-<p>(tips:有关MVCC的详情可看<a href="https://blog.csdn.net/Waves___/article/details/105295060" target="_blank" rel="noopener">https://blog.csdn.net/Waves___/article/details/105295060</a>)</p>
-</li>
+<li>大多数系统设计者考虑用加锁或者队列的方式保证来保证不会有大量的线程对数据库一次性进行读写，从而避免失效时大量的并发请求落到底层存储系统上。但是系统的吞吐量会下降</li>
+<li>还有一个简单方案就时讲缓存失效时间分散开，比如我们可以在原有的失效时间基础上增加一个随机值，比如1-5分钟随机，这样每一个缓存的过期时间的重复率就会降低，就很难引发集体失效的事件。</li>
 </ul>
-<p>10.SQL的优化</p>
-<p>（1）尽量避免全表扫描，首先考虑在where以及order by涉及的列上建立索引，这样能过滤好多数据。</p>
-<p>（2）避免在where子句中对字段进行null值判断，否则会导致引擎放弃索引而进行全表扫描</p>
-<p>（3）避免在where子句中使用！=或者&lt; &gt;操作符，否则会导致引擎放弃索引而进行全表扫描</p>
-<p>（4）避免在where子句中使用or来连接条件，若果一个字段有索引，一个字段没有索引，否则会导致引擎放弃使用索引而进行全表扫描</p>
-<p>（5）like模糊全匹配，in 和 not in都要慎用，会导致全表扫描</p>
-<p>11.三个范式</p>
-<blockquote>
-<p>第一范式（1NF）：数据库表中的字段都是单一属性的，不可再分。这个单一属性由基本类型构成，包括整型、实数、字符型、逻辑型、日期型等。</p>
-<p>第二范式（2NF）：数据库表中不存在非关键字段对任一候选关键字段的部分函数依赖（部分函数依赖指的是存在组合关键字中的某些字段决定非关键字段的情况），也即所有非关键字段都完全依赖于任意一组候选关键字。</p>
-<p>第三范式（3NF）：在第二范式的基础上，数据表中如果不存在非关键字段对任一候选关键字段的传递函数依赖则符合第三范式。所谓传递函数依赖，指的是如 果存在”A → B → C”的决定关系，则C传递函数依赖于A。因此，满足第三范式的数据库表应该不存在如下依赖关系：关键字段 → 非关键字段 x → 非关键字段y</p>
-</blockquote>
-<p>内容解读：</p>
+<p>（3）缓存击穿</p>
+<p>概念：指一个key值非常热点，在不停的扛着大并发，大并发集中对这一个点进行访问，当这个key在失效的瞬间，持续的大并发就穿破缓存，直接请求数据库，就像在一个屏障上凿开了一个洞。</p>
+<p>解决方案：</p>
 <ul>
-<li><p>首先要明确的是：<strong>满足着第三范式，那么就一定满足第二范式、满足着第二范式就一定满足第一范式</strong></p>
-</li>
-<li><p>第一范式：<strong>字段是最小的的单元不可再分</strong></p>
-</li>
-<li><ul>
-<li>学生信息组成学生信息表，有年龄、性别、学号等信息组成。这些字段都不可再分，所以它是满足第一范式的</li>
+<li>利用互斥锁，缓存失效的时候，先去获得锁，得到锁了，再去请求数据库。其他没得到锁，则休眠一段时间重试，再次得到锁后已经有缓存了就直接走缓存</li>
 </ul>
-</li>
-<li><p>第二范式：满足第一范式,<strong>表中的字段必须完全依赖于全部主键而非部分主键。</strong></p>
-</li>
-<li><ul>
-<li><strong>其他字段组成的这行记录和主键表示的是同一个东西，而主键是唯一的，它们只需要依赖于主键，也就成了唯一的</strong></li>
-<li>学号为1024的同学，姓名为Timi，年龄是24岁。姓名和年龄字段都依赖着学号主键。</li>
-</ul>
-</li>
-<li><p>第三范式：满足第二范式，<strong>非主键外的所有字段必须互不依赖</strong></p>
-</li>
-<li><ul>
-<li><strong>就是数据只在一个地方存储，不重复出现在多张表中，可以认为就是消除传递依赖</strong></li>
-<li>比如，我们大学分了很多系（中文系、英语系、计算机系……），这个系别管理表信息有以下字段组成：系编号，系主任，系简介，系架构。那我们能不能在学生信息表添加系编号，系主任，系简介，系架构字段呢？不行的，因为这样就冗余了，非主键外的字段形成了依赖关系(依赖到学生信息表了)！正确的做法是：学生表就只能增加一个系编号字段。</li>
-</ul>
-</li>
-</ul>
+<p>8.<strong>redis持久化机制有哪些？</strong></p>
+<p>Redis 提供两种持久化机制： RDB 和 AOF</p>
+<p>RDB（Redis DataBase）：</p>
+<p>​        指用数据集快照的方式半持久化模式，记录 redis 数据库的所有键值对，在某个时间点将数据写入一个临时文件，持久化结束后，用这个临时文件替换上次持久化的文件，可恢复数据。</p>
+<p>AOF（Append-only file）：</p>
+<p>​        指所有的命令行记录以 redis 命令请求协议的格式完全持久化存储，保存为 aof 文件</p>
+<p>具体可以看我另外一篇博客</p>
+<p>[]: <a href="http://baidu.com" target="_blank" rel="noopener">http://baidu.com</a>    “redis的持久化策略”</p>
+<p>参考相关链接：</p>
+<p><a href="https://blog.csdn.net/hukaijun/article/details/81010279" target="_blank" rel="noopener">https://blog.csdn.net/hukaijun/article/details/81010279</a></p>
+<p><a href="https://www.cnblogs.com/midoujava/p/11277096.html" target="_blank" rel="noopener">https://www.cnblogs.com/midoujava/p/11277096.html</a></p>
+<p><a href="https://zhuanlan.zhihu.com/p/34438275" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/34438275</a></p>
 
       
 
@@ -391,7 +323,7 @@
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">数据库</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">redis</a>
         		</li>
       		
 		</ul>
@@ -447,7 +379,7 @@
     <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2020/06/04/MySQL/" alt="微信分享二维码">
+      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2020/06/08/redis/" alt="微信分享二维码">
     </div>
 </div>
 
@@ -461,18 +393,18 @@
   
 <nav id="article-nav">
   
-    <a href="/2020/06/08/redis/" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/2020/06/10/Redis%E6%8C%81%E4%B9%85%E5%8C%96%E7%AD%96%E7%95%A5/" id="article-nav-newer" class="article-nav-link-wrap">
       <i class="icon-circle-left"></i>
       <div class="article-nav-title">
         
-          redis面试汇总
+          Redis持久化策略
         
       </div>
     </a>
   
   
-    <a href="/2020/06/03/Spring/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">Spring</div>
+    <a href="/2020/06/04/MySQL/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">MySQL面试题</div>
       <i class="icon-circle-right"></i>
     </a>
   
