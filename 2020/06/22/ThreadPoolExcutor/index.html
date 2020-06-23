@@ -6,15 +6,22 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>Tag: 操作系统 | Hexo</title>
+  <title>ThreadPoolExcutor | Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="Hexo">
-<meta property="og:url" content="http://yoursite.com/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/index.html">
+  <meta name="description" content="背景​        线程池是为了避免线程频繁的创建和销毁带来的性能消耗，而建立的一种池化技术，它是把已创建的线程放入“池”中，当有任务来临时就可以重用已有的线程，无需等待创建的过程，这样就可以有效提高程序的响应速度。而说到线程池的话一定离不开 ThreadPoolExecutor ，在阿里巴巴的《Java 开发手册》中是这样规定线程池的：    ​      线程池不允许使用 Executor">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ThreadPoolExcutor">
+<meta property="og:url" content="http://yoursite.com/2020/06/22/ThreadPoolExcutor/index.html">
 <meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="背景​        线程池是为了避免线程频繁的创建和销毁带来的性能消耗，而建立的一种池化技术，它是把已创建的线程放入“池”中，当有任务来临时就可以重用已有的线程，无需等待创建的过程，这样就可以有效提高程序的响应速度。而说到线程池的话一定离不开 ThreadPoolExecutor ，在阿里巴巴的《Java 开发手册》中是这样规定线程池的：    ​      线程池不允许使用 Executor">
 <meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://yoursite.com/2020/06/22/ThreadPoolExcutor/%E7%BA%BF%E7%A8%8B%E7%9A%84%E6%B5%81%E7%A8%8B%E5%9B%BE.png">
+<meta property="article:published_time" content="2020-06-22T07:53:10.000Z">
+<meta property="article:modified_time" content="2020-06-22T13:59:18.477Z">
 <meta property="article:author" content="John Doe">
+<meta property="article:tag" content="高并发">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/2020/06/22/ThreadPoolExcutor/%E7%BA%BF%E7%A8%8B%E7%9A%84%E6%B5%81%E7%A8%8B%E5%9B%BE.png">
   
     <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
   
@@ -146,60 +153,209 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-  
+            <article id="post-ThreadPoolExcutor" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
     
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2020" class="archive-year">2020</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2020/06/02/%E8%BF%9B%E7%A8%8B/" class="archive-article-date">
-  	<time datetime="2020-06-02T08:58:09.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-06-02</time>
-</a>
-        </div>
-    	 
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/06/02/%E8%BF%9B%E7%A8%8B/">进程</a>
+    <h1 class="article-title" itemprop="name">
+      ThreadPoolExcutor
     </h1>
   
 
-        <div class="article-info info-on-right">
-          
+        
+        <a href="/2020/06/22/ThreadPoolExcutor/" class="archive-article-date">
+  	<time datetime="2020-06-22T07:53:10.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-06-22</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <ol>
+<li><h5 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h5><p>​        线程池是为了避免线程频繁的创建和销毁带来的性能消耗，而建立的一种池化技术，它是把已创建的线程放入“池”中，当有任务来临时就可以重用已有的线程，无需等待创建的过程，这样就可以有效提高程序的响应速度。而说到线程池的话一定离不开 ThreadPoolExecutor ，在阿里巴巴的《Java 开发手册》中是这样规定线程池的：</p>
+</li>
+</ol>
+<blockquote>
+<p>​      线程池不允许使用 Executors 去创建，而是通过 ThreadPoolExecutor 的方式，这样的处理方式让写的读者更加明确线程池的运行规则，规避资源耗尽的风险。</p>
+</blockquote>
+<h5 id="2-线程池的创建"><a href="#2-线程池的创建" class="headerlink" title="2.线程池的创建"></a>2.线程池的创建</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> ThreadPoolExecutor THREADPOOL =  <span class="keyword">new</span> ThreadPoolExecutor(<span class="keyword">int</span> corePoolSize, <span class="keyword">int</span> maximumPoolSize,<span class="keyword">long</span> keepAliveTime, TimeUnit unit,BlockingQueue&lt;Runnable&gt; workQueue,RejectedExecutionHandler handler)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>corePoolSize： 核心容量，创建线程池的时候，默认有多少线程。也是线程池保持的最少线程数。</li>
+<li>maximumPoolSize：   线程池维护线程的最大数量     </li>
+<li>keepAliveTime：     线程池维护线程所允许的空闲时间 （生命周期），0为永久。当线程空闲多久后，自动回收  </li>
+<li>unit：               线程池维护线程所允许的空闲时间的单位    </li>
+<li>workQueue：          线程池所使用的缓冲队列    </li>
+<li>handler：            线程池对拒绝任务的处理策略</li>
+</ul>
+<h5 id="3-线程池的执行流程"><a href="#3-线程池的执行流程" class="headerlink" title="3.线程池的执行流程"></a>3.线程池的执行流程</h5><p>线程池任务执行的主要流程如下所示：</p>
+<p><img src="/2020/06/22/ThreadPoolExcutor/%E7%BA%BF%E7%A8%8B%E7%9A%84%E6%B5%81%E7%A8%8B%E5%9B%BE.png" alt="线程的流程图"></p>
+<p>​        任务进来时，首先执行判断，判断核心线程是否处于空闲状态，如果是，核心线程就先就执行任务，如果核心线程已满，则判断任务队列是否有地方存放该任务，若果有，就将任务保存在任务队列中，等待执行，如果满了，在判断最大可容纳的线程数，如果没有超出这个数量，就开创非核心线程执行任务，如果超出了，就调用handler实现拒绝策略。</p>
+<h5 id="4-线程池的拒绝策略"><a href="#4-线程池的拒绝策略" class="headerlink" title="4.线程池的拒绝策略"></a>4.线程池的拒绝策略</h5><p>java自带的拒绝策略有4种：</p>
+<ul>
+<li>AbortPolicy，终止策略，线程池会抛出异常并终止执行，它是默认的拒绝策略；</li>
+<li>CallerRunsPolicy，把任务交给当前线程来执行；</li>
+<li>DiscardPolicy，忽略此任务（最新的任务）；</li>
+<li>DiscardOldestPolicy，忽略最早的任务（最先加入队列的任务）。</li>
+</ul>
+<p>例如，我们来演示一个AbortPolicy的拒绝策略，代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">ThreadPoolExecutor executor = <span class="keyword">new</span> ThreadPoolExecutor(<span class="number">1</span>, <span class="number">3</span>, <span class="number">10</span>,</span><br><span class="line">        TimeUnit.SECONDS, <span class="keyword">new</span> LinkedBlockingQueue&lt;&gt;(<span class="number">2</span>),</span><br><span class="line">        <span class="keyword">new</span> ThreadPoolExecutor.AbortPolicy()); <span class="comment">// 添加 AbortPolicy 拒绝策略</span></span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">6</span>; i++) &#123;</span><br><span class="line">    executor.execute(() -&gt; &#123;</span><br><span class="line">        System.out.println(Thread.currentThread().getName());</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>以上程序的执行结果：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">pool-<span class="number">1</span>-thread-<span class="number">1</span></span><br><span class="line">pool-<span class="number">1</span>-thread-<span class="number">1</span></span><br><span class="line">pool-<span class="number">1</span>-thread-<span class="number">1</span></span><br><span class="line">pool-<span class="number">1</span>-thread-<span class="number">3</span></span><br><span class="line">pool-<span class="number">1</span>-thread-<span class="number">2</span></span><br><span class="line">Exception in thread <span class="string">"main"</span> java.util.concurrent.RejectedExecutionException: Task com.lagou.interview.ThreadPoolExample$$Lambda$<span class="number">1</span>/<span class="number">1096979270</span>@<span class="number">448139f</span>0 rejected from java.util.concurrent.ThreadPoolExecutor@<span class="number">7</span>cca494b[Running, pool size = <span class="number">3</span>, active threads = <span class="number">3</span>, queued tasks = <span class="number">2</span>, completed tasks = <span class="number">0</span>]</span><br><span class="line"> at java.util.concurrent.ThreadPoolExecutor$AbortPolicy.rejectedExecution(ThreadPoolExecutor.java:<span class="number">2063</span>)</span><br><span class="line"> at java.util.concurrent.ThreadPoolExecutor.reject(ThreadPoolExecutor.java:<span class="number">830</span>)</span><br><span class="line"> at java.util.concurrent.ThreadPoolExecutor.execute(ThreadPoolExecutor.java:<span class="number">1379</span>)</span><br><span class="line"> at com.lagou.interview.ThreadPoolExample.rejected(ThreadPoolExample.java:<span class="number">35</span>)</span><br><span class="line"> at com.lagou.interview.ThreadPoolExample.main(ThreadPoolExample.java:<span class="number">26</span>)</span><br></pre></td></tr></table></figure>
+
+<p>可以看出当第 6 个任务来的时候，线程池则执行了 AbortPolicy  拒绝策略，抛出了异常。因为队列最多存储 2 个任务，最大可以创建 3 个线程来执行任务（2+3=5），所以当第 6 个任务来的时候，此线程池就“忙”不过来了。</p>
+
+      
+
+      
+        <div class="page-reward">
+          <a href="javascript:;" class="page-reward-btn tooltip-top">
+            <div class="tooltip tooltip-east">
+            <span class="tooltip-item">
+              赏
+            </span>
+            <span class="tooltip-content">
+              <span class="tooltip-text">
+                <span class="tooltip-inner">
+                  <p class="reward-p"><i class="icon icon-quo-left"></i>谢谢你请我吃糖果<i class="icon icon-quo-right"></i></p>
+                  <div class="reward-box">
+                    
+                    
+                  </div>
+                </span>
+              </span>
+            </span>
+          </div>
+          </a>
+        </div>
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">操作系统</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">高并发</a>
         		</li>
       		
 		</ul>
 	</div>
 
-          
+      
 
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2020/06/22/ThreadPoolExcutor/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
+  
+<nav id="article-nav">
+  
+    <a href="/2020/06/23/synchronized%E5%92%8CReentrantLock/" id="article-nav-newer" class="article-nav-link-wrap">
+      <i class="icon-circle-left"></i>
+      <div class="article-nav-title">
+        
+          synchronized,ReentrantLock和各类锁
+        
+      </div>
+    </a>
   
   
-    </div></section>
+    <a href="/2020/06/22/%E9%94%81%E7%9A%84%E5%BA%95%E5%B1%82%E5%AE%9E%E7%8E%B0/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">锁的底层实现</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+  
+  
   
 
-    
+  
+
+  
+
+  
 
 
           </div>
@@ -222,9 +378,9 @@
 	var yiliaConfig = {
 		mathjax: true,
 		isHome: false,
-		isPost: false,
+		isPost: true,
 		isArchive: false,
-		isTag: true,
+		isTag: false,
 		isCategory: false,
 		open_in_new: false,
 		toc_hide_index: true,

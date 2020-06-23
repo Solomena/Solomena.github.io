@@ -6,15 +6,23 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>Tag: 操作系统 | Hexo</title>
+  <title>锁的底层实现 | Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="Hexo">
-<meta property="og:url" content="http://yoursite.com/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/index.html">
+  <meta name="description" content="​        java虚拟机中的同步是基于Monitor对象实现。每个对象都会对应一个monitor对象。具体简图如下所示：  对象头：主要包括俩部分——Mark Word 和 类型指针。  Mark Word用于存储对象自身的运行时数据，如哈希码（HashCode）、GC分代年龄、锁状态标志、线程持有的锁、偏向线程ID、偏向时间戳等等，占用内存大小与虚拟机位长一致。 类型指针指向对象的类元数">
+<meta property="og:type" content="article">
+<meta property="og:title" content="锁的底层实现">
+<meta property="og:url" content="http://yoursite.com/2020/06/22/%E9%94%81%E7%9A%84%E5%BA%95%E5%B1%82%E5%AE%9E%E7%8E%B0/index.html">
 <meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="​        java虚拟机中的同步是基于Monitor对象实现。每个对象都会对应一个monitor对象。具体简图如下所示：  对象头：主要包括俩部分——Mark Word 和 类型指针。  Mark Word用于存储对象自身的运行时数据，如哈希码（HashCode）、GC分代年龄、锁状态标志、线程持有的锁、偏向线程ID、偏向时间戳等等，占用内存大小与虚拟机位长一致。 类型指针指向对象的类元数">
 <meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://yoursite.com/2020/06/22/%E9%94%81%E7%9A%84%E5%BA%95%E5%B1%82%E5%AE%9E%E7%8E%B0/monitor%E5%AF%B9%E8%B1%A1.png">
+<meta property="og:image" content="http://yoursite.com/2020/06/22/%E9%94%81%E7%9A%84%E5%BA%95%E5%B1%82%E5%AE%9E%E7%8E%B0/%E7%BA%BF%E7%A8%8B%E7%8A%B6%E6%80%81%E5%9B%BE.png">
+<meta property="article:published_time" content="2020-06-22T01:36:01.000Z">
+<meta property="article:modified_time" content="2020-06-22T02:39:07.062Z">
 <meta property="article:author" content="John Doe">
+<meta property="article:tag" content="高并发">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/2020/06/22/%E9%94%81%E7%9A%84%E5%BA%95%E5%B1%82%E5%AE%9E%E7%8E%B0/monitor%E5%AF%B9%E8%B1%A1.png">
   
     <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
   
@@ -146,60 +154,197 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-  
+            <article id="post-锁的底层实现" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
     
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2020" class="archive-year">2020</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2020/06/02/%E8%BF%9B%E7%A8%8B/" class="archive-article-date">
-  	<time datetime="2020-06-02T08:58:09.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-06-02</time>
-</a>
-        </div>
-    	 
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/06/02/%E8%BF%9B%E7%A8%8B/">进程</a>
+    <h1 class="article-title" itemprop="name">
+      锁的底层实现
     </h1>
   
 
-        <div class="article-info info-on-right">
-          
+        
+        <a href="/2020/06/22/%E9%94%81%E7%9A%84%E5%BA%95%E5%B1%82%E5%AE%9E%E7%8E%B0/" class="archive-article-date">
+  	<time datetime="2020-06-22T01:36:01.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-06-22</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>​        java虚拟机中的同步是基于<strong>Monitor对象</strong>实现。每个对象都会对应一个monitor对象。具体简图如下所示：</p>
+<p><img src="/2020/06/22/%E9%94%81%E7%9A%84%E5%BA%95%E5%B1%82%E5%AE%9E%E7%8E%B0/monitor%E5%AF%B9%E8%B1%A1.png" alt="monitor对象"></p>
+<p>对象头：主要包括俩部分——Mark Word 和 类型指针。</p>
+<ul>
+<li>Mark Word用于存储对象自身的运行时数据，如哈希码（HashCode）、GC分代年龄、锁状态标志、线程持有的锁、偏向线程ID、偏向时间戳等等，占用内存大小与虚拟机位长一致。</li>
+<li>类型指针指向对象的类元数据，JVM通过这个指针确定该对象是那个类的实例。</li>
+</ul>
+<p>实例对象：存放类的属性数据信息，包括父类的属性信息</p>
+<p>填充数据：由于虚拟机要求对象起始对象地址必须是8字节的整数倍，填充数据不是必须存在的，仅仅是为了字节对齐</p>
+<p>​        当在对象上加锁时，数据是记录在对象头中。当执行 <em>synchronized</em> 同步方法或同步代码块时，会在对象头中记录锁标记，锁标记指向的是 <em>monitor</em> 对象（也</p>
+<p>称为管程或监视器锁）的起始地址。<strong>每个对象都存在着一个 <em>monitor</em> 与之关联</strong>，对象与其 <em>monitor</em> 之间的关系有存在多种实现方式，如 <em>monitor</em> 可以与对象一</p>
+<p>起创建销毁或当线程试图获取对象锁时自动生成，但当一个 <em>monitor</em> 被某个线程持有后，它便处于锁定状态。</p>
+<p>​        在Java虚拟机中，monitor是由ObjectMonitor实现的。ObjectMonitor中有两个队列， <strong>_WaitSet</strong>  （等待队列）和  <strong>_EntryList</strong>（锁池队列，也有叫同步队</p>
+<p>列），以及 <strong>_Owner</strong> 标记。其中<strong>_WaitSet</strong>  是用于管理等待队列线程的，<strong>_EntryList</strong>是用于管理锁池阻塞线程的，<strong>_WaitSet</strong> 标记用于记录当前执行线程的对象。</p>
+<p>线程状态图如下：</p>
+<p>​    <img src="/2020/06/22/%E9%94%81%E7%9A%84%E5%BA%95%E5%B1%82%E5%AE%9E%E7%8E%B0/%E7%BA%BF%E7%A8%8B%E7%8A%B6%E6%80%81%E5%9B%BE.png" alt="线程状态图"></p>
+<p>​    当多线程并发访问同一个同步代码时，<strong>首先会进入_EntryList</strong>，锁池队列中的线程才可以竞争锁。当线程获取锁标记后，<strong>monitor中的_Owner记录此线程</strong>，并</p>
+<p>在monitor中的计数器执行递增计算（+1）,代表锁定，其他线程在_EntryList中继续阻塞。</p>
+<ul>
+<li>若执行线程调用wait方法，则monitor中的计数器赋值为0，并将 _Owner标记为null，代表放弃锁，执行线程进入 _WaitSet中等待，只有执行线程调用notify/notifyAll方法， _WaitSet中的线程才会被唤醒，进入 _EntryList中阻塞，等待获取锁标记。</li>
+<li>若执行线程的同步代码执行结束，同样会释放锁标记，monitor 中的 _Owner标记赋值为 <em>null*，且计数器赋值为 *0</em> 计算。</li>
+</ul>
+
+      
+
+      
+        <div class="page-reward">
+          <a href="javascript:;" class="page-reward-btn tooltip-top">
+            <div class="tooltip tooltip-east">
+            <span class="tooltip-item">
+              赏
+            </span>
+            <span class="tooltip-content">
+              <span class="tooltip-text">
+                <span class="tooltip-inner">
+                  <p class="reward-p"><i class="icon icon-quo-left"></i>谢谢你请我吃糖果<i class="icon icon-quo-right"></i></p>
+                  <div class="reward-box">
+                    
+                    
+                  </div>
+                </span>
+              </span>
+            </span>
+          </div>
+          </a>
+        </div>
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">操作系统</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">高并发</a>
         		</li>
       		
 		</ul>
 	</div>
 
-          
+      
 
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2020/06/22/%E9%94%81%E7%9A%84%E5%BA%95%E5%B1%82%E5%AE%9E%E7%8E%B0/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
+  
+<nav id="article-nav">
+  
+    <a href="/2020/06/22/ThreadPoolExcutor/" id="article-nav-newer" class="article-nav-link-wrap">
+      <i class="icon-circle-left"></i>
+      <div class="article-nav-title">
+        
+          ThreadPoolExcutor
+        
+      </div>
+    </a>
   
   
-    </div></section>
+    <a href="/2020/06/19/%E7%BA%BF%E7%A8%8B%E7%9A%84%E7%8A%B6%E6%80%81/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">线程的执行状态</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+  
+  
   
 
-    
+  
+
+  
+
+  
 
 
           </div>
@@ -222,9 +367,9 @@
 	var yiliaConfig = {
 		mathjax: true,
 		isHome: false,
-		isPost: false,
+		isPost: true,
 		isArchive: false,
-		isTag: true,
+		isTag: false,
 		isCategory: false,
 		open_in_new: false,
 		toc_hide_index: true,

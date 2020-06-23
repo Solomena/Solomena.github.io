@@ -6,11 +6,11 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>Tag: 操作系统 | Hexo</title>
+  <title>Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta property="og:type" content="website">
 <meta property="og:title" content="Hexo">
-<meta property="og:url" content="http://yoursite.com/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/index.html">
+<meta property="og:url" content="http://yoursite.com/page/2/index.html">
 <meta property="og:site_name" content="Hexo">
 <meta property="og:locale" content="en_US">
 <meta property="article:author" content="John Doe">
@@ -148,58 +148,573 @@
           <div id="js-content" class="content-ll">
             
   
-  
+    <article id="post-java类加载机制" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
     
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2020" class="archive-year">2020</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2020/06/02/%E8%BF%9B%E7%A8%8B/" class="archive-article-date">
-  	<time datetime="2020-06-02T08:58:09.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-06-02</time>
-</a>
-        </div>
-    	 
+      <header class="article-header">
+        
   
     <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/06/02/%E8%BF%9B%E7%A8%8B/">进程</a>
+      <a class="article-title" href="/2020/06/02/java%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6/">java类加载机制</a>
     </h1>
   
 
-        <div class="article-info info-on-right">
-          
+        
+        <a href="/2020/06/02/java%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6/" class="archive-article-date">
+  	<time datetime="2020-06-02T07:22:17.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-06-02</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h4 id="一．java的类加载过程"><a href="#一．java的类加载过程" class="headerlink" title="一．java的类加载过程"></a>一．java的类加载过程</h4><p>java的类加载过程的生命周期有7部分，如下图所示。但是类加载过程就是前5部分：</p>
+<p><img src="/2020/06/02/java%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6/1.png" alt="1"></p>
+<ul>
+<li><p><strong>加载</strong>：将字节码从不同的数据源（可能是class文件，也可能是jar包,甚至是网络）转化成二进制字节流加载到内存中，并生成一个代表该类的java.lang.class对象</p>
+</li>
+<li><p><strong>验证</strong>：只有符合JVM字节码规范的才能被JVM正确执行</p>
+<ul>
+<li>确保二进制字节流格式符合预期（比如是否以cafe bene开头）</li>
+<li>是否所有方法都遵循访问控制关键字的限定</li>
+<li>方法调用的参数个数和类型是否正确</li>
+<li>确保变量在使用之前被正确初始化了</li>
+<li>检查变量是否被赋予恰当类型的值</li>
+</ul>
+</li>
+<li><p><strong>准备</strong>：JVM会在该阶段对类变量（也称为静态变量）分配内存并初始化（对应数据类型的默认初始值，如 0、0L、null、false 等）。</p>
+<p>例如：有下面这样的一段代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">public String name &#x3D; &quot;卫龙&quot;</span><br><span class="line">public static String job &#x3D; &quot;程序猿&quot;</span><br><span class="line">public static final String hobby &#x3D;“吃辣条”</span><br></pre></td></tr></table></figure>
+
+<p>name在这一阶段不会被分配内存，但是job会被分配内存，并初始化成null</p>
+<p>需要注意的是，static final修饰的变量被称为常量，常量一旦被赋值就不会改变了，所以hobby在准备阶段的值是“吃辣条”，而不是null</p>
+</li>
+<li><p><strong>解析</strong>：该阶段是将常量池中的符号引用转化为直接引用。在class文件被加载至Java虚拟机前，这个类无法知道其它类及其方法，字段所对应的具体地址。甚至不知道自己方法，字段的地址。因此，每当需要引用这些成员时，Java编译器会生成一个符号引用。在运行阶段，这个符号引用一般能够无歧义地定位到具体目标上。解析阶段的目的，正是将这些符号引用解析为实际引用。</p>
+</li>
+<li><p><strong>初始化</strong>：该阶段是类加载的最后一个阶段。在准备阶段，静态变量已经被赋值过默认初始值，在初始化阶段，静态变量将被赋值为代码锁期望赋的值。话句话说，初始化阶段是执行类构造器方法的过程。也就是说上面的job这时候会被赋值为“程序猿”。 </p>
+</li>
+</ul>
+<h4 id="二．类加载器"><a href="#二．类加载器" class="headerlink" title="二．类加载器"></a>二．类加载器</h4><p>类加载器的任务是根据一个类的全限定名来读取此类的二进制字节流到 JVM 中，然后转换为一个与目标类对应的java.lang.Class对象实例，在虚拟机提供了3种类加载器 </p>
+<p><strong>1.</strong> <strong>启动类加载器</strong>，加载jre/lib包下面的jar文件，比如说常见的rt.jar</p>
+<p><strong>2.</strong> <strong>扩展类加载器</strong>，加载jre/lib/ext包下面的jar文件</p>
+<p><strong>3.</strong> <strong>应用类加载器</strong>，根据程序的类路径来加载java类</p>
+<h4 id="三．双亲委派模型"><a href="#三．双亲委派模型" class="headerlink" title="三．双亲委派模型"></a>三．双亲委派模型</h4><p>在Java的日常应用程序开发中，类的加载几乎是由上述3种类加载器相互配合执行的，在必要时，我们还可以自定义类加载器，而此时Java虚拟机采用的是双亲委派模式。双亲委派工作机制如下所示：</p>
+<p><img src="/2020/06/02/java%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6/3.png" alt="类加载机制"></p>
+<p>双亲委派模型的机制是如果一个类加载器收到了加载类的请求，它会优先把请求委托给上层加载器去完成。上层又委托给上上层去完成，一直到最顶层的类加载器。而只有所有上层的类加载器无法完成类加载的时候，当前的类加载器才会自己尝试去加载这个类。 </p>
+<p>双亲委派的好处：</p>
+<ol>
+<li>可以避免重复加载，父类已经加载，子类就不需要再次加载</li>
+<li>更加安全，很好的解决了各个类加载器的基础类的统一问题，如果不使用该方式，那么用户可以随意定义类加载器加载核心API，会带来安全隐患</li>
+</ol>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">操作系统</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">JVM</a>
         		</li>
       		
 		</ul>
 	</div>
 
-          
+      
 
-        </div>
-        <div class="clearfix"></div>
-    </header>
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2020/06/02/java%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
   
+    <article id="post-JVM" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
   
-    </div></section>
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/06/02/JVM/">JVM笔记</a>
+    </h1>
   
 
+        
+        <a href="/2020/06/02/JVM/" class="archive-article-date">
+  	<time datetime="2020-06-02T06:14:05.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-06-02</time>
+</a>
+        
+      </header>
     
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>最近看了《深入理解java虚拟机》（周志明）,对JVM 运行时区域和GC机制做一个笔记整理</p>
+<h4 id="一-java的运行时区域"><a href="#一-java的运行时区域" class="headerlink" title="一.java的运行时区域"></a>一.java的运行时区域</h4><p>运行时数据区（也就是我们说的java内存）整体分为两类  <strong>线程私有</strong>和<strong>线程共享</strong>。 </p>
+<p><img src="/2020/06/02/JVM/1.jpg" alt="1"></p>
+<p>线程私有的包括: </p>
+<ul>
+<li>程序计数器<ul>
+<li>若正在执行的是java方法，则计数器记录的是正在执行的字节码指令的地址 </li>
+<li>若正在执行的是native本地方法，则计数器为空 </li>
+<li>该区域是唯一一个不会导致outofmemoryError的区域 </li>
+</ul>
+</li>
+<li>虚拟机栈<ul>
+<li>描述的是<strong>Java方法执行的内存模型</strong>：每个方法在执行时会创建一个栈帧，用于存储局部变量表，操作数栈等信息，每一个方法从调用到执行完成的过程就对应着一个栈帧从入栈到出栈的过程</li>
+<li>局部变量表存放了编译期可知的基本数据类型，对象引用，和returnAddress类型（指向一条字节码指令地址），局部标量表中的内存空间在编译期间完成分配，在方法运行期间不会改变局部变量表的大小</li>
+<li>可导致两种异常：线程请求的栈深度大于虚拟机允许的深度-StackOverflowError；虚拟机无法申请到足够的内存-OutOfMemoryError         </li>
+</ul>
+</li>
+<li>本地方法栈 <ul>
+<li>和虚拟机栈类似，但它是为Native本地方法服务的 </li>
+</ul>
+</li>
+</ul>
+<hr>
+<p>线程共享的包括: </p>
+<ul>
+<li>堆<ul>
+<li>java堆是被所有线程共享的内存区域，在虚拟机启动时创建，用来<strong>分配对象实例和数组</strong> </li>
+<li>堆是垃圾回收器主要管理的区域，堆可分为新生代和老年代 <ul>
+<li>从内存分配角度看，堆可划分出多个线程私有的分配缓冲区（TLAB） </li>
+</ul>
+</li>
+<li>java堆可以处于物理上不连续的内存空间，只要逻辑上是连续的即可。</li>
+<li>大小可通过 -Xmx 和 -Xms 控制 </li>
+</ul>
+</li>
+<li>方法区<ul>
+<li>用来存放虚拟机加载的<strong>类信息，常量，静态变量，即时编译器编译后的代码</strong>等信息 </li>
+<li>GC会回收该区域的常量池和进行类型的卸载 </li>
+<li>运行时常量池 也属于方法区的一部分<ul>
+<li>Class文件的常量池用于存放编译期生成的各种字面量和符号引用，这部分内容将在类加载后存放在运行时常量池中 </li>
+<li>还把翻译出来的直接引用也放在运行时常量池中，运行时产生的常量也放在里面</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<hr>
+<ul>
+<li>直接内存<ul>
+<li>并不是虚拟机运行时数据区的部分，也不是java虚拟机规范中定义的内存区域，但是这部分内存会被频繁使用，可能导致OutOfMemoryError异常出现。</li>
+</ul>
+</li>
+</ul>
+<h4 id="二-垃圾回收机制"><a href="#二-垃圾回收机制" class="headerlink" title="二.垃圾回收机制"></a>二.垃圾回收机制</h4><h5 id="1-判断对象是否存活"><a href="#1-判断对象是否存活" class="headerlink" title="1.判断对象是否存活"></a>1.判断对象是否存活</h5><p>要进行垃圾回收，首先要判断对象是否存活，这时引出了两个方法：</p>
+<ul>
+<li>引用计数法<ul>
+<li>思想：给对象设置引用计数器，每当引用该对象一次，计数器就+1，引用失效时，计数器就-1，当任意时候引用计数器的值都为0时，则该对象可被回收 </li>
+<li>Java不适用原因：无法解决对象互相循环引用的问题 </li>
+</ul>
+</li>
+<li>可达性分析法<ul>
+<li>以GC Roots为起点，从这些起点开始向下搜索，经过的路径称为引用链。若一个对象到GC Roots之间没有任何引用链，则该对象是不可达的。 </li>
+<li>那么可作为GC Roots的对象有 <ul>
+<li>虚拟机栈（栈帧中的局部变量表）中引用的对象 </li>
+<li>方法区中类静态属性引用的对象 </li>
+<li>方法区中常量引用的对象 </li>
+<li>本地方法栈中JNI（Java Native Interface）引用的对象 </li>
+</ul>
+</li>
+</ul>
+</li>
+<li>在可达性分析过程中，对象引用类型会对对象的生命周期产生影响，JAVA中有这几种类型的引用：<ul>
+<li>强引用：只要该引用还有效，GC就不会回收 </li>
+<li>软引用：内存空间足够时不进行回收，在内存溢出发生前进行回收、用SoftReference类实现 </li>
+<li>弱引用：弱引用关联的对象只能存活到下一次Gc收集、用WeakReference类实现 </li>
+<li>虚引用：无法通过虚引用获得对象实例，也不会对对象的生存时间产生影响、唯一目的：当该对象被Gc收集时，收到一个系统通知。用PhantomReference类实现 </li>
+</ul>
+</li>
+</ul>
+<p>一个对象真正不可用，要经历两次标记过程：</p>
+<ul>
+<li>首先进行可达性分析，筛选出与GC Roots没用引用链的对象，进行第一次标记 </li>
+<li>第一次标记后，再进行一次筛选，筛选条件是是否有必要执行finalize()方法。若对象没有重写finalize()方法，或者finalize()已被jvm调用过，则没必要执行，GC会回收该对象 </li>
+<li>若有必要执行，则该对象会被放入F-Queue中，由jvm开启一个低优先级的线程去执行它（但不一定等待finalize执行完毕）。 </li>
+<li>Finalize()是对象最后一次自救的机会，若对象在finalize()中重新加入到引用链中，则它会被移出要回收的对象的集合。其他对象则会被第二次标记，进行回收</li>
+</ul>
+<h5 id="2-垃圾回收算法"><a href="#2-垃圾回收算法" class="headerlink" title="2.垃圾回收算法"></a>2.垃圾回收算法</h5><p>JAVA中的垃圾回收算法有：</p>
+<ul>
+<li>标记-清除（Mark-Sweep） <ul>
+<li>两个阶段：标记， 清除 </li>
+<li>缺点：两个阶段的效率都不高；容易产生大量的内存碎片 </li>
+</ul>
+</li>
+<li>复制（Copying） <ul>
+<li>把内存分成大小相同的两块，当一块的内存用完了，就把可用对象复制到另一块上，将使用过的一块一次性清理掉 </li>
+<li>缺点：浪费了一半内存 </li>
+</ul>
+</li>
+<li>标记-整理（Mark-Compact） <ul>
+<li>标记后，让所有存活的对象移到一端，然后直接清理掉端边界以外的内存 </li>
+</ul>
+</li>
+<li>分代收集 <ul>
+<li>把堆分为新生代和老年代 </li>
+<li>新生代使用复制算法 </li>
+<li>将新生代内存分为一块大的Eden区和两块小的Survivor；每次使用Eden和一个Survivor，回收时将Eden和Survivor存活的对象复制到另一个Survivor（HotSpot的比例默认Eden：Survivor = 8：1） </li>
+<li>老年代使用标记-清理或者标记-整理 </li>
+</ul>
+</li>
+</ul>
+<h5 id="3-内存分配原则"><a href="#3-内存分配原则" class="headerlink" title="3.内存分配原则"></a>3.内存分配原则</h5><p>触发GC又涉及到了内存分配规则：</p>
+<p>对象主要分配在Eden，若启动了本地线程分配缓冲，将优先在TLAB（Thread Local Allocation Buffer）上分配（如果设置了虚拟机参数 -XX:UseTLAB，在线程初始化时，同时也会申请一块指定大小的内存，只给当前线程使用，这样每个线程都单独拥有一个空间，如果需要分配内存，就在自己的空间上分配，这样就不存在竞争的情况，可以大大提升分配效率。）</p>
+<ul>
+<li>对象优先在Eden分配 <ul>
+<li>当Eden区没有足够的空间时就会发起一次Minor GC </li>
+</ul>
+</li>
+<li>大对象直接进入老年代 <ul>
+<li>典型的大对象是很长的字符串和数组 </li>
+</ul>
+</li>
+<li>长期存活的对象进入老年代 <ul>
+<li>每个对象有年龄计数器，每经过一次GC，计数器值加一，当到达一定程度时（默认15），就会进入老年代 </li>
+<li>年龄的阈值可通过参数 -XX:MaxTenuringThreshold设置 </li>
+</ul>
+</li>
+<li>对象年龄的判定 <ul>
+<li>Survivor空间中相同年龄所有对象大小的总和大于Survivor空间的一半，年龄大于等于该年龄的对象就可直接进入老年代，无须等到MaxTenuringThreshold要求的年龄 </li>
+</ul>
+</li>
+<li>空间分配担保 <ul>
+<li>发生Minor GC前，jvm会检查老年代最大可用的连续空间是否大于新生代所有对象总空间，若大于，则Minor GC是安全的 </li>
+<li>若不大于，jvm会查看HandlePromotionFailure是否允许担保失败，若不允许，则改为一次Full GC </li>
+<li>若允许担保失败，则检查老年代最大可用的连续空间是否大于历次晋升到老年代对象的平均大小，若大于，则尝试进行Minor GC；若小于，则要改为Full GC </li>
+</ul>
+</li>
+</ul>
+<h5 id="4-垃圾收集器："><a href="#4-垃圾收集器：" class="headerlink" title="4.垃圾收集器："></a>4.垃圾收集器：</h5><p>java垃圾回收器较多，主流搭配如下所示</p>
+<p><img src="/2020/06/02/JVM/GC.png" alt="GC"></p>
+<ul>
+<li>Serial（串行收集器）<ul>
+<li>特性：单线程，stop the world，采用复制算法 </li>
+<li>应用场景：jvm在Client模式下默认的新生代收集器 </li>
+<li>优点：简单高效 </li>
+</ul>
+</li>
+<li>ParNew<ul>
+<li>特点：是Serial的多线程版本，采用复制算法 </li>
+<li>应用场景：在Server模式下常用的新生代收集器，可与CMS配合工作 </li>
+</ul>
+</li>
+<li>Parallel Scavenge<ul>
+<li>特点：并行的多线程收集器，采用复制算法，吞吐量优先，有自适应调节策略 </li>
+<li>应用场景：需要吞吐量大的时候       <code>注意:吞吐量=程序运行时间/（程序运行时间+垃圾清理时间）</code></li>
+</ul>
+</li>
+<li>SerialOld<ul>
+<li>特点：Serial的老年代版本，单线程，使用标记-整理算法 </li>
+</ul>
+</li>
+<li>Parallel Old<ul>
+<li>Parallel Scavenge的老年代版本，多线程，标记-整理算法 </li>
+</ul>
+</li>
+<li>CMS<ul>
+<li>特点：以最短回收停顿时间为目标，使用标记-清除算法 </li>
+<li>过程： <ul>
+<li>初始标记：stop the world 标记GC Roots能直接关联到的对象 </li>
+<li>并发标记：进行GC Roots Tracing </li>
+<li>重新标记：stop the world；修正并发标记期间因用户程序继续运作而导致标记产生变动的 那一部分对象的标记记录 </li>
+<li>并发清除：清除对象 </li>
+</ul>
+</li>
+<li>优点：并发收集，低停顿 </li>
+<li>缺点： <ul>
+<li>对CPU资源敏感 </li>
+<li>无法处理浮动垃圾（并发清除 时，用户线程仍在运行，此时产生的垃圾为浮动垃圾） </li>
+<li>产生大量的空间碎片 </li>
+</ul>
+</li>
+</ul>
+</li>
+<li>G1<ul>
+<li>特点：面向服务端应用，将整个堆划分为大小相同的region。 <ul>
+<li>并行与并发 </li>
+<li>分代收集 </li>
+<li>空间整合：从整体看是基于“标记-整理”的，从局部（两个region之间）看是基于“复制”的。 </li>
+<li>可预测的停顿：使用者可明确指定在一个长度为M毫秒的时间片段内，消耗在垃圾收集上的时间不得超过N毫秒。 </li>
+</ul>
+</li>
+<li>执行过程： <ul>
+<li>初始标记：stop the world 标记GC Roots能直接关联到的对象 </li>
+<li>并发标记：可达性分析 </li>
+<li>最终标记：修正在并发标记期间因用户程序继续运作而导致标记产生变动的那一部分标记记录 </li>
+<li>筛选回收：筛选回收阶段首先对各个Region的回收价值和成本进行排序，根据用户所期望的GC停顿时间来制定回收计划 </li>
+</ul>
+</li>
+</ul>
+</li>
+<li>GC自适应调节策略 Parallel Scavenge收集器有一个参数-XX:+UseAdaptiveSizePolicy。当这个参数打开之后，就不需要手工指定新生代的大小、Eden与Survivor区的比例、晋升老年代对象年龄等细节参数了，虚拟机会根据当前系统的运行情况收集性能监控信息，动态调整这些参数以提供最合适的停顿时间或者最大的吞吐量，这种调节方式称为GC自适应的调节策略（GC Ergonomics）。</li>
+</ul>
+<hr>
+<p>上述介绍的垃圾回收主要针对堆，而方法区也会进行垃圾回收：</p>
+<ul>
+<li>永久代中主要回收两部分内容：废弃常量和无用的类 </li>
+<li>废弃常量回收和对象的回收类似 </li>
+<li>无用的类需满足3个条件 <ul>
+<li>该类的所有实例对象已被回收 </li>
+<li>加载该类的ClassLoader已被回收 </li>
+<li>该类的Class对象没有在任何地方被引用，无法在任何地方通过反射访问该类的方法</li>
+</ul>
+</li>
+</ul>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">JVM</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2020/06/02/JVM/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-hexo本地图片显示" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/06/01/hexo%E6%9C%AC%E5%9C%B0%E5%9B%BE%E7%89%87%E6%98%BE%E7%A4%BA/">hexo本地图片显示</a>
+    </h1>
+  
+
+        
+        <a href="/2020/06/01/hexo%E6%9C%AC%E5%9C%B0%E5%9B%BE%E7%89%87%E6%98%BE%E7%A4%BA/" class="archive-article-date">
+  	<time datetime="2020-06-01T12:22:12.581Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-06-01</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="hexo-本地图片不显示问题解决"><a href="#hexo-本地图片不显示问题解决" class="headerlink" title="hexo 本地图片不显示问题解决"></a>hexo 本地图片不显示问题解决</h1><p>最近刚刚部署好博客，简单写完一篇博客发现部署到本地和远程服务器以后，本地插入的图片无法显示。</p>
+<p>于是网上找资料啥的，但是遇到了各种问题。现在简单记录下，希望以后对有遇到同样问题的朋友有所帮助。</p>
+<p>1.首先第一步我们需要修改文件博客根目录下的<code>_config.yml</code> 文件里的<code>post_asset_folder:</code>这个选项设置为<code>true</code></p>
+<p>2.修改之后，当我们再终端使用hexo n “hexo指令” 以后，会在_post 文件下生成如下的文件。</p>
+<p><img src="/2020/06/01/hexo%E6%9C%AC%E5%9C%B0%E5%9B%BE%E7%89%87%E6%98%BE%E7%A4%BA/1png.png" alt="1png"></p>
+<p>也就是说会多生成一个文件夹，这个文件夹用来存放这个md文件中需要插入的图片。当然我们也可以自己建立md文件和这样的文件夹，而不是在终端输入hexo n “filename”。这样的效果是一样的。</p>
+<p>3.安装hexo-asset-image，用来上传本地图片的插件。</p>
+<p>这里网上资料有两个版本，</p>
+<p>npm install <a href="https://github.com/CodeFalling/hexo-asset-image" target="_blank" rel="noopener">https://github.com/CodeFalling/hexo-asset-image</a> –save                         这个对应0.0.5版本</p>
+<p>npm install hexo-asset-image –save                           对应1.0.0版本</p>
+<p>两个版本对应的映射关系不同，第一次我安装的是1.0.0版本，但是安装出错了，最后安装了0.0.5版本</p>
+<p>然后在安装的过程中出现了错误</p>
+<p><img src="/2020/06/01/hexo%E6%9C%AC%E5%9C%B0%E5%9B%BE%E7%89%87%E6%98%BE%E7%A4%BA/2.png" alt="2"></p>
+<p>查询资料，是npm版本不对，然后更新了npm版本到最新版本</p>
+<p>npm install npm -g</p>
+<p>然后重新打开终端，再次下载hexo-asset-image文件，然后成功了（这个过程多试试几次，楼主一开始还是出错，然后试过几次 最后成功了）</p>
+<p>4.这时候本地md文件插入图片要改变格式</p>
+<p>原本是这样的格式</p>
+<p><img src="/2020/06/01/hexo%E6%9C%AC%E5%9C%B0%E5%9B%BE%E7%89%87%E6%98%BE%E7%A4%BA/3.png" alt="3"></p>
+<p>现在需要变成</p>
+<p><img src="/2020/06/01/hexo%E6%9C%AC%E5%9C%B0%E5%9B%BE%E7%89%87%E6%98%BE%E7%A4%BA/4.png" alt="4"></p>
+<p>也就是说<strong>首先去掉前面的路径，然后将‘\“变成”/“</strong> </p>
+<p>5.这时候部署到本地后你就会发现图片可以显示了。但是这时候我突然又出现问题了，hexo d后报错了，无法远程部署了。然后重新安装hexo-deployer-git也报错</p>
+<p><img src="/2020/06/01/hexo%E6%9C%AC%E5%9C%B0%E5%9B%BE%E7%89%87%E6%98%BE%E7%A4%BA/5.png" alt="5"></p>
+<p>查询了很多，然后试了好多方法。最后是将本地博客目录下package-lock.json文件先删除,然后再安装hexo-deployer-git，这时候可以hexo d了。</p>
+<p>弄完表示心很累，记录一下，能帮助后面遇到相同问题的朋友。</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2020/06/01/hexo%E6%9C%AC%E5%9C%B0%E5%9B%BE%E7%89%87%E6%98%BE%E7%A4%BA/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-hexo指令" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/06/01/hexo%E6%8C%87%E4%BB%A4/">hexo指令</a>
+    </h1>
+  
+
+        
+        <a href="/2020/06/01/hexo%E6%8C%87%E4%BB%A4/" class="archive-article-date">
+  	<time datetime="2020-06-01T08:44:58.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-06-01</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h4 id="前言："><a href="#前言：" class="headerlink" title="前言："></a>前言：</h4><p>最近刚借助hexo和github搭建了自己的博客，为了方便以后查询，打算将hexo的常用指令做一个简单的记录。</p>
+<p><img src="/2020/06/01/hexo%E6%8C%87%E4%BB%A4/hexo.jpg" alt="hexo"></p>
+<h4 id="常用指令："><a href="#常用指令：" class="headerlink" title="常用指令："></a>常用指令：</h4><p><strong>hexo init [folder]</strong>             </p>
+<p> #新建一个网站，如果没有设置folder,hexo默认在当前的文件夹建立网站</p>
+<p><strong>hexo new [layout]  “title”</strong></p>
+<p>#可以缩写成hexo n,表示新建一篇文章。如果没有设置 <code>layout</code> 的话，默认使用 config.yml中的 <code>default_layout</code> 参数代替。例如 hexo n “hexo常用指令”，便会在此时会在站点根目录下的—-&gt;source—–&gt;_post文件夹下生成  <strong><em>hexo常用指令.md</em></strong>   文件</p>
+<p><strong>hexo generate</strong>      </p>
+<p>#等价于hexo g，表示生成静态网页  (执行 <code>$ hexo g</code>后会在站点根目录下生成public文件夹, hexo会将”/blog/source/“   下面的.md后缀的文件编译为.html后缀的文件,存放在”/blog/public/ “ 路径下)</p>
+<p><strong>hexo clean</strong></p>
+<p>#清除缓存文件（db.json）,网页正常情况下可以忽略此条命令,执行该指令后,会删掉站点根目录下的静态（public）文件夹</p>
+<p><strong>hexo deploy</strong></p>
+<p>#可以简写为hexo d 将本地的数据部署到远程服务器，如本博客就是使用该命令将文件部署到在远程github上</p>
+<p><strong>hexo server</strong></p>
+<p>#可以缩写成hexo s，表示启动服务器，默认情况下，访问网站为 <a href="http://localhost:4000" target="_blank" rel="noopener">http://localhost:4000</a>  ,这时候就可以在本地网页上打开博客了</p>
+<p><img src="/2020/06/01/hexo%E6%8C%87%E4%BB%A4/hexo_s.png" alt="hexo_s"></p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2020/06/01/hexo%E6%8C%87%E4%BB%A4/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+  
+    <nav id="page-nav">
+      <a class="extend prev" rel="prev" href="/">&amp;laquo; Prev</a><a class="page-number" href="/">1</a><span class="page-number current">2</span>
+    </nav>
+  
 
 
           </div>
@@ -221,10 +736,10 @@
     <script>
 	var yiliaConfig = {
 		mathjax: true,
-		isHome: false,
+		isHome: true,
 		isPost: false,
 		isArchive: false,
-		isTag: true,
+		isTag: false,
 		isCategory: false,
 		open_in_new: false,
 		toc_hide_index: true,

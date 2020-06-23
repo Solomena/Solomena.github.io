@@ -6,15 +6,23 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>Tag: 操作系统 | Hexo</title>
+  <title>线程的执行状态 | Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="Hexo">
-<meta property="og:url" content="http://yoursite.com/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/index.html">
+  <meta name="description" content="java中的线程有6个状态，状态图如下：   NEW，新建状态，线程被创建出来后，但尚未启动时的线程状态，例如：Thread thread &#x3D; new Thread()。  RUNNABLE，就绪状态，表示可以运行的线程状态，它可能正在运行（RUNNING），或者是在排队等待操作系统给它分配CPU资源(READY)； BLOCKED，表示处于阻塞状态的线程正在等待监视器锁，比如等待执行 synch">
+<meta property="og:type" content="article">
+<meta property="og:title" content="线程的执行状态">
+<meta property="og:url" content="http://yoursite.com/2020/06/19/%E7%BA%BF%E7%A8%8B%E7%9A%84%E7%8A%B6%E6%80%81/index.html">
 <meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="java中的线程有6个状态，状态图如下：   NEW，新建状态，线程被创建出来后，但尚未启动时的线程状态，例如：Thread thread &#x3D; new Thread()。  RUNNABLE，就绪状态，表示可以运行的线程状态，它可能正在运行（RUNNING），或者是在排队等待操作系统给它分配CPU资源(READY)； BLOCKED，表示处于阻塞状态的线程正在等待监视器锁，比如等待执行 synch">
 <meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://yoursite.com/2020/06/19/%E7%BA%BF%E7%A8%8B%E7%9A%84%E7%8A%B6%E6%80%81/%E7%BA%BF%E7%A8%8B%E7%8A%B6%E6%80%81.png">
+<meta property="og:image" content="http://yoursite.com/2020/06/19/%E7%BA%BF%E7%A8%8B%E7%9A%84%E7%8A%B6%E6%80%81/%E7%AD%89%E5%BE%85%E9%98%9F%E5%88%97%E6%AD%A5%E9%AA%A4%E5%9B%BE.jpg">
+<meta property="article:published_time" content="2020-06-19T07:39:23.000Z">
+<meta property="article:modified_time" content="2020-06-22T07:52:33.814Z">
 <meta property="article:author" content="John Doe">
+<meta property="article:tag" content="高并发">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/2020/06/19/%E7%BA%BF%E7%A8%8B%E7%9A%84%E7%8A%B6%E6%80%81/%E7%BA%BF%E7%A8%8B%E7%8A%B6%E6%80%81.png">
   
     <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
   
@@ -146,60 +154,214 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-  
+            <article id="post-线程的状态" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
     
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2020" class="archive-year">2020</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2020/06/02/%E8%BF%9B%E7%A8%8B/" class="archive-article-date">
-  	<time datetime="2020-06-02T08:58:09.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-06-02</time>
-</a>
-        </div>
-    	 
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/06/02/%E8%BF%9B%E7%A8%8B/">进程</a>
+    <h1 class="article-title" itemprop="name">
+      线程的执行状态
     </h1>
   
 
-        <div class="article-info info-on-right">
-          
+        
+        <a href="/2020/06/19/%E7%BA%BF%E7%A8%8B%E7%9A%84%E7%8A%B6%E6%80%81/" class="archive-article-date">
+  	<time datetime="2020-06-19T07:39:23.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-06-19</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>java中的线程有6个状态，状态图如下：</p>
+<p><img src="/2020/06/19/%E7%BA%BF%E7%A8%8B%E7%9A%84%E7%8A%B6%E6%80%81/%E7%BA%BF%E7%A8%8B%E7%8A%B6%E6%80%81.png" alt="线程状态"></p>
+<ul>
+<li><strong>NEW</strong>，新建状态，线程被创建出来后，但尚未启动时的线程状态，例如：Thread thread = new Thread()。 </li>
+<li><strong>RUNNABLE</strong>，就绪状态，表示可以运行的线程状态，它可能正在运行（RUNNING），或者是在排队等待操作系统给它分配CPU资源(READY)；</li>
+<li><strong>BLOCKED</strong>，表示处于阻塞状态的线程正在等待监视器锁，比如等待执行 synchronized 代码块或者使用 synchronized 标记的方法（此时线程进入到 _EntryList–锁池队列）</li>
+<li><strong>WAITING</strong>，等待状态，一个处于等待状态的线程正在等待另一个线程执行某个特定的动作，比如一个线程调用了 Object.wait() 方法，那它就在等待另一个线程调用 Object.notify() 或 Object.notifyAll() 方法（此时线程进入到 _WaitSet–等待队列）</li>
+<li><strong>TIMED_WAITING</strong>，计时等待状态，和等待状态（WAITING）类似，但是它多了超时时间，比如调用了有超时时间设置的方法 Object.wait(long timeout) 和 Thread.join(long timeout) 等这些方法时，它才会进入此状态，<strong>时间一到，会被自动唤醒</strong>（此时线程进入到 _WaitSet–等待队列）</li>
+<li><strong>TERMINATED</strong>，终止状态，表示线程已经执行完成。</li>
+</ul>
+<p>线程中的几个重要方法比较：</p>
+<ol>
+<li>Thread.sleep(long millis)，一定是当前线程调用此方法，当前线程进入<strong>TIMED_WAITING状态</strong>，但不释放对象锁，millis后线程自动苏醒进入就绪状态。作用：给其它线程执行机会的，<strong>不考虑其优先级</strong>（和yeild的主要区别）。</li>
+<li>Thread.yield()，一定是当前线程调用此方法，当前线程放弃获取的CPU时间片，但不释放锁资源，由运行状态变为<strong>就绪状态</strong>，让OS再次选择线程。作用：让<strong>相同优先级或者比他高的线程</strong>轮流执行，但并不保证一定会轮流执行。实际中无法保证yield()达到让步目的，因为让步的线程还有可能被线程调度程序再次选中。Thread.yield()不会导致阻塞。该方法与sleep()类似，只是不能由用户指定暂停多长时间。</li>
+<li>thread.join()/thread.join(long millis)，<strong>当前线程里调用其它线程t的join方法，当前线程进入WAITING/TIMED_WAITING状态</strong>，当前线程不会释放已经持有的对象锁。线程t执行完毕或者millis时间到，当前线程一般情况下进入RUNNABLE状态，也有可能进入BLOCKED状态（因为join是基于wait实现的）。</li>
+<li>obj.wait()，当前线程调用对象的wait()方法，当前线程释放对象锁，<strong>进入等待队列</strong>。依靠notify()/notifyAll()唤醒或者wait(long timeout) timeout时间到自动唤醒。</li>
+<li>obj.notify()唤醒在此对象监视器上等待的单个线程，选择是任意性的。notifyAll()唤醒在此对象监视器上等待的所有线程。俩者会让线程<strong>进入同步队列竞争锁</strong>，如果获得锁，进入RUNNABLE状态，否则进入BLOCKED状态等待获取锁。</li>
+<li>LockSupport.park()/LockSupport.parkNanos(long nanos),LockSupport.parkUntil(long deadlines), 当前线程进入WAITING/TIMED_WAITING状态。对比wait方法,不需要获得锁就可以让线程进入WAITING/TIMED_WAITING状态，需要通过LockSupport.unpark(Thread thread)唤醒。</li>
+</ol>
+<p><strong>等待队列（_WaitSet）</strong></p>
+<p>调用obj的wait(), notify()方法前，必须获得obj锁，也就是必须写在synchronized(obj) 代码段内</p>
+<p>具体步骤图如下：</p>
+<p><img src="/2020/06/19/%E7%BA%BF%E7%A8%8B%E7%9A%84%E7%8A%B6%E6%80%81/%E7%AD%89%E5%BE%85%E9%98%9F%E5%88%97%E6%AD%A5%E9%AA%A4%E5%9B%BE.jpg" alt="等待队列步骤图"></p>
+<p>1.线程1获取对象A的锁，正在使用对象A。</p>
+<p>2.线程1调用对象A的wait()方法。</p>
+<p>3.线程1释放对象A的锁，并马上进入等待队列。</p>
+<p>4.锁池里面的对象争抢对象A的锁。</p>
+<p>5.线程5获得对象A的锁，进入synchronized块，使用对象A。</p>
+<p>6.线程5调用对象A的notifyAll()方法，唤醒所有线程，所有线程进入同步队列。若线程5调用对象A的notify()方法，则唤醒一个线程，不知道会唤醒谁，被唤醒的那个线程进入同步队列。</p>
+<p>7.notifyAll()方法所在synchronized结束，线程5释放对象A的锁。</p>
+<p>8.同步队列的线程争抢对象锁，但线程1什么时候能抢到就不知道了。 </p>
+<p><strong>同步（锁池）队列（_EntryList）</strong></p>
+<ul>
+<li>当前线程想调用对象A的同步方法时，发现对象A的锁被别的线程占有，此时当前线程进入同步队列。简言之，同步队列里面放的都是想争夺对象锁的线程。<br>当一个线程1被另外一个线程2唤醒时，1线程进入同步队列，去争夺对象锁。</li>
+<li>同步队列是在同步的环境下才有的概念，一个对象对应一个同步队列。</li>
+<li>线程等待时间到了或被notify/notifyAll唤醒后，会进入同步队列竞争锁，如果获得锁，进入RUNNABLE状态，否则进入BLOCKED状态等待获取锁。</li>
+</ul>
+<p>参考链接：</p>
+<p>1.<a href="https://blog.csdn.net/pange1991/article/details/53860651" target="_blank" rel="noopener">https://blog.csdn.net/pange1991/article/details/53860651</a></p>
+
+      
+
+      
+        <div class="page-reward">
+          <a href="javascript:;" class="page-reward-btn tooltip-top">
+            <div class="tooltip tooltip-east">
+            <span class="tooltip-item">
+              赏
+            </span>
+            <span class="tooltip-content">
+              <span class="tooltip-text">
+                <span class="tooltip-inner">
+                  <p class="reward-p"><i class="icon icon-quo-left"></i>谢谢你请我吃糖果<i class="icon icon-quo-right"></i></p>
+                  <div class="reward-box">
+                    
+                    
+                  </div>
+                </span>
+              </span>
+            </span>
+          </div>
+          </a>
+        </div>
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">操作系统</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">高并发</a>
         		</li>
       		
 		</ul>
 	</div>
 
-          
+      
 
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2020/06/19/%E7%BA%BF%E7%A8%8B%E7%9A%84%E7%8A%B6%E6%80%81/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
+  
+<nav id="article-nav">
+  
+    <a href="/2020/06/22/%E9%94%81%E7%9A%84%E5%BA%95%E5%B1%82%E5%AE%9E%E7%8E%B0/" id="article-nav-newer" class="article-nav-link-wrap">
+      <i class="icon-circle-left"></i>
+      <div class="article-nav-title">
+        
+          锁的底层实现
+        
+      </div>
+    </a>
   
   
-    </div></section>
+    <a href="/2020/06/10/Redis%E6%8C%81%E4%B9%85%E5%8C%96%E7%AD%96%E7%95%A5/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Redis持久化策略</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+  
+  
   
 
-    
+  
+
+  
+
+  
 
 
           </div>
@@ -222,9 +384,9 @@
 	var yiliaConfig = {
 		mathjax: true,
 		isHome: false,
-		isPost: false,
+		isPost: true,
 		isArchive: false,
-		isTag: true,
+		isTag: false,
 		isCategory: false,
 		open_in_new: false,
 		toc_hide_index: true,

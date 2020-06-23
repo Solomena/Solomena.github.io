@@ -6,14 +6,19 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>Tag: 操作系统 | Hexo</title>
+  <title>synchronized,ReentrantLock和各类锁 | Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="Hexo">
-<meta property="og:url" content="http://yoursite.com/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/index.html">
+  <meta name="description" content="​        synchronized 属于独占式悲观锁，是通过 JVM 隐式实现的，synchronized 只允许同一时刻只有一个线程操作资源。 ​        在 Java 中每个对象都隐式包含一个 monitor（监视器）对象，加锁的过程其实就是竞争 monitor 的过程，当线程进入字节码  monitorenter 指令之后，线程将持有 monitor 对象，执行 monitor">
+<meta property="og:type" content="article">
+<meta property="og:title" content="synchronized,ReentrantLock和各类锁">
+<meta property="og:url" content="http://yoursite.com/2020/06/23/synchronized%E5%92%8CReentrantLock/index.html">
 <meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="​        synchronized 属于独占式悲观锁，是通过 JVM 隐式实现的，synchronized 只允许同一时刻只有一个线程操作资源。 ​        在 Java 中每个对象都隐式包含一个 monitor（监视器）对象，加锁的过程其实就是竞争 monitor 的过程，当线程进入字节码  monitorenter 指令之后，线程将持有 monitor 对象，执行 monitor">
 <meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2020-06-23T01:56:12.000Z">
+<meta property="article:modified_time" content="2020-06-23T03:12:51.423Z">
 <meta property="article:author" content="John Doe">
+<meta property="article:tag" content="高并发">
 <meta name="twitter:card" content="summary">
   
     <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
@@ -146,60 +151,223 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-  
+            <article id="post-synchronized和ReentrantLock" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
     
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2020" class="archive-year">2020</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2020/06/02/%E8%BF%9B%E7%A8%8B/" class="archive-article-date">
-  	<time datetime="2020-06-02T08:58:09.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-06-02</time>
-</a>
-        </div>
-    	 
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/06/02/%E8%BF%9B%E7%A8%8B/">进程</a>
+    <h1 class="article-title" itemprop="name">
+      synchronized,ReentrantLock和各类锁
     </h1>
   
 
-        <div class="article-info info-on-right">
-          
+        
+        <a href="/2020/06/23/synchronized%E5%92%8CReentrantLock/" class="archive-article-date">
+  	<time datetime="2020-06-23T01:56:12.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-06-23</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>​        synchronized 属于独占式悲观锁，是通过 JVM 隐式实现的，synchronized 只允许同一时刻只有一个线程操作资源。</p>
+<p>​        在 Java 中每个对象都隐式包含一个 monitor（监视器）对象，<strong>加锁的过程其实就是竞争 monitor 的过程</strong>，当线程进入字节码 </p>
+<p>monitorenter 指令之后，线程将持有 monitor 对象，执行 monitorexit 时释放 monitor 对象，当其他线程没有拿到 monitor 对象时，</p>
+<p>则需要阻塞等待获取该对象。</p>
+<p>​        ReentrantLock 是 Lock 的默认实现方式之一，它是基于 <strong>AQS</strong>（Abstract Queued Synchronizer，队列同步器）实现的，它默认是通</p>
+<p>过非公平锁实现的，在它的内部有一个 state 的状态字段用于表示锁是否被占用，如果是 0 则表示锁未被占用，此时线程就可以把 state </p>
+<p>改为 1，并成功获得锁，而其他未获得锁的线程只能去排队等待获取锁资源。</p>
+<p>​        synchronized 和 ReentrantLock 都提供了锁的功能，具备互斥性和不可见性。在 JDK 1.5 中 synchronized 的性能远远低于  </p>
+<p>ReentrantLock，但在 JDK 1.6 之后  synchronized 的性能略低于  ReentrantLock，它的区别如下：</p>
+<ul>
+<li>synchronized是JVM隐式实现的，而ReentrantLock是Java语言提供的API</li>
+<li>ReentrantLock可以设置为公平锁，但synchronized却不行</li>
+<li>ReentrantLock只能修饰代码块，而synchronized可以用于修饰方法、修饰代码块等</li>
+<li>ReentrantLock需要手动加锁和释放锁，如果忘记释放锁，这回造成资源被永久占用，而synchronized无需手动释放锁</li>
+<li>ReentrantLock可以知道是否成功获取了锁，但synchronized却不行</li>
+</ul>
+<h5 id="公平锁VS非公平锁"><a href="#公平锁VS非公平锁" class="headerlink" title="公平锁VS非公平锁"></a>公平锁VS非公平锁</h5><p>​        公平锁的含义是线程需要按照请求的顺序来获得锁；而非公平锁则允许“插队”的情况存在，所谓的“插队”指的是，线程在发送请求的</p>
+<p>同时该锁的状态恰好变成了可用，那么此线程就可以跳过队列中所有排队的线程直接拥有该锁。</p>
+<p>​        而公平锁由于有挂起和恢复所以存在一定的开销，因此性能不如非公平锁，所以 ReentrantLock 和 synchronized <strong>默认都是非公平锁</strong></p>
+<p>的实现方式。</p>
+<h5 id="自适应自旋锁"><a href="#自适应自旋锁" class="headerlink" title="自适应自旋锁"></a>自适应自旋锁</h5><p>​        自适应式自旋锁意味着自旋的时间不再是固定的时间了，比如在同一个锁对象上，如果通过自旋等待成功获取了锁，那么虚拟机就会</p>
+<p>认为，它下一次很有可能也会成功 (通过自旋获取到锁)，因此允许自旋等待的时间会相对的比较长，而当某个锁通过自旋很少成功获得过</p>
+<p>锁，那么以后在获取该锁时，可能会直接忽略掉自旋的过程，以避免浪费 CPU 的资源，这就是自适应自旋锁的功能。</p>
+<h5 id="锁升级（锁膨胀）"><a href="#锁升级（锁膨胀）" class="headerlink" title="锁升级（锁膨胀）"></a>锁升级（锁膨胀）</h5><p>​        锁升级其实就是<strong>从偏向锁到轻量级锁再到重量级锁升级的过程</strong>，这是 JDK 1.6 提供的优化功能，也称之为锁膨胀。</p>
+<p>​        偏向锁是指在无竞争的情况下设置的一种锁状态。偏向锁的意思是它会偏向于第一个获取它的线程，当锁对象第一次被获取到之后，</p>
+<p>会在此对象头中设置标示为“01”，表示偏向锁的模式，并且在对象头中记录此线程的 ID，这种情况下，如果是持有偏向锁的线程每次在进</p>
+<p>入的话，不再进行任何同步操作，如 Locking、Unlocking 等，直到另一个线程尝试获取此锁的时候，偏向锁模式才会结束，偏向锁可以</p>
+<p>提高带有同步但无竞争的程序性能。但如果在多数锁总会被不同的线程访问时，偏向锁模式就比较多余了，此时可以通过 -XX:-</p>
+<p>UseBiasedLocking 来禁用偏向锁以提高性能。</p>
+<p>​        轻量锁是相对于重量锁而言的，在 JDK 1.6 之前，synchronized 是通过操作系统的互斥量（mutex lock）来实现的，这种实现方式</p>
+<p>需要在用户态和核心态之间做转换，有很大的性能消耗，这种传统实现锁的方式被称之为重量级锁。</p>
+<p>​        而轻量级锁是通过比较并交换（<strong>CAS</strong>，Compare and Swap）来实现的，它对比的是线程和对象的 Mark Word（对象头中的一个区</p>
+<p>域），如果更新成功则表示当前线程成功拥有此锁；如果失败，虚拟机会先检查对象的 Mark Word 是否指向当前线程的栈帧，如果是，</p>
+<p>则说明当前线程已经拥有此锁，否则，则说明此锁已经被其他线程占用了。当两个以上的线程争抢此锁时，轻量级锁就膨胀为重量级锁，</p>
+<p>这就是锁升级的过程，也是 JDK 1.6 锁优化的内容。</p>
+<h5 id="乐观锁和悲观锁"><a href="#乐观锁和悲观锁" class="headerlink" title="乐观锁和悲观锁"></a>乐观锁和悲观锁</h5><p>​        悲观锁指的是数据对外界的修改采取保守策略，它认为线程很容易会把数据修改掉，因此再整个数据被修改的过程中都会采用锁定状</p>
+<p>态，直到一个线程使用完，其他线程才可以继续使用。</p>
+<p>​        乐观锁和悲观锁的概念恰好相反，乐观锁认为一般情况下数据在修改时不会出现冲突，所以在数据访问之前不会加锁，只是在数据提交更改时，才会对数据进行检测。</p>
+<p>​        Java 中的乐观锁大部分都是通过 <strong>CAS</strong>（Compare And Swap，比较并交换）操作实现的，CAS 是一个多线程同步的原子指令，CAS </p>
+<p>操作包含三个重要的信息，即内存位置、预期原值和新值。如果内存位置的值和预期的原值相等的话，那么就可以把该位置的值更新为新</p>
+<p>值，否则不做任何修改。</p>
+<p>​        CAS 可能会造成 <strong>ABA</strong> 的问题，ABA 问题指的是，线程拿到了最初的预期原值 A，然而在将要进行 CAS 的时候，被其他线程抢占了执</p>
+<p>行权，把此值从 A 变成了 B，然后其他线程又把此值从 B 变成了 A，然而此时的 A 值已经并非原来的 A 值了，但最初的线程并不知道这</p>
+<p>个情况，在它进行 CAS 的时候，只对比了预期原值为 A 就进行了修改，这就造成了 ABA 的问题。</p>
+<p>​        ABA 的常见处理方式是添加版本号（或者添加时间戳），每次修改之后更新版本号，拿上面的例子来说，假如每次移动箱子之后，箱</p>
+<p>子的位置就会发生变化，而这个变化的位置就相当于“版本号”，当某人进来之后发现箱子的位置发生了变化就知道有人动了手脚，就会放</p>
+<p>弃原有的计划，这样就解决了 ABA 的问题。</p>
+<p>​        JDK 在 1.5 时提供了 AtomicStampedReference 类也可以解决 ABA 的问题，此类维护了一个“版本号” Stamp，每次在比较时不止比</p>
+<p>较当前值还比较版本号，这样就解决了 ABA 的问题。</p>
+<h5 id="可重入锁"><a href="#可重入锁" class="headerlink" title="可重入锁"></a>可重入锁</h5><p>​        可重入锁也叫递归锁，指的是同一个线程，如果外面的函数拥有此锁之后，内层的函数也可以继续获取该锁。在 Java 语言中 </p>
+<p>ReentrantLock 和 synchronized 都是可重入锁。</p>
+<p>​        可重入锁的实现原理，是在锁内部存储了一个线程标识，用于判断当前的锁属于哪个线程，并且锁的内部维护了一个计数器，当锁空</p>
+<p>闲时此计数器的值为 0，当被线程占用和重入时分别加 1，当锁被释放时计数器减 1，直到减到 0 时表示此锁为空闲状态。</p>
+<h5 id="排他锁和共享锁"><a href="#排他锁和共享锁" class="headerlink" title="排他锁和共享锁"></a>排他锁和共享锁</h5><p>​        排他锁，又称为写锁、独占锁。获准排他锁后，<strong>既能读数据，又能修改数据</strong>。在任何时候最多只能有<strong>一个线程持有该锁</strong>，比如 </p>
+<p>synchronized 就是排他锁</p>
+<p>​        共享锁，又称为读锁，可以被多线程持有，获得共享锁之后，<strong>可以查看但无法修改和删除数据</strong>。ReadWriteLock 读写锁允许同一时</p>
+<p>间内有<strong>多个线程进行读操作，但是写锁只能被独占</strong>，它就属于共享锁。</p>
+
+      
+
+      
+        <div class="page-reward">
+          <a href="javascript:;" class="page-reward-btn tooltip-top">
+            <div class="tooltip tooltip-east">
+            <span class="tooltip-item">
+              赏
+            </span>
+            <span class="tooltip-content">
+              <span class="tooltip-text">
+                <span class="tooltip-inner">
+                  <p class="reward-p"><i class="icon icon-quo-left"></i>谢谢你请我吃糖果<i class="icon icon-quo-right"></i></p>
+                  <div class="reward-box">
+                    
+                    
+                  </div>
+                </span>
+              </span>
+            </span>
+          </div>
+          </a>
+        </div>
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">操作系统</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">高并发</a>
         		</li>
       		
 		</ul>
 	</div>
 
-          
+      
 
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2020/06/23/synchronized%E5%92%8CReentrantLock/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
+  
+<nav id="article-nav">
   
   
-    </div></section>
+    <a href="/2020/06/22/ThreadPoolExcutor/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">ThreadPoolExcutor</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+  
+  
   
 
-    
+  
+
+  
+
+  
 
 
           </div>
@@ -222,9 +390,9 @@
 	var yiliaConfig = {
 		mathjax: true,
 		isHome: false,
-		isPost: false,
+		isPost: true,
 		isArchive: false,
-		isTag: true,
+		isTag: false,
 		isCategory: false,
 		open_in_new: false,
 		toc_hide_index: true,

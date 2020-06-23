@@ -148,6 +148,450 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-synchronized和ReentrantLock" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/06/23/synchronized%E5%92%8CReentrantLock/">synchronized,ReentrantLock和各类锁</a>
+    </h1>
+  
+
+        
+        <a href="/2020/06/23/synchronized%E5%92%8CReentrantLock/" class="archive-article-date">
+  	<time datetime="2020-06-23T01:56:12.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-06-23</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>​        synchronized 属于独占式悲观锁，是通过 JVM 隐式实现的，synchronized 只允许同一时刻只有一个线程操作资源。</p>
+<p>​        在 Java 中每个对象都隐式包含一个 monitor（监视器）对象，<strong>加锁的过程其实就是竞争 monitor 的过程</strong>，当线程进入字节码 </p>
+<p>monitorenter 指令之后，线程将持有 monitor 对象，执行 monitorexit 时释放 monitor 对象，当其他线程没有拿到 monitor 对象时，</p>
+<p>则需要阻塞等待获取该对象。</p>
+<p>​        ReentrantLock 是 Lock 的默认实现方式之一，它是基于 <strong>AQS</strong>（Abstract Queued Synchronizer，队列同步器）实现的，它默认是通</p>
+<p>过非公平锁实现的，在它的内部有一个 state 的状态字段用于表示锁是否被占用，如果是 0 则表示锁未被占用，此时线程就可以把 state </p>
+<p>改为 1，并成功获得锁，而其他未获得锁的线程只能去排队等待获取锁资源。</p>
+<p>​        synchronized 和 ReentrantLock 都提供了锁的功能，具备互斥性和不可见性。在 JDK 1.5 中 synchronized 的性能远远低于  </p>
+<p>ReentrantLock，但在 JDK 1.6 之后  synchronized 的性能略低于  ReentrantLock，它的区别如下：</p>
+<ul>
+<li>synchronized是JVM隐式实现的，而ReentrantLock是Java语言提供的API</li>
+<li>ReentrantLock可以设置为公平锁，但synchronized却不行</li>
+<li>ReentrantLock只能修饰代码块，而synchronized可以用于修饰方法、修饰代码块等</li>
+<li>ReentrantLock需要手动加锁和释放锁，如果忘记释放锁，这回造成资源被永久占用，而synchronized无需手动释放锁</li>
+<li>ReentrantLock可以知道是否成功获取了锁，但synchronized却不行</li>
+</ul>
+<h5 id="公平锁VS非公平锁"><a href="#公平锁VS非公平锁" class="headerlink" title="公平锁VS非公平锁"></a>公平锁VS非公平锁</h5><p>​        公平锁的含义是线程需要按照请求的顺序来获得锁；而非公平锁则允许“插队”的情况存在，所谓的“插队”指的是，线程在发送请求的</p>
+<p>同时该锁的状态恰好变成了可用，那么此线程就可以跳过队列中所有排队的线程直接拥有该锁。</p>
+<p>​        而公平锁由于有挂起和恢复所以存在一定的开销，因此性能不如非公平锁，所以 ReentrantLock 和 synchronized <strong>默认都是非公平锁</strong></p>
+<p>的实现方式。</p>
+<h5 id="自适应自旋锁"><a href="#自适应自旋锁" class="headerlink" title="自适应自旋锁"></a>自适应自旋锁</h5><p>​        自适应式自旋锁意味着自旋的时间不再是固定的时间了，比如在同一个锁对象上，如果通过自旋等待成功获取了锁，那么虚拟机就会</p>
+<p>认为，它下一次很有可能也会成功 (通过自旋获取到锁)，因此允许自旋等待的时间会相对的比较长，而当某个锁通过自旋很少成功获得过</p>
+<p>锁，那么以后在获取该锁时，可能会直接忽略掉自旋的过程，以避免浪费 CPU 的资源，这就是自适应自旋锁的功能。</p>
+<h5 id="锁升级（锁膨胀）"><a href="#锁升级（锁膨胀）" class="headerlink" title="锁升级（锁膨胀）"></a>锁升级（锁膨胀）</h5><p>​        锁升级其实就是<strong>从偏向锁到轻量级锁再到重量级锁升级的过程</strong>，这是 JDK 1.6 提供的优化功能，也称之为锁膨胀。</p>
+<p>​        偏向锁是指在无竞争的情况下设置的一种锁状态。偏向锁的意思是它会偏向于第一个获取它的线程，当锁对象第一次被获取到之后，</p>
+<p>会在此对象头中设置标示为“01”，表示偏向锁的模式，并且在对象头中记录此线程的 ID，这种情况下，如果是持有偏向锁的线程每次在进</p>
+<p>入的话，不再进行任何同步操作，如 Locking、Unlocking 等，直到另一个线程尝试获取此锁的时候，偏向锁模式才会结束，偏向锁可以</p>
+<p>提高带有同步但无竞争的程序性能。但如果在多数锁总会被不同的线程访问时，偏向锁模式就比较多余了，此时可以通过 -XX:-</p>
+<p>UseBiasedLocking 来禁用偏向锁以提高性能。</p>
+<p>​        轻量锁是相对于重量锁而言的，在 JDK 1.6 之前，synchronized 是通过操作系统的互斥量（mutex lock）来实现的，这种实现方式</p>
+<p>需要在用户态和核心态之间做转换，有很大的性能消耗，这种传统实现锁的方式被称之为重量级锁。</p>
+<p>​        而轻量级锁是通过比较并交换（<strong>CAS</strong>，Compare and Swap）来实现的，它对比的是线程和对象的 Mark Word（对象头中的一个区</p>
+<p>域），如果更新成功则表示当前线程成功拥有此锁；如果失败，虚拟机会先检查对象的 Mark Word 是否指向当前线程的栈帧，如果是，</p>
+<p>则说明当前线程已经拥有此锁，否则，则说明此锁已经被其他线程占用了。当两个以上的线程争抢此锁时，轻量级锁就膨胀为重量级锁，</p>
+<p>这就是锁升级的过程，也是 JDK 1.6 锁优化的内容。</p>
+<h5 id="乐观锁和悲观锁"><a href="#乐观锁和悲观锁" class="headerlink" title="乐观锁和悲观锁"></a>乐观锁和悲观锁</h5><p>​        悲观锁指的是数据对外界的修改采取保守策略，它认为线程很容易会把数据修改掉，因此再整个数据被修改的过程中都会采用锁定状</p>
+<p>态，直到一个线程使用完，其他线程才可以继续使用。</p>
+<p>​        乐观锁和悲观锁的概念恰好相反，乐观锁认为一般情况下数据在修改时不会出现冲突，所以在数据访问之前不会加锁，只是在数据提交更改时，才会对数据进行检测。</p>
+<p>​        Java 中的乐观锁大部分都是通过 <strong>CAS</strong>（Compare And Swap，比较并交换）操作实现的，CAS 是一个多线程同步的原子指令，CAS </p>
+<p>操作包含三个重要的信息，即内存位置、预期原值和新值。如果内存位置的值和预期的原值相等的话，那么就可以把该位置的值更新为新</p>
+<p>值，否则不做任何修改。</p>
+<p>​        CAS 可能会造成 <strong>ABA</strong> 的问题，ABA 问题指的是，线程拿到了最初的预期原值 A，然而在将要进行 CAS 的时候，被其他线程抢占了执</p>
+<p>行权，把此值从 A 变成了 B，然后其他线程又把此值从 B 变成了 A，然而此时的 A 值已经并非原来的 A 值了，但最初的线程并不知道这</p>
+<p>个情况，在它进行 CAS 的时候，只对比了预期原值为 A 就进行了修改，这就造成了 ABA 的问题。</p>
+<p>​        ABA 的常见处理方式是添加版本号（或者添加时间戳），每次修改之后更新版本号，拿上面的例子来说，假如每次移动箱子之后，箱</p>
+<p>子的位置就会发生变化，而这个变化的位置就相当于“版本号”，当某人进来之后发现箱子的位置发生了变化就知道有人动了手脚，就会放</p>
+<p>弃原有的计划，这样就解决了 ABA 的问题。</p>
+<p>​        JDK 在 1.5 时提供了 AtomicStampedReference 类也可以解决 ABA 的问题，此类维护了一个“版本号” Stamp，每次在比较时不止比</p>
+<p>较当前值还比较版本号，这样就解决了 ABA 的问题。</p>
+<h5 id="可重入锁"><a href="#可重入锁" class="headerlink" title="可重入锁"></a>可重入锁</h5><p>​        可重入锁也叫递归锁，指的是同一个线程，如果外面的函数拥有此锁之后，内层的函数也可以继续获取该锁。在 Java 语言中 </p>
+<p>ReentrantLock 和 synchronized 都是可重入锁。</p>
+<p>​        可重入锁的实现原理，是在锁内部存储了一个线程标识，用于判断当前的锁属于哪个线程，并且锁的内部维护了一个计数器，当锁空</p>
+<p>闲时此计数器的值为 0，当被线程占用和重入时分别加 1，当锁被释放时计数器减 1，直到减到 0 时表示此锁为空闲状态。</p>
+<h5 id="排他锁和共享锁"><a href="#排他锁和共享锁" class="headerlink" title="排他锁和共享锁"></a>排他锁和共享锁</h5><p>​        排他锁，又称为写锁、独占锁。获准排他锁后，<strong>既能读数据，又能修改数据</strong>。在任何时候最多只能有<strong>一个线程持有该锁</strong>，比如 </p>
+<p>synchronized 就是排他锁</p>
+<p>​        共享锁，又称为读锁，可以被多线程持有，获得共享锁之后，<strong>可以查看但无法修改和删除数据</strong>。ReadWriteLock 读写锁允许同一时</p>
+<p>间内有<strong>多个线程进行读操作，但是写锁只能被独占</strong>，它就属于共享锁。</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">高并发</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2020/06/23/synchronized%E5%92%8CReentrantLock/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-ThreadPoolExcutor" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/06/22/ThreadPoolExcutor/">ThreadPoolExcutor</a>
+    </h1>
+  
+
+        
+        <a href="/2020/06/22/ThreadPoolExcutor/" class="archive-article-date">
+  	<time datetime="2020-06-22T07:53:10.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-06-22</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <ol>
+<li><h5 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h5><p>​        线程池是为了避免线程频繁的创建和销毁带来的性能消耗，而建立的一种池化技术，它是把已创建的线程放入“池”中，当有任务来临时就可以重用已有的线程，无需等待创建的过程，这样就可以有效提高程序的响应速度。而说到线程池的话一定离不开 ThreadPoolExecutor ，在阿里巴巴的《Java 开发手册》中是这样规定线程池的：</p>
+</li>
+</ol>
+<blockquote>
+<p>​      线程池不允许使用 Executors 去创建，而是通过 ThreadPoolExecutor 的方式，这样的处理方式让写的读者更加明确线程池的运行规则，规避资源耗尽的风险。</p>
+</blockquote>
+<h5 id="2-线程池的创建"><a href="#2-线程池的创建" class="headerlink" title="2.线程池的创建"></a>2.线程池的创建</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> ThreadPoolExecutor THREADPOOL =  <span class="keyword">new</span> ThreadPoolExecutor(<span class="keyword">int</span> corePoolSize, <span class="keyword">int</span> maximumPoolSize,<span class="keyword">long</span> keepAliveTime, TimeUnit unit,BlockingQueue&lt;Runnable&gt; workQueue,RejectedExecutionHandler handler)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>corePoolSize： 核心容量，创建线程池的时候，默认有多少线程。也是线程池保持的最少线程数。</li>
+<li>maximumPoolSize：   线程池维护线程的最大数量     </li>
+<li>keepAliveTime：     线程池维护线程所允许的空闲时间 （生命周期），0为永久。当线程空闲多久后，自动回收  </li>
+<li>unit：               线程池维护线程所允许的空闲时间的单位    </li>
+<li>workQueue：          线程池所使用的缓冲队列    </li>
+<li>handler：            线程池对拒绝任务的处理策略</li>
+</ul>
+<h5 id="3-线程池的执行流程"><a href="#3-线程池的执行流程" class="headerlink" title="3.线程池的执行流程"></a>3.线程池的执行流程</h5><p>线程池任务执行的主要流程如下所示：</p>
+<p><img src="/2020/06/22/ThreadPoolExcutor/%E7%BA%BF%E7%A8%8B%E7%9A%84%E6%B5%81%E7%A8%8B%E5%9B%BE.png" alt="线程的流程图"></p>
+<p>​        任务进来时，首先执行判断，判断核心线程是否处于空闲状态，如果是，核心线程就先就执行任务，如果核心线程已满，则判断任务队列是否有地方存放该任务，若果有，就将任务保存在任务队列中，等待执行，如果满了，在判断最大可容纳的线程数，如果没有超出这个数量，就开创非核心线程执行任务，如果超出了，就调用handler实现拒绝策略。</p>
+<h5 id="4-线程池的拒绝策略"><a href="#4-线程池的拒绝策略" class="headerlink" title="4.线程池的拒绝策略"></a>4.线程池的拒绝策略</h5><p>java自带的拒绝策略有4种：</p>
+<ul>
+<li>AbortPolicy，终止策略，线程池会抛出异常并终止执行，它是默认的拒绝策略；</li>
+<li>CallerRunsPolicy，把任务交给当前线程来执行；</li>
+<li>DiscardPolicy，忽略此任务（最新的任务）；</li>
+<li>DiscardOldestPolicy，忽略最早的任务（最先加入队列的任务）。</li>
+</ul>
+<p>例如，我们来演示一个AbortPolicy的拒绝策略，代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">ThreadPoolExecutor executor = <span class="keyword">new</span> ThreadPoolExecutor(<span class="number">1</span>, <span class="number">3</span>, <span class="number">10</span>,</span><br><span class="line">        TimeUnit.SECONDS, <span class="keyword">new</span> LinkedBlockingQueue&lt;&gt;(<span class="number">2</span>),</span><br><span class="line">        <span class="keyword">new</span> ThreadPoolExecutor.AbortPolicy()); <span class="comment">// 添加 AbortPolicy 拒绝策略</span></span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">6</span>; i++) &#123;</span><br><span class="line">    executor.execute(() -&gt; &#123;</span><br><span class="line">        System.out.println(Thread.currentThread().getName());</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>以上程序的执行结果：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">pool-<span class="number">1</span>-thread-<span class="number">1</span></span><br><span class="line">pool-<span class="number">1</span>-thread-<span class="number">1</span></span><br><span class="line">pool-<span class="number">1</span>-thread-<span class="number">1</span></span><br><span class="line">pool-<span class="number">1</span>-thread-<span class="number">3</span></span><br><span class="line">pool-<span class="number">1</span>-thread-<span class="number">2</span></span><br><span class="line">Exception in thread <span class="string">"main"</span> java.util.concurrent.RejectedExecutionException: Task com.lagou.interview.ThreadPoolExample$$Lambda$<span class="number">1</span>/<span class="number">1096979270</span>@<span class="number">448139f</span>0 rejected from java.util.concurrent.ThreadPoolExecutor@<span class="number">7</span>cca494b[Running, pool size = <span class="number">3</span>, active threads = <span class="number">3</span>, queued tasks = <span class="number">2</span>, completed tasks = <span class="number">0</span>]</span><br><span class="line"> at java.util.concurrent.ThreadPoolExecutor$AbortPolicy.rejectedExecution(ThreadPoolExecutor.java:<span class="number">2063</span>)</span><br><span class="line"> at java.util.concurrent.ThreadPoolExecutor.reject(ThreadPoolExecutor.java:<span class="number">830</span>)</span><br><span class="line"> at java.util.concurrent.ThreadPoolExecutor.execute(ThreadPoolExecutor.java:<span class="number">1379</span>)</span><br><span class="line"> at com.lagou.interview.ThreadPoolExample.rejected(ThreadPoolExample.java:<span class="number">35</span>)</span><br><span class="line"> at com.lagou.interview.ThreadPoolExample.main(ThreadPoolExample.java:<span class="number">26</span>)</span><br></pre></td></tr></table></figure>
+
+<p>可以看出当第 6 个任务来的时候，线程池则执行了 AbortPolicy  拒绝策略，抛出了异常。因为队列最多存储 2 个任务，最大可以创建 3 个线程来执行任务（2+3=5），所以当第 6 个任务来的时候，此线程池就“忙”不过来了。</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">高并发</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2020/06/22/ThreadPoolExcutor/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-锁的底层实现" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/06/22/%E9%94%81%E7%9A%84%E5%BA%95%E5%B1%82%E5%AE%9E%E7%8E%B0/">锁的底层实现</a>
+    </h1>
+  
+
+        
+        <a href="/2020/06/22/%E9%94%81%E7%9A%84%E5%BA%95%E5%B1%82%E5%AE%9E%E7%8E%B0/" class="archive-article-date">
+  	<time datetime="2020-06-22T01:36:01.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-06-22</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>​        java虚拟机中的同步是基于<strong>Monitor对象</strong>实现。每个对象都会对应一个monitor对象。具体简图如下所示：</p>
+<p><img src="/2020/06/22/%E9%94%81%E7%9A%84%E5%BA%95%E5%B1%82%E5%AE%9E%E7%8E%B0/monitor%E5%AF%B9%E8%B1%A1.png" alt="monitor对象"></p>
+<p>对象头：主要包括俩部分——Mark Word 和 类型指针。</p>
+<ul>
+<li>Mark Word用于存储对象自身的运行时数据，如哈希码（HashCode）、GC分代年龄、锁状态标志、线程持有的锁、偏向线程ID、偏向时间戳等等，占用内存大小与虚拟机位长一致。</li>
+<li>类型指针指向对象的类元数据，JVM通过这个指针确定该对象是那个类的实例。</li>
+</ul>
+<p>实例对象：存放类的属性数据信息，包括父类的属性信息</p>
+<p>填充数据：由于虚拟机要求对象起始对象地址必须是8字节的整数倍，填充数据不是必须存在的，仅仅是为了字节对齐</p>
+<p>​        当在对象上加锁时，数据是记录在对象头中。当执行 <em>synchronized</em> 同步方法或同步代码块时，会在对象头中记录锁标记，锁标记指向的是 <em>monitor</em> 对象（也</p>
+<p>称为管程或监视器锁）的起始地址。<strong>每个对象都存在着一个 <em>monitor</em> 与之关联</strong>，对象与其 <em>monitor</em> 之间的关系有存在多种实现方式，如 <em>monitor</em> 可以与对象一</p>
+<p>起创建销毁或当线程试图获取对象锁时自动生成，但当一个 <em>monitor</em> 被某个线程持有后，它便处于锁定状态。</p>
+<p>​        在Java虚拟机中，monitor是由ObjectMonitor实现的。ObjectMonitor中有两个队列， <strong>_WaitSet</strong>  （等待队列）和  <strong>_EntryList</strong>（锁池队列，也有叫同步队</p>
+<p>列），以及 <strong>_Owner</strong> 标记。其中<strong>_WaitSet</strong>  是用于管理等待队列线程的，<strong>_EntryList</strong>是用于管理锁池阻塞线程的，<strong>_WaitSet</strong> 标记用于记录当前执行线程的对象。</p>
+<p>线程状态图如下：</p>
+<p>​    <img src="/2020/06/22/%E9%94%81%E7%9A%84%E5%BA%95%E5%B1%82%E5%AE%9E%E7%8E%B0/%E7%BA%BF%E7%A8%8B%E7%8A%B6%E6%80%81%E5%9B%BE.png" alt="线程状态图"></p>
+<p>​    当多线程并发访问同一个同步代码时，<strong>首先会进入_EntryList</strong>，锁池队列中的线程才可以竞争锁。当线程获取锁标记后，<strong>monitor中的_Owner记录此线程</strong>，并</p>
+<p>在monitor中的计数器执行递增计算（+1）,代表锁定，其他线程在_EntryList中继续阻塞。</p>
+<ul>
+<li>若执行线程调用wait方法，则monitor中的计数器赋值为0，并将 _Owner标记为null，代表放弃锁，执行线程进入 _WaitSet中等待，只有执行线程调用notify/notifyAll方法， _WaitSet中的线程才会被唤醒，进入 _EntryList中阻塞，等待获取锁标记。</li>
+<li>若执行线程的同步代码执行结束，同样会释放锁标记，monitor 中的 _Owner标记赋值为 <em>null*，且计数器赋值为 *0</em> 计算。</li>
+</ul>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">高并发</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2020/06/22/%E9%94%81%E7%9A%84%E5%BA%95%E5%B1%82%E5%AE%9E%E7%8E%B0/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-线程的状态" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/06/19/%E7%BA%BF%E7%A8%8B%E7%9A%84%E7%8A%B6%E6%80%81/">线程的执行状态</a>
+    </h1>
+  
+
+        
+        <a href="/2020/06/19/%E7%BA%BF%E7%A8%8B%E7%9A%84%E7%8A%B6%E6%80%81/" class="archive-article-date">
+  	<time datetime="2020-06-19T07:39:23.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-06-19</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>java中的线程有6个状态，状态图如下：</p>
+<p><img src="/2020/06/19/%E7%BA%BF%E7%A8%8B%E7%9A%84%E7%8A%B6%E6%80%81/%E7%BA%BF%E7%A8%8B%E7%8A%B6%E6%80%81.png" alt="线程状态"></p>
+<ul>
+<li><strong>NEW</strong>，新建状态，线程被创建出来后，但尚未启动时的线程状态，例如：Thread thread = new Thread()。 </li>
+<li><strong>RUNNABLE</strong>，就绪状态，表示可以运行的线程状态，它可能正在运行（RUNNING），或者是在排队等待操作系统给它分配CPU资源(READY)；</li>
+<li><strong>BLOCKED</strong>，表示处于阻塞状态的线程正在等待监视器锁，比如等待执行 synchronized 代码块或者使用 synchronized 标记的方法（此时线程进入到 _EntryList–锁池队列）</li>
+<li><strong>WAITING</strong>，等待状态，一个处于等待状态的线程正在等待另一个线程执行某个特定的动作，比如一个线程调用了 Object.wait() 方法，那它就在等待另一个线程调用 Object.notify() 或 Object.notifyAll() 方法（此时线程进入到 _WaitSet–等待队列）</li>
+<li><strong>TIMED_WAITING</strong>，计时等待状态，和等待状态（WAITING）类似，但是它多了超时时间，比如调用了有超时时间设置的方法 Object.wait(long timeout) 和 Thread.join(long timeout) 等这些方法时，它才会进入此状态，<strong>时间一到，会被自动唤醒</strong>（此时线程进入到 _WaitSet–等待队列）</li>
+<li><strong>TERMINATED</strong>，终止状态，表示线程已经执行完成。</li>
+</ul>
+<p>线程中的几个重要方法比较：</p>
+<ol>
+<li>Thread.sleep(long millis)，一定是当前线程调用此方法，当前线程进入<strong>TIMED_WAITING状态</strong>，但不释放对象锁，millis后线程自动苏醒进入就绪状态。作用：给其它线程执行机会的，<strong>不考虑其优先级</strong>（和yeild的主要区别）。</li>
+<li>Thread.yield()，一定是当前线程调用此方法，当前线程放弃获取的CPU时间片，但不释放锁资源，由运行状态变为<strong>就绪状态</strong>，让OS再次选择线程。作用：让<strong>相同优先级或者比他高的线程</strong>轮流执行，但并不保证一定会轮流执行。实际中无法保证yield()达到让步目的，因为让步的线程还有可能被线程调度程序再次选中。Thread.yield()不会导致阻塞。该方法与sleep()类似，只是不能由用户指定暂停多长时间。</li>
+<li>thread.join()/thread.join(long millis)，<strong>当前线程里调用其它线程t的join方法，当前线程进入WAITING/TIMED_WAITING状态</strong>，当前线程不会释放已经持有的对象锁。线程t执行完毕或者millis时间到，当前线程一般情况下进入RUNNABLE状态，也有可能进入BLOCKED状态（因为join是基于wait实现的）。</li>
+<li>obj.wait()，当前线程调用对象的wait()方法，当前线程释放对象锁，<strong>进入等待队列</strong>。依靠notify()/notifyAll()唤醒或者wait(long timeout) timeout时间到自动唤醒。</li>
+<li>obj.notify()唤醒在此对象监视器上等待的单个线程，选择是任意性的。notifyAll()唤醒在此对象监视器上等待的所有线程。俩者会让线程<strong>进入同步队列竞争锁</strong>，如果获得锁，进入RUNNABLE状态，否则进入BLOCKED状态等待获取锁。</li>
+<li>LockSupport.park()/LockSupport.parkNanos(long nanos),LockSupport.parkUntil(long deadlines), 当前线程进入WAITING/TIMED_WAITING状态。对比wait方法,不需要获得锁就可以让线程进入WAITING/TIMED_WAITING状态，需要通过LockSupport.unpark(Thread thread)唤醒。</li>
+</ol>
+<p><strong>等待队列（_WaitSet）</strong></p>
+<p>调用obj的wait(), notify()方法前，必须获得obj锁，也就是必须写在synchronized(obj) 代码段内</p>
+<p>具体步骤图如下：</p>
+<p><img src="/2020/06/19/%E7%BA%BF%E7%A8%8B%E7%9A%84%E7%8A%B6%E6%80%81/%E7%AD%89%E5%BE%85%E9%98%9F%E5%88%97%E6%AD%A5%E9%AA%A4%E5%9B%BE.jpg" alt="等待队列步骤图"></p>
+<p>1.线程1获取对象A的锁，正在使用对象A。</p>
+<p>2.线程1调用对象A的wait()方法。</p>
+<p>3.线程1释放对象A的锁，并马上进入等待队列。</p>
+<p>4.锁池里面的对象争抢对象A的锁。</p>
+<p>5.线程5获得对象A的锁，进入synchronized块，使用对象A。</p>
+<p>6.线程5调用对象A的notifyAll()方法，唤醒所有线程，所有线程进入同步队列。若线程5调用对象A的notify()方法，则唤醒一个线程，不知道会唤醒谁，被唤醒的那个线程进入同步队列。</p>
+<p>7.notifyAll()方法所在synchronized结束，线程5释放对象A的锁。</p>
+<p>8.同步队列的线程争抢对象锁，但线程1什么时候能抢到就不知道了。 </p>
+<p><strong>同步（锁池）队列（_EntryList）</strong></p>
+<ul>
+<li>当前线程想调用对象A的同步方法时，发现对象A的锁被别的线程占有，此时当前线程进入同步队列。简言之，同步队列里面放的都是想争夺对象锁的线程。<br>当一个线程1被另外一个线程2唤醒时，1线程进入同步队列，去争夺对象锁。</li>
+<li>同步队列是在同步的环境下才有的概念，一个对象对应一个同步队列。</li>
+<li>线程等待时间到了或被notify/notifyAll唤醒后，会进入同步队列竞争锁，如果获得锁，进入RUNNABLE状态，否则进入BLOCKED状态等待获取锁。</li>
+</ul>
+<p>参考链接：</p>
+<p>1.<a href="https://blog.csdn.net/pange1991/article/details/53860651" target="_blank" rel="noopener">https://blog.csdn.net/pange1991/article/details/53860651</a></p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">高并发</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2020/06/19/%E7%BA%BF%E7%A8%8B%E7%9A%84%E7%8A%B6%E6%80%81/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-Redis持久化策略" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -731,12 +1175,12 @@
 <p>​        </p>
 <p><strong>3.AOP介绍</strong></p>
 <p>​    AOP（Aspect Oriented Programming）面向切面编程，是面向对象开发的一种补充，它允许开发人员在不改变原有的逻辑的基础上，增加一些额外的功能。例如，开发人员可以在不改变原来业务逻辑模型的基础可以进行动态的增加日志，安全或异常处理功能。</p>
-<p>​    AOP实现的关键在于代理模式，AOP代理主要分为<strong>静态代理和动态代理</strong>。静态代理的代表为AspectJ；动态代理则以Spring AOP为代表。**</p>
+<p>​    AOP实现的关键在于代理模式，AOP代理主要分为<strong>静态代理和动态代理</strong>。静态代理的代表为AspectJ；动态代理则以Spring AOP为代表。</p>
 <p>​    （1）AspectJ是静态代理的增强，所谓静态代理，所谓静态也就是在程序运行前就已经存在代理类的字节码文件，代理类和委托类的关系在运行前就确定了。</p>
 <p>​    （2）Spring AOP使用的动态代理，动态代理类的源码是在程序运行期间由JVM根据反射等机制动态的生成，所以不存在代理类的字节码文件。代理类和委托类的关系是在程序运行时确定。 </p>
-<p>​    Spring AOP的动态代理主要由两种方式，JDK动态代理和CGLib动态代理</p>
+<p>​    Spring AOP的动态代理主要由两种方式，<strong>JDK动态代理和CGLib动态代理</strong></p>
 <p>（1）JDK动态代理只提供接口的代理，不支持类的代理。核心InvocationHandler接口和Proxy类，InvocationHandler 通过invoke()方法反射来调用目标类中的代码，动态地将横切逻辑和业务编织在一起；接着Proxy利用 InvocationHandler动态创建一个符合某一接口的的实例,  生成目标类的代理对象。</p>
-<p> （2）如果代理类没有实现 InvocationHandler 接口，那么Spring AOP会选择使用CGLIB来动态代理目标类。CGLIB（Code Generation Library），是一个代码生成的类库，可以在运行时动态的生成指定类的一个子类对象，并覆盖其中特定方法并添加增强代码，从而实现AOP。CGLIB是通过继承的方式做的动态代理，因此如果某个类被标记为final，那么它是无法使用CGLIB做动态代理的。</p>
+<p> （2）如果代理类没有实现 InvocationHandler 接口，那么Spring AOP会选择使用CGLIB来动态代理目标类。CGLIB（Code Generation Library），是一个代码生成的类库，可以在运行时动态的生成指定类的一个子类对象，并覆盖其中特定方法并添加增强代码，从而实现AOP。CGLIB是通过<strong>继承</strong>的方式做的动态代理，因此如果某个类被标记为final，那么它是无法使用CGLIB做动态代理的。</p>
 <table>
 <thead>
 <tr>
@@ -750,7 +1194,7 @@
 </tr>
 <tr>
 <td>JDK动态代理</td>
-<td>需要有顶层接口才能使用。利用反射完成。使用动态字节码技。是mybaits的mapeer文件代理模式</td>
+<td>需要有顶层接口才能使用。利用反射完成。使用动态字节码技。是mybaits的mapper文件代理模式</td>
 </tr>
 <tr>
 <td>CGLib动态代理</td>
@@ -830,7 +1274,7 @@
 <p>（1）工厂模式：BeanFactory就是简单工厂模式的体现，用来创建对象的实例；</p>
 <p>（2）单例模式：Bean默认为单例模式。</p>
 <p>（3）代理模式：Spring的AOP功能用到了JDK的动态代理和CGLIB字节码生成技术；</p>
-<p>（4）模板方法：用来解决代码重复的问题。比如. RestTemplate, JmsTemplate, JpaTemplate。</p>
+<p>（4）模板方法：用来解决代码重复的问题。比如:RestTemplate, JmsTemplate, JpaTemplate。</p>
 <p>（5）观察者模式：定义对象键一种一对多的依赖关系，当一个对象的状态发生改变时，所有依赖于它的对象都会得到通知被制动更新，如Spring中listener的实现–ApplicationListener。</p>
 <p><strong>9.Spring事务的实现方式和实现原理</strong></p>
 <p>​     Spring事务的本质其实就是数据库对事务的支持，没有数据库的事务支持，spring是无法提供事务功能的。真正的数据库层的事务提交和回滚是通过binlog或者redo log实现的。</p>
@@ -1171,568 +1615,10 @@
 
 
   
-    <article id="post-java类加载机制" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
   
-    <h1 itemprop="name">
-      <a class="article-title" href="/2020/06/02/java%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6/">java类加载机制</a>
-    </h1>
-  
-
-        
-        <a href="/2020/06/02/java%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6/" class="archive-article-date">
-  	<time datetime="2020-06-02T07:22:17.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-06-02</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h4 id="一．java的类加载过程"><a href="#一．java的类加载过程" class="headerlink" title="一．java的类加载过程"></a>一．java的类加载过程</h4><p>java的类加载过程的生命周期有7部分，如下图所示。但是类加载过程就是前5部分：</p>
-<p><img src="/2020/06/02/java%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6/1.png" alt="1"></p>
-<ul>
-<li><p><strong>加载</strong>：将字节码从不同的数据源（可能是class文件，也可能是jar包,甚至是网络）转化成二进制字节流加载到内存中，并生成一个代表该类的java.lang.class对象</p>
-</li>
-<li><p><strong>验证</strong>：只有符合JVM字节码规范的才能被JVM正确执行</p>
-<ul>
-<li>确保二进制字节流格式符合预期（比如是否以cafe bene开头）</li>
-<li>是否所有方法都遵循访问控制关键字的限定</li>
-<li>方法调用的参数个数和类型是否正确</li>
-<li>确保变量在使用之前被正确初始化了</li>
-<li>检查变量是否被赋予恰当类型的值</li>
-</ul>
-</li>
-<li><p><strong>准备</strong>：JVM会在该阶段对类变量（也称为静态变量）分配内存并初始化（对应数据类型的默认初始值，如 0、0L、null、false 等）。</p>
-<p>例如：有下面这样的一段代码：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">public String name &#x3D; &quot;卫龙&quot;</span><br><span class="line">public static String job &#x3D; &quot;程序猿&quot;</span><br><span class="line">public static final String hobby &#x3D;“吃辣条”</span><br></pre></td></tr></table></figure>
-
-<p>name在这一阶段不会被分配内存，但是job会被分配内存，并初始化成null</p>
-<p>需要注意的是，static final修饰的变量被称为常量，常量一旦被赋值就不会改变了，所以hobby在准备阶段的值是“吃辣条”，而不是null</p>
-</li>
-<li><p><strong>解析</strong>：该阶段是将常量池中的符号引用转化为直接引用。在class文件被加载至Java虚拟机前，这个类无法知道其它类及其方法，字段所对应的具体地址。甚至不知道自己方法，字段的地址。因此，每当需要引用这些成员时，Java编译器会生成一个符号引用。在运行阶段，这个符号引用一般能够无歧义地定位到具体目标上。解析阶段的目的，正是将这些符号引用解析为实际引用。</p>
-</li>
-<li><p><strong>初始化</strong>：该阶段是类加载的最后一个阶段。在准备阶段，静态变量已经被赋值过默认初始值，在初始化阶段，静态变量将被赋值为代码锁期望赋的值。话句话说，初始化阶段是执行类构造器方法的过程。也就是说上面的job这时候会被赋值为“程序猿”。 </p>
-</li>
-</ul>
-<h4 id="二．类加载器"><a href="#二．类加载器" class="headerlink" title="二．类加载器"></a>二．类加载器</h4><p>类加载器的任务是根据一个类的全限定名来读取此类的二进制字节流到 JVM 中，然后转换为一个与目标类对应的java.lang.Class对象实例，在虚拟机提供了3种类加载器 </p>
-<p><strong>1.</strong> <strong>启动类加载器</strong>，加载jre/lib包下面的jar文件，比如说常见的rt.jar</p>
-<p><strong>2.</strong> <strong>扩展类加载器</strong>，加载jre/lib/ext包下面的jar文件</p>
-<p><strong>3.</strong> <strong>应用类加载器</strong>，根据程序的类路径来加载java类</p>
-<h4 id="三．双亲委派模型"><a href="#三．双亲委派模型" class="headerlink" title="三．双亲委派模型"></a>三．双亲委派模型</h4><p>在Java的日常应用程序开发中，类的加载几乎是由上述3种类加载器相互配合执行的，在必要时，我们还可以自定义类加载器，而此时Java虚拟机采用的是双亲委派模式。双亲委派工作机制如下所示：</p>
-<p><img src="/2020/06/02/java%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6/3.png" alt="类加载机制"></p>
-<p>双亲委派模型的机制是如果一个类加载器收到了加载类的请求，它会优先把请求委托给上层加载器去完成。上层又委托给上上层去完成，一直到最顶层的类加载器。而只有所有上层的类加载器无法完成类加载的时候，当前的类加载器才会自己尝试去加载这个类。 </p>
-<p>双亲委派的好处：</p>
-<ol>
-<li>可以避免重复加载，父类已经加载，子类就不需要再次加载</li>
-<li>更加安全，很好的解决了各个类加载器的基础类的统一问题，如果不使用该方式，那么用户可以随意定义类加载器加载核心API，会带来安全隐患</li>
-</ol>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">JVM</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2020/06/02/java%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-JVM" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2020/06/02/JVM/">JVM笔记</a>
-    </h1>
-  
-
-        
-        <a href="/2020/06/02/JVM/" class="archive-article-date">
-  	<time datetime="2020-06-02T06:14:05.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-06-02</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>最近看了《深入理解java虚拟机》（周志明）,对JVM 运行时区域和GC机制做一个笔记整理</p>
-<h4 id="一-java的运行时区域"><a href="#一-java的运行时区域" class="headerlink" title="一.java的运行时区域"></a>一.java的运行时区域</h4><p>运行时数据区（也就是我们说的java内存）整体分为两类  <strong>线程私有</strong>和<strong>线程共享</strong>。 </p>
-<p><img src="/2020/06/02/JVM/1.jpg" alt="1"></p>
-<p>线程私有的包括: </p>
-<ul>
-<li>程序计数器<ul>
-<li>若正在执行的是java方法，则计数器记录的是正在执行的字节码指令的地址 </li>
-<li>若正在执行的是native本地方法，则计数器为空 </li>
-<li>该区域是唯一一个不会导致outofmemoryError的区域 </li>
-</ul>
-</li>
-<li>虚拟机栈<ul>
-<li>描述的是<strong>Java方法执行的内存模型</strong>：每个方法在执行时会创建一个栈帧，用于存储局部变量表，操作数栈等信息，每一个方法从调用到执行完成的过程就对应着一个栈帧从入栈到出栈的过程</li>
-<li>局部变量表存放了编译期可知的基本数据类型，对象引用，和returnAddress类型（指向一条字节码指令地址），局部标量表中的内存空间在编译期间完成分配，在方法运行期间不会改变局部变量表的大小</li>
-<li>可导致两种异常：线程请求的栈深度大于虚拟机允许的深度-StackOverflowError；虚拟机无法申请到足够的内存-OutOfMemoryError         </li>
-</ul>
-</li>
-<li>本地方法栈 <ul>
-<li>和虚拟机栈类似，但它是为Native本地方法服务的 </li>
-</ul>
-</li>
-</ul>
-<hr>
-<p>线程共享的包括: </p>
-<ul>
-<li>堆<ul>
-<li>java堆是被所有线程共享的内存区域，在虚拟机启动时创建，用来<strong>分配对象实例和数组</strong> </li>
-<li>堆是垃圾回收器主要管理的区域，堆可分为新生代和老年代 <ul>
-<li>从内存分配角度看，堆可划分出多个线程私有的分配缓冲区（TLAB） </li>
-</ul>
-</li>
-<li>java堆可以处于物理上不连续的内存空间，只要逻辑上是连续的即可。</li>
-<li>大小可通过 -Xmx 和 -Xms 控制 </li>
-</ul>
-</li>
-<li>方法区<ul>
-<li>用来存放虚拟机加载的<strong>类信息，常量，静态变量，即时编译器编译后的代码</strong>等信息 </li>
-<li>GC会回收该区域的常量池和进行类型的卸载 </li>
-<li>运行时常量池 也属于方法区的一部分<ul>
-<li>Class文件的常量池用于存放编译期生成的各种字面量和符号引用，这部分内容将在类加载后存放在运行时常量池中 </li>
-<li>还把翻译出来的直接引用也放在运行时常量池中，运行时产生的常量也放在里面</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<hr>
-<ul>
-<li>直接内存<ul>
-<li>并不是虚拟机运行时数据区的部分，也不是java虚拟机规范中定义的内存区域，但是这部分内存会被频繁使用，可能导致OutOfMemoryError异常出现。</li>
-</ul>
-</li>
-</ul>
-<h4 id="二-垃圾回收机制"><a href="#二-垃圾回收机制" class="headerlink" title="二.垃圾回收机制"></a>二.垃圾回收机制</h4><h5 id="1-判断对象是否存活"><a href="#1-判断对象是否存活" class="headerlink" title="1.判断对象是否存活"></a>1.判断对象是否存活</h5><p>要进行垃圾回收，首先要判断对象是否存活，这时引出了两个方法：</p>
-<ul>
-<li>引用计数法<ul>
-<li>思想：给对象设置引用计数器，每当引用该对象一次，计数器就+1，引用失效时，计数器就-1，当任意时候引用计数器的值都为0时，则该对象可被回收 </li>
-<li>Java不适用原因：无法解决对象互相循环引用的问题 </li>
-</ul>
-</li>
-<li>可达性分析法<ul>
-<li>以GC Roots为起点，从这些起点开始向下搜索，经过的路径称为引用链。若一个对象到GC Roots之间没有任何引用链，则该对象是不可达的。 </li>
-<li>那么可作为GC Roots的对象有 <ul>
-<li>虚拟机栈（栈帧中的局部变量表）中引用的对象 </li>
-<li>方法区中类静态属性引用的对象 </li>
-<li>方法区中常量引用的对象 </li>
-<li>本地方法栈中JNI（Java Native Interface）引用的对象 </li>
-</ul>
-</li>
-</ul>
-</li>
-<li>在可达性分析过程中，对象引用类型会对对象的生命周期产生影响，JAVA中有这几种类型的引用：<ul>
-<li>强引用：只要该引用还有效，GC就不会回收 </li>
-<li>软引用：内存空间足够时不进行回收，在内存溢出发生前进行回收、用SoftReference类实现 </li>
-<li>弱引用：弱引用关联的对象只能存活到下一次Gc收集、用WeakReference类实现 </li>
-<li>虚引用：无法通过虚引用获得对象实例，也不会对对象的生存时间产生影响、唯一目的：当该对象被Gc收集时，收到一个系统通知。用PhantomReference类实现 </li>
-</ul>
-</li>
-</ul>
-<p>一个对象真正不可用，要经历两次标记过程：</p>
-<ul>
-<li>首先进行可达性分析，筛选出与GC Roots没用引用链的对象，进行第一次标记 </li>
-<li>第一次标记后，再进行一次筛选，筛选条件是是否有必要执行finalize()方法。若对象没有重写finalize()方法，或者finalize()已被jvm调用过，则没必要执行，GC会回收该对象 </li>
-<li>若有必要执行，则该对象会被放入F-Queue中，由jvm开启一个低优先级的线程去执行它（但不一定等待finalize执行完毕）。 </li>
-<li>Finalize()是对象最后一次自救的机会，若对象在finalize()中重新加入到引用链中，则它会被移出要回收的对象的集合。其他对象则会被第二次标记，进行回收</li>
-</ul>
-<h5 id="2-垃圾回收算法"><a href="#2-垃圾回收算法" class="headerlink" title="2.垃圾回收算法"></a>2.垃圾回收算法</h5><p>JAVA中的垃圾回收算法有：</p>
-<ul>
-<li>标记-清除（Mark-Sweep） <ul>
-<li>两个阶段：标记， 清除 </li>
-<li>缺点：两个阶段的效率都不高；容易产生大量的内存碎片 </li>
-</ul>
-</li>
-<li>复制（Copying） <ul>
-<li>把内存分成大小相同的两块，当一块的内存用完了，就把可用对象复制到另一块上，将使用过的一块一次性清理掉 </li>
-<li>缺点：浪费了一半内存 </li>
-</ul>
-</li>
-<li>标记-整理（Mark-Compact） <ul>
-<li>标记后，让所有存活的对象移到一端，然后直接清理掉端边界以外的内存 </li>
-</ul>
-</li>
-<li>分代收集 <ul>
-<li>把堆分为新生代和老年代 </li>
-<li>新生代使用复制算法 </li>
-<li>将新生代内存分为一块大的Eden区和两块小的Survivor；每次使用Eden和一个Survivor，回收时将Eden和Survivor存活的对象复制到另一个Survivor（HotSpot的比例默认Eden：Survivor = 8：1） </li>
-<li>老年代使用标记-清理或者标记-整理 </li>
-</ul>
-</li>
-</ul>
-<h5 id="3-内存分配原则"><a href="#3-内存分配原则" class="headerlink" title="3.内存分配原则"></a>3.内存分配原则</h5><p>触发GC又涉及到了内存分配规则：</p>
-<p>对象主要分配在Eden，若启动了本地线程分配缓冲，将优先在TLAB（Thread Local Allocation Buffer）上分配（如果设置了虚拟机参数 -XX:UseTLAB，在线程初始化时，同时也会申请一块指定大小的内存，只给当前线程使用，这样每个线程都单独拥有一个空间，如果需要分配内存，就在自己的空间上分配，这样就不存在竞争的情况，可以大大提升分配效率。）</p>
-<ul>
-<li>对象优先在Eden分配 <ul>
-<li>当Eden区没有足够的空间时就会发起一次Minor GC </li>
-</ul>
-</li>
-<li>大对象直接进入老年代 <ul>
-<li>典型的大对象是很长的字符串和数组 </li>
-</ul>
-</li>
-<li>长期存活的对象进入老年代 <ul>
-<li>每个对象有年龄计数器，每经过一次GC，计数器值加一，当到达一定程度时（默认15），就会进入老年代 </li>
-<li>年龄的阈值可通过参数 -XX:MaxTenuringThreshold设置 </li>
-</ul>
-</li>
-<li>对象年龄的判定 <ul>
-<li>Survivor空间中相同年龄所有对象大小的总和大于Survivor空间的一半，年龄大于等于该年龄的对象就可直接进入老年代，无须等到MaxTenuringThreshold要求的年龄 </li>
-</ul>
-</li>
-<li>空间分配担保 <ul>
-<li>发生Minor GC前，jvm会检查老年代最大可用的连续空间是否大于新生代所有对象总空间，若大于，则Minor GC是安全的 </li>
-<li>若不大于，jvm会查看HandlePromotionFailure是否允许担保失败，若不允许，则改为一次Full GC </li>
-<li>若允许担保失败，则检查老年代最大可用的连续空间是否大于历次晋升到老年代对象的平均大小，若大于，则尝试进行Minor GC；若小于，则要改为Full GC </li>
-</ul>
-</li>
-</ul>
-<h5 id="4-垃圾收集器："><a href="#4-垃圾收集器：" class="headerlink" title="4.垃圾收集器："></a>4.垃圾收集器：</h5><p>java垃圾回收器较多，主流搭配如下所示</p>
-<p><img src="/2020/06/02/JVM/GC.png" alt="GC"></p>
-<ul>
-<li>Serial（串行收集器）<ul>
-<li>特性：单线程，stop the world，采用复制算法 </li>
-<li>应用场景：jvm在Client模式下默认的新生代收集器 </li>
-<li>优点：简单高效 </li>
-</ul>
-</li>
-<li>ParNew<ul>
-<li>特点：是Serial的多线程版本，采用复制算法 </li>
-<li>应用场景：在Server模式下常用的新生代收集器，可与CMS配合工作 </li>
-</ul>
-</li>
-<li>Parallel Scavenge<ul>
-<li>特点：并行的多线程收集器，采用复制算法，吞吐量优先，有自适应调节策略 </li>
-<li>应用场景：需要吞吐量大的时候       <code>注意:吞吐量=程序运行时间/（程序运行时间+垃圾清理时间）</code></li>
-</ul>
-</li>
-<li>SerialOld<ul>
-<li>特点：Serial的老年代版本，单线程，使用标记-整理算法 </li>
-</ul>
-</li>
-<li>Parallel Old<ul>
-<li>Parallel Scavenge的老年代版本，多线程，标记-整理算法 </li>
-</ul>
-</li>
-<li>CMS<ul>
-<li>特点：以最短回收停顿时间为目标，使用标记-清除算法 </li>
-<li>过程： <ul>
-<li>初始标记：stop the world 标记GC Roots能直接关联到的对象 </li>
-<li>并发标记：进行GC Roots Tracing </li>
-<li>重新标记：stop the world；修正并发标记期间因用户程序继续运作而导致标记产生变动的 那一部分对象的标记记录 </li>
-<li>并发清除：清除对象 </li>
-</ul>
-</li>
-<li>优点：并发收集，低停顿 </li>
-<li>缺点： <ul>
-<li>对CPU资源敏感 </li>
-<li>无法处理浮动垃圾（并发清除 时，用户线程仍在运行，此时产生的垃圾为浮动垃圾） </li>
-<li>产生大量的空间碎片 </li>
-</ul>
-</li>
-</ul>
-</li>
-<li>G1<ul>
-<li>特点：面向服务端应用，将整个堆划分为大小相同的region。 <ul>
-<li>并行与并发 </li>
-<li>分代收集 </li>
-<li>空间整合：从整体看是基于“标记-整理”的，从局部（两个region之间）看是基于“复制”的。 </li>
-<li>可预测的停顿：使用者可明确指定在一个长度为M毫秒的时间片段内，消耗在垃圾收集上的时间不得超过N毫秒。 </li>
-</ul>
-</li>
-<li>执行过程： <ul>
-<li>初始标记：stop the world 标记GC Roots能直接关联到的对象 </li>
-<li>并发标记：可达性分析 </li>
-<li>最终标记：修正在并发标记期间因用户程序继续运作而导致标记产生变动的那一部分标记记录 </li>
-<li>筛选回收：筛选回收阶段首先对各个Region的回收价值和成本进行排序，根据用户所期望的GC停顿时间来制定回收计划 </li>
-</ul>
-</li>
-</ul>
-</li>
-<li>GC自适应调节策略 Parallel Scavenge收集器有一个参数-XX:+UseAdaptiveSizePolicy。当这个参数打开之后，就不需要手工指定新生代的大小、Eden与Survivor区的比例、晋升老年代对象年龄等细节参数了，虚拟机会根据当前系统的运行情况收集性能监控信息，动态调整这些参数以提供最合适的停顿时间或者最大的吞吐量，这种调节方式称为GC自适应的调节策略（GC Ergonomics）。</li>
-</ul>
-<hr>
-<p>上述介绍的垃圾回收主要针对堆，而方法区也会进行垃圾回收：</p>
-<ul>
-<li>永久代中主要回收两部分内容：废弃常量和无用的类 </li>
-<li>废弃常量回收和对象的回收类似 </li>
-<li>无用的类需满足3个条件 <ul>
-<li>该类的所有实例对象已被回收 </li>
-<li>加载该类的ClassLoader已被回收 </li>
-<li>该类的Class对象没有在任何地方被引用，无法在任何地方通过反射访问该类的方法</li>
-</ul>
-</li>
-</ul>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">JVM</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2020/06/02/JVM/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-hexo本地图片显示" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2020/06/01/hexo%E6%9C%AC%E5%9C%B0%E5%9B%BE%E7%89%87%E6%98%BE%E7%A4%BA/">hexo本地图片显示</a>
-    </h1>
-  
-
-        
-        <a href="/2020/06/01/hexo%E6%9C%AC%E5%9C%B0%E5%9B%BE%E7%89%87%E6%98%BE%E7%A4%BA/" class="archive-article-date">
-  	<time datetime="2020-06-01T12:22:12.581Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-06-01</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="hexo-本地图片不显示问题解决"><a href="#hexo-本地图片不显示问题解决" class="headerlink" title="hexo 本地图片不显示问题解决"></a>hexo 本地图片不显示问题解决</h1><p>最近刚刚部署好博客，简单写完一篇博客发现部署到本地和远程服务器以后，本地插入的图片无法显示。</p>
-<p>于是网上找资料啥的，但是遇到了各种问题。现在简单记录下，希望以后对有遇到同样问题的朋友有所帮助。</p>
-<p>1.首先第一步我们需要修改文件博客根目录下的<code>_config.yml</code> 文件里的<code>post_asset_folder:</code>这个选项设置为<code>true</code></p>
-<p>2.修改之后，当我们再终端使用hexo n “hexo指令” 以后，会在_post 文件下生成如下的文件。</p>
-<p><img src="/2020/06/01/hexo%E6%9C%AC%E5%9C%B0%E5%9B%BE%E7%89%87%E6%98%BE%E7%A4%BA/1png.png" alt="1png"></p>
-<p>也就是说会多生成一个文件夹，这个文件夹用来存放这个md文件中需要插入的图片。当然我们也可以自己建立md文件和这样的文件夹，而不是在终端输入hexo n “filename”。这样的效果是一样的。</p>
-<p>3.安装hexo-asset-image，用来上传本地图片的插件。</p>
-<p>这里网上资料有两个版本，</p>
-<p>npm install <a href="https://github.com/CodeFalling/hexo-asset-image" target="_blank" rel="noopener">https://github.com/CodeFalling/hexo-asset-image</a> –save                         这个对应0.0.5版本</p>
-<p>npm install hexo-asset-image –save                           对应1.0.0版本</p>
-<p>两个版本对应的映射关系不同，第一次我安装的是1.0.0版本，但是安装出错了，最后安装了0.0.5版本</p>
-<p>然后在安装的过程中出现了错误</p>
-<p><img src="/2020/06/01/hexo%E6%9C%AC%E5%9C%B0%E5%9B%BE%E7%89%87%E6%98%BE%E7%A4%BA/2.png" alt="2"></p>
-<p>查询资料，是npm版本不对，然后更新了npm版本到最新版本</p>
-<p>npm install npm -g</p>
-<p>然后重新打开终端，再次下载hexo-asset-image文件，然后成功了（这个过程多试试几次，楼主一开始还是出错，然后试过几次 最后成功了）</p>
-<p>4.这时候本地md文件插入图片要改变格式</p>
-<p>原本是这样的格式</p>
-<p><img src="/2020/06/01/hexo%E6%9C%AC%E5%9C%B0%E5%9B%BE%E7%89%87%E6%98%BE%E7%A4%BA/3.png" alt="3"></p>
-<p>现在需要变成</p>
-<p><img src="/2020/06/01/hexo%E6%9C%AC%E5%9C%B0%E5%9B%BE%E7%89%87%E6%98%BE%E7%A4%BA/4.png" alt="4"></p>
-<p>也就是说<strong>首先去掉前面的路径，然后将‘\“变成”/“</strong> </p>
-<p>5.这时候部署到本地后你就会发现图片可以显示了。但是这时候我突然又出现问题了，hexo d后报错了，无法远程部署了。然后重新安装hexo-deployer-git也报错</p>
-<p><img src="/2020/06/01/hexo%E6%9C%AC%E5%9C%B0%E5%9B%BE%E7%89%87%E6%98%BE%E7%A4%BA/5.png" alt="5"></p>
-<p>查询了很多，然后试了好多方法。最后是将本地博客目录下package-lock.json文件先删除,然后再安装hexo-deployer-git，这时候可以hexo d了。</p>
-<p>弄完表示心很累，记录一下，能帮助后面遇到相同问题的朋友。</p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2020/06/01/hexo%E6%9C%AC%E5%9C%B0%E5%9B%BE%E7%89%87%E6%98%BE%E7%A4%BA/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-hexo指令" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2020/06/01/hexo%E6%8C%87%E4%BB%A4/">hexo指令</a>
-    </h1>
-  
-
-        
-        <a href="/2020/06/01/hexo%E6%8C%87%E4%BB%A4/" class="archive-article-date">
-  	<time datetime="2020-06-01T08:44:58.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-06-01</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h4 id="前言："><a href="#前言：" class="headerlink" title="前言："></a>前言：</h4><p>最近刚借助hexo和github搭建了自己的博客，为了方便以后查询，打算将hexo的常用指令做一个简单的记录。</p>
-<p><img src="/2020/06/01/hexo%E6%8C%87%E4%BB%A4/hexo.jpg" alt="hexo"></p>
-<h4 id="常用指令："><a href="#常用指令：" class="headerlink" title="常用指令："></a>常用指令：</h4><p><strong>hexo init [folder]</strong>             </p>
-<p> #新建一个网站，如果没有设置folder,hexo默认在当前的文件夹建立网站</p>
-<p><strong>hexo new [layout]  “title”</strong></p>
-<p>#可以缩写成hexo n,表示新建一篇文章。如果没有设置 <code>layout</code> 的话，默认使用 config.yml中的 <code>default_layout</code> 参数代替。例如 hexo n “hexo常用指令”，便会在此时会在站点根目录下的—-&gt;source—–&gt;_post文件夹下生成  <strong><em>hexo常用指令.md</em></strong>   文件</p>
-<p><strong>hexo generate</strong>      </p>
-<p>#等价于hexo g，表示生成静态网页  (执行 <code>$ hexo g</code>后会在站点根目录下生成public文件夹, hexo会将”/blog/source/“   下面的.md后缀的文件编译为.html后缀的文件,存放在”/blog/public/ “ 路径下)</p>
-<p><strong>hexo clean</strong></p>
-<p>#清除缓存文件（db.json）,网页正常情况下可以忽略此条命令,执行该指令后,会删掉站点根目录下的静态（public）文件夹</p>
-<p><strong>hexo deploy</strong></p>
-<p>#可以简写为hexo d 将本地的数据部署到远程服务器，如本博客就是使用该命令将文件部署到在远程github上</p>
-<p><strong>hexo server</strong></p>
-<p>#可以缩写成hexo s，表示启动服务器，默认情况下，访问网站为 <a href="http://localhost:4000" target="_blank" rel="noopener">http://localhost:4000</a>  ,这时候就可以在本地网页上打开博客了</p>
-<p><img src="/2020/06/01/hexo%E6%8C%87%E4%BB%A4/hexo_s.png" alt="hexo_s"></p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2020/06/01/hexo%E6%8C%87%E4%BB%A4/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
+    <nav id="page-nav">
+      <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/">Next &amp;raquo;</a>
+    </nav>
   
 
 
@@ -1868,6 +1754,10 @@ MathJax.Hub.Queue(function() {
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">Redis</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">高并发</a>
               </li>
             
             <div class="clearfix"></div>
