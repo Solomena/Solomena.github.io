@@ -6,28 +6,29 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>MySQL面试题 | Hexo</title>
+  <title>MySQL面试题 | Blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta name="description" content="1.MySQL索引采用B+树的原因 ​    首先MySQL中的数据一般是放在磁盘中的，读取数据的时候肯定会有访问磁盘的操作。而磁盘的定位是非常消耗时间的，树的深度越深，对应的定位次数也就越多，而B-&#x2F;B+树因为“矮胖”,可以减少访问的层数，从而减少I&#x2F;O支出。而B+树在提高了磁盘IO性能的同时，也解决了B-树遍历元素效率低下的问题。（B+树只要遍历叶子节点就可以实现整棵树的遍历。在内存中直接遍历">
 <meta property="og:type" content="article">
 <meta property="og:title" content="MySQL面试题">
 <meta property="og:url" content="http://yoursite.com/2020/06/04/MySQL/index.html">
-<meta property="og:site_name" content="Hexo">
+<meta property="og:site_name" content="Blog">
 <meta property="og:description" content="1.MySQL索引采用B+树的原因 ​    首先MySQL中的数据一般是放在磁盘中的，读取数据的时候肯定会有访问磁盘的操作。而磁盘的定位是非常消耗时间的，树的深度越深，对应的定位次数也就越多，而B-&#x2F;B+树因为“矮胖”,可以减少访问的层数，从而减少I&#x2F;O支出。而B+树在提高了磁盘IO性能的同时，也解决了B-树遍历元素效率低下的问题。（B+树只要遍历叶子节点就可以实现整棵树的遍历。在内存中直接遍历">
 <meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://yoursite.com/2020/06/04/MySQL/%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B%E5%9B%BE.png">
 <meta property="og:image" content="http://yoursite.com/2020/06/04/MySQL/1.png">
 <meta property="og:image" content="http://yoursite.com/2020/06/04/MySQL/2.png">
 <meta property="og:image" content="http://yoursite.com/2020/06/04/MySQL/%E4%B8%BB%E9%94%AE%E7%B4%A2%E5%BC%95%E5%92%8C%E9%9D%9E%E4%B8%BB%E9%94%AE%E7%B4%A2%E5%BC%95.png">
 <meta property="og:image" content="http://yoursite.com/2020/06/04/MySQL/4.png">
 <meta property="og:image" content="http://yoursite.com/2020/06/04/MySQL/5.png">
 <meta property="article:published_time" content="2020-06-04T07:55:51.000Z">
-<meta property="article:modified_time" content="2020-06-10T10:23:30.014Z">
-<meta property="article:author" content="John Doe">
+<meta property="article:modified_time" content="2020-07-08T10:42:52.245Z">
+<meta property="article:author" content="Solomon">
 <meta property="article:tag" content="数据库">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://yoursite.com/2020/06/04/MySQL/1.png">
+<meta name="twitter:image" content="http://yoursite.com/2020/06/04/MySQL/%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B%E5%9B%BE.png">
   
-    <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
+    <link rel="alternative" href="/atom.xml" title="Blog" type="application/atom+xml">
   
   
     <link rel="icon" href="/favicon.jpg">
@@ -57,7 +58,7 @@
 			<img src="/photos/dog.jpg" class="js-avatar">
 		</a>
 		<hgroup>
-		  <h1 class="header-author"><a href="/">John Doe</a></h1>
+		  <h1 class="header-author"><a href="/">Solomon</a></h1>
 		</hgroup>
 		
 
@@ -113,7 +114,7 @@
 				<img src="/photos/dog.jpg" class="js-avatar">
 			</div>
 			<hgroup>
-			  <h1 class="header-author js-header-author">John Doe</h1>
+			  <h1 class="header-author js-header-author">Solomon</h1>
 			</hgroup>
 			
 			
@@ -179,8 +180,16 @@
       
         <p>1.MySQL索引采用B+树的原因</p>
 <p>​    首先MySQL中的数据一般是放在磁盘中的，读取数据的时候肯定会有访问磁盘的操作。而磁盘的定位是非常消耗时间的，树的深度越深，对应的定位次数也就越多，而B-/B+树因为“矮胖”,可以减少访问的层数，从而减少I/O支出。而B+树在提高了磁盘IO性能的同时，也解决了B-树遍历元素效率低下的问题。（B+树只要遍历叶子节点就可以实现整棵树的遍历。在内存中直接遍历是很快的，而B树的话需要跨层中序遍历，涉及到I/O操作，所以慢）</p>
+<p>2.MySQL的执行流程</p>
+<p>整个 SQL 的执行流程，如下图所示：</p>
+<p><img src="/2020/06/04/MySQL/%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B%E5%9B%BE.png" alt="执行流程图"></p>
+<p>​        首先客户端先要发送用户信息去服务器端<strong>进行授权认证</strong>。</p>
+<p>​        <strong>当连接服务器端成功之后就可以正常的执行 SQL 命令了</strong>，MySQL 服务器拿到 SQL 命令之后，<strong>会使用 MySQL 的分析器解析 SQL 指令，同时会根据语法分析器验证 SQL 指令</strong>，查询 SQL 指令是否满足 MySQL 的语法规则。如果不支持此语法，则会提示“SQL syntax”语法错误信息。</p>
+<p>​        当分析器验证并解析 SQL 命令之后，<strong>会进入优化器阶段，执行生成计划，并设置相应的索引；当上面的这些步骤都执行完之后，就进入了执行器阶段，并开始正式执行 SQL 命令。</strong>同样在执行命令之前，它会先对你的执行命令进行权限查询，看看是否有操作某个表的权限，如果有相应的权限，执行器就去调用 MySQL 数据库引擎提供的接口，执行相应的命令；如果是非查询操作会记录对应的操作日志，再命令执行完成之后返回结果给客户端，这就是整个 MySQL 操作的完整流程。</p>
+<p>​        需要注意的是，如果执行的是 select 语句并且是 MySQL 8.0 之前的版本的话，则会去 MySQL 的查询缓存中查看之前是否有执行过这条 SQL；如果缓存中可以查到，则会直接返回查询结果，这样查询性能就会提升很高。</p>
+<p>​        tips:当我们好不容易缓存了很多查询语句之后，任何一条对此表的更新操作都会把和这个表关联的所有查询缓存全部清空，那么在更新频率相对较高的业务中，查询缓存功能完全是一个鸡肋。因此，在 MySQL 8.0 的版本中已经完全移除了此功能。</p>
 <p>2.MyISAM与InnoDB的区别</p>
-<p>常见的Mysql存储引擎就MyISAM，InnoDB,Memory,NDB。之前MyISAM是默认的数据引擎，但从MySQL-5.5.5版本开始，InnoDB成为默认的数据引擎。</p>
+<p>​        常见的Mysql存储引擎就MyISAM，InnoDB,Memory,NDB。之前MyISAM是默认的数据引擎，但从MySQL-5.5.5版本开始，InnoDB成为默认的数据引擎。</p>
 <table>
 <thead>
 <tr>
@@ -237,7 +246,7 @@
 </tbody></table>
 <p>总结：</p>
 <ul>
-<li>InnoDB 存储引擎提供了具有提交、回滚、崩溃恢复能力的事务安全，与 MyISAM 比 InnoDB 写的效率差一些，并且会占用更多的磁盘空间以保留数据和索引</li>
+<li>InnoDB 存储引擎提供了具有提交、回滚、崩溃恢复能力的事务安全，与 MyISAM 相比 InnoDB 写的效率差一些，并且会占用更多的磁盘空间以保留数据和索引</li>
 <li>MyISAM 不支持事务、也不支持外键，优势是访问的速度快。对事务的完整性没有要求、以 SELECT 和 INSERT 为主的应用可以使用这个存储引擎</li>
 </ul>
 <p>3.最左前缀原则</p>
@@ -320,12 +329,49 @@
 <p>(tips:有关MVCC的详情可看<a href="https://blog.csdn.net/Waves___/article/details/105295060" target="_blank" rel="noopener">https://blog.csdn.net/Waves___/article/details/105295060</a>)</p>
 </li>
 </ul>
-<p>10.SQL的优化</p>
-<p>（1）尽量避免全表扫描，首先考虑在where以及order by涉及的列上建立索引，这样能过滤好多数据。</p>
-<p>（2）避免在where子句中对字段进行null值判断，否则会导致引擎放弃索引而进行全表扫描</p>
-<p>（3）避免在where子句中使用！=或者&lt; &gt;操作符，否则会导致引擎放弃索引而进行全表扫描</p>
-<p>（4）避免在where子句中使用or来连接条件，若果一个字段有索引，一个字段没有索引，否则会导致引擎放弃使用索引而进行全表扫描</p>
-<p>（5）like模糊全匹配，in 和 not in都要慎用，会导致全表扫描</p>
+<p>10.MySQL的优化</p>
+<p>MySQL数据库常见的优化手段分为三个层面：<strong>SQL和索引优化、数据库结构优化、系统硬件优化</strong>，每个层面又包括多个小优化点。</p>
+<p><strong>(1) SQL 和索引优化</strong></p>
+<p>此优化方案指的是通过优化 SQL 语句以及索引来提高 MySQL 数据库的运行效率，具体内容如下。</p>
+<ul>
+<li><p><strong>使用正确的索引,避免全表扫描</strong>。我们应该尽可能的使用<strong>主键查询</strong>，而非其他索引查询，因为主键查询不会触发回表查询，因此节省了一部分时间，变相的提高了查询的性能；首先考虑在where以及order by涉及的列上建立索引，这样能过滤好多数据；避免在where子句中对字段进行null值判断；避免在where子句中使用！=或者&lt; &gt;操作符；不要在列字段上进行算术运算或其他表达式运算；避免在where子句中使用or来连接条件，如果一个字段有索引，一个字段没有索引，否则会导致引擎放弃使用索引而进行全表扫描；like模糊全匹配，in 和 not in都要慎用</p>
+</li>
+<li><p><strong>查询具体的字段而非全部字段</strong>。要尽量避免使用 select *，而是查询需要的字段，这样可以提升速度，以及减少网络传输的带宽压力。</p>
+</li>
+<li><p><strong>优化子查询</strong>。尽量使用 join 语句来替代子查询，因为子查询是嵌套查询，而嵌套查询会新创建一张临时表，而临时表的创建与销毁会占用一定的系统资源以及花费一定的时间，但 join 语句并不会创建临时表，因此性能会更高。</p>
+</li>
+<li><p><strong>注意查询结果集</strong>。我们要尽量使用小表驱动大表的方式进行查询，也就是如果 B 表的数据小于 A 表的数据，那执行的顺序就是先查 B 表再查 A 表，具体查询语句如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select name from A where id in (select id from B);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>适当增加冗余字段</strong>。增加冗余字段可以减少大量的连表查询，因为多张表的连表查询性能很低，所有可以适当的增加冗余字段，以减少多张表的关联查询，这是以<strong>空间换时间</strong>的优化策略。</p>
+</li>
+</ul>
+<p><strong>（2）数据库结构优化</strong></p>
+<ul>
+<li><p><strong>最小数据长度</strong>。一般说来数据库的表越小，那么它的查询速度就越快，因此为了提高表的效率，应该将表的字段设置的尽可能小，比如身份证号，可以设置为 char(18) 就不要设置为 varchar(18)。</p>
+</li>
+<li><p><strong>使用最简单数据类型</strong>。能使用 int 类型就不要使用 varchar 类型，因为 int 类型比 varchar 类型的查询效率更高。</p>
+</li>
+<li><p><strong>尽量少定义 text 类型</strong>。text 类型的查询效率很低，如果必须要使用 text 定义字段，可以把此字段分离成子表，需要查询此字段时使用联合查询，这样可以提高主表的查询效率。</p>
+</li>
+<li><p><strong>适当分表、分库策略</strong>。分表和分库方案也是我们经常说的垂直分隔（分表）和水平分隔（分库）。</p>
+<p>分表是指当一张表中的字段更多时，可以尝试将一张大表拆分为多张子表，把使用比较高频的主信息放入主表中，其他的放入子表，这样我们大部分查询只需要查询字段更少的主表就可以完成了，从而有效的提高了查询的效率。</p>
+<p>分库是指将一个数据库分为多个数据库。比如我们把一个数据库拆分为了多个数据库，一个主数据库用于写入和修改数据，其他的用于同步主数据并提供给客户端查询，这样就把一个库的读和写的压力，分摊给了多个库，从而提高了数据库整体的运行效率。</p>
+</li>
+</ul>
+<p><strong>（3）硬件优化</strong></p>
+<p>MySQL对硬件的要求主要体现在三个方面：磁盘、网络和内存。</p>
+<ul>
+<li><p><strong>磁盘</strong></p>
+<p>磁盘应该尽量使用有高性能读写能力的磁盘，比如固态硬盘，这样就可以减少 I/O 运行的时间，从而提高了 MySQL 整体的运行效率。磁盘也可以尽量使用多个小磁盘而不是一个大磁盘，因为磁盘的转速是固定的，有多个小磁盘就相当于拥有多个并行运行的磁盘一样。</p>
+</li>
+<li><p><strong>网络</strong></p>
+<p>保证网络带宽的通畅（低延迟）以及够大的网络带宽是 MySQL 正常运行的基本条件，如果条件允许的话也可以设置多个网卡，以提高网络高峰期 MySQL 服务器的运行效率。</p>
+</li>
+<li><p><strong>内存</strong></p>
+<p>MySQL 服务器的内存越大，那么存储和缓存的信息也就越多，而内存的性能是非常高的，从而提高了整个 MySQL 的运行效率。</p>
+</li>
+</ul>
 <p>11.三个范式</p>
 <blockquote>
 <p>第一范式（1NF）：数据库表中的字段都是单一属性的，不可再分。这个单一属性由基本类型构成，包括整型、实数、字符型、逻辑型、日期型等。</p>
@@ -465,7 +511,7 @@
       <i class="icon-circle-left"></i>
       <div class="article-nav-title">
         
-          redis面试汇总
+          Redis面试汇总
         
       </div>
     </a>
@@ -515,7 +561,7 @@
   <div class="outer">
     <div id="footer-info">
     	<div class="footer-left">
-    		&copy; 2020 John Doe
+    		&copy; 2020 Solomon
     	</div>
       	<div class="footer-right">
       		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
@@ -619,6 +665,10 @@ MathJax.Hub.Queue(function() {
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">网络</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">Redis</a>
               </li>
              
@@ -639,11 +689,15 @@ MathJax.Hub.Queue(function() {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">操作系统</a>
+                <a href="javascript:void(0)" class="js-tag color1">redis</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">redis</a>
+                <a href="javascript:void(0)" class="js-tag color3">MQ</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">操作系统</a>
               </li>
             
             <div class="clearfix"></div>

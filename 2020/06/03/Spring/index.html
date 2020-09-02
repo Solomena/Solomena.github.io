@@ -6,27 +6,27 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>Spring | Hexo</title>
+  <title>Spring | Blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="1.Spring介绍 Spring是一个轻量级的IoC和AOP容器框架，是为Java应用程序提供基础性服务的一套框架，目的是用于简化企业应用程序的开发，它使得开发者只需要关心业务需求。常见的配置方式有三种：基于XML的配置、基于注解的配置、基于Java的配置。 Spring模块主要由以下构成：  Spring Core：核心类库，提供IOC服务； Spring Context：提供框架式的Bean">
+  <meta name="description" content="1. Spring介绍 Spring是一个轻量级的IoC和AOP容器框架，是为Java应用程序提供基础性服务的一套框架，目的是用于简化企业应用程序的开发，它使得开发者只需要关心业务需求。常见的配置方式有三种：基于XML的配置、基于注解的配置、基于Java的配置。 Spring模块主要由以下构成：  Spring Core：核心类库，提供IOC服务； Spring Context：提供框架式的Bea">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Spring">
 <meta property="og:url" content="http://yoursite.com/2020/06/03/Spring/index.html">
-<meta property="og:site_name" content="Hexo">
-<meta property="og:description" content="1.Spring介绍 Spring是一个轻量级的IoC和AOP容器框架，是为Java应用程序提供基础性服务的一套框架，目的是用于简化企业应用程序的开发，它使得开发者只需要关心业务需求。常见的配置方式有三种：基于XML的配置、基于注解的配置、基于Java的配置。 Spring模块主要由以下构成：  Spring Core：核心类库，提供IOC服务； Spring Context：提供框架式的Bean">
+<meta property="og:site_name" content="Blog">
+<meta property="og:description" content="1. Spring介绍 Spring是一个轻量级的IoC和AOP容器框架，是为Java应用程序提供基础性服务的一套框架，目的是用于简化企业应用程序的开发，它使得开发者只需要关心业务需求。常见的配置方式有三种：基于XML的配置、基于注解的配置、基于Java的配置。 Spring模块主要由以下构成：  Spring Core：核心类库，提供IOC服务； Spring Context：提供框架式的Bea">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="http://yoursite.com/2020/06/03/Spring/Spring.jpg">
 <meta property="og:image" content="http://yoursite.com/2020/06/03/Spring/%E6%8E%A5%E5%8F%A3.png">
 <meta property="og:image" content="http://yoursite.com/2020/06/03/Spring/bean.jpg">
 <meta property="og:image" content="http://yoursite.com/2020/06/03/Spring/AOP.png">
 <meta property="article:published_time" content="2020-06-03T02:54:10.000Z">
-<meta property="article:modified_time" content="2020-06-18T13:45:17.264Z">
-<meta property="article:author" content="John Doe">
+<meta property="article:modified_time" content="2020-06-28T13:49:15.190Z">
+<meta property="article:author" content="Solomon">
 <meta property="article:tag" content="框架">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://yoursite.com/2020/06/03/Spring/Spring.jpg">
   
-    <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
+    <link rel="alternative" href="/atom.xml" title="Blog" type="application/atom+xml">
   
   
     <link rel="icon" href="/favicon.jpg">
@@ -56,7 +56,7 @@
 			<img src="/photos/dog.jpg" class="js-avatar">
 		</a>
 		<hgroup>
-		  <h1 class="header-author"><a href="/">John Doe</a></h1>
+		  <h1 class="header-author"><a href="/">Solomon</a></h1>
 		</hgroup>
 		
 
@@ -112,7 +112,7 @@
 				<img src="/photos/dog.jpg" class="js-avatar">
 			</div>
 			<hgroup>
-			  <h1 class="header-author js-header-author">John Doe</h1>
+			  <h1 class="header-author js-header-author">Solomon</h1>
 			</hgroup>
 			
 			
@@ -176,7 +176,7 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p><strong>1.Spring介绍</strong></p>
+        <p><strong>1. Spring介绍</strong></p>
 <p>Spring是一个轻量级的IoC和AOP容器框架，是为Java应用程序提供基础性服务的一套框架，目的是用于简化企业应用程序的开发，它使得开发者只需要关心业务需求。常见的配置方式有三种：基于XML的配置、基于注解的配置、基于Java的配置。</p>
 <p>Spring模块主要由以下构成：</p>
 <p><img src="/2020/06/03/Spring/Spring.jpg" alt="Spring核心模块"></p>
@@ -192,20 +192,32 @@
 <p>（2）spring的DI机制将对象之间的依赖交由框架处理，减低组件的耦合性</p>
 <p>（3）Spring提供了AOP技术，支持将一些通用任务，如安全、事务、日志、权限等进行集中式管理，从而提供更好的复用</p>
 <p>（4）spring对于主流的应用框架提供了集成支持</p>
-<p><strong>2.IoC介绍</strong></p>
+<p><strong>2. IoC介绍</strong></p>
 <p>​    IoC(Inversion of Control)控制反转，它是一种设计思想，在java开发中，将你设计好的对象交给容器控制器控制，而不是主动地用代码进行对象的创建。</p>
 <p>​    DI（Dependency Injection）依赖注入，就是由IOC容器在运行期间，动态地将某种依赖关系注入到对象之中。所以，依赖注入(DI)和控制反转(IOC)是从不同的角度的描述的同一件事情，就是指通过引入IOC容器，利用依赖关系注入的方式，实现对象之间的解耦。</p>
 <p>​    最直观的表达就是，IOC让对象的创建不用去new了，可以由spring自动生产，使用java的反射机制，根据配置文件在运行时动态的去创建对象以及管理对象，并调用对象的方法的。</p>
-<p>​    使用IoC的4种注入方式：构造器注入、setter方法注入、注解注入、接口注入</p>
-<p>​        </p>
-<p><strong>3.AOP介绍</strong></p>
+<p>​    使用IoC的3种注入方式：</p>
+<p>(1) 构造器注入</p>
+<p>​        构造方法注入主要是依赖于构造方法去实现，构造方法可以是有参的也可以是无参的，我们平时 new 对象时就是通过类的构造方法来创建类对象的，每个类对象默认会有一个无参的构造方法，Spring 通过构造方法注入的代码示例如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Person</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Person</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">Person</span><span class="params">(<span class="keyword">int</span> id, String name)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">this</span>.id = id;</span><br><span class="line">		<span class="keyword">this</span>.name = name;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">int</span> id;</span><br><span class="line">	<span class="keyword">private</span> String name;</span><br><span class="line">    <span class="comment">// 忽略 Setter、Getter 的方法</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>applicationContext.xml 配置如下：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;bean id=<span class="string">"person"</span> <span class="class"><span class="keyword">class</span></span>=<span class="string">"org.springframework.beans.Person"</span>&gt;</span><br><span class="line">    &lt;constructor-arg value="1" type="int"&gt;&lt;/constructor-arg&gt;</span><br><span class="line">    &lt;constructor-arg value="Java" type="java.lang.String"&gt;&lt;/constructor-arg&gt;</span><br><span class="line">&lt;/bean&gt;</span><br></pre></td></tr></table></figure>
+
+<p>(2) setter方法注入</p>
+<p>​        Setter 方法注入的方式是目前 Spring <strong>主流</strong>的注入方式，它可以利用 Java Bean 规范所定义的 Setter/Getter 方法来完成注入，可读性和灵活性都很高，它不需要使用声明式构造方法，而是使用 Setter 注入直接设置相关的值，实现示例如下：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;bean id=<span class="string">"person"</span> <span class="class"><span class="keyword">class</span></span>=<span class="string">"org.springframework.beans.Person"</span>&gt;</span><br><span class="line">    &lt;property name=<span class="string">"id"</span> value=<span class="string">"1"</span>/&gt;</span><br><span class="line">    &lt;property name=<span class="string">"name"</span> value=<span class="string">"Java"</span>/&gt;</span><br><span class="line">&lt;/bean&gt;</span><br></pre></td></tr></table></figure>
+
+<p>(3) 接口注入</p>
+<p>​        接口注入模式因为具备侵入性，它要求组件必须与特定的接口相关联，因此并不被看好，实际使用有限。</p>
+<p><strong>3. AOP介绍</strong></p>
 <p>​    AOP（Aspect Oriented Programming）面向切面编程，是面向对象开发的一种补充，它允许开发人员在不改变原有的逻辑的基础上，增加一些额外的功能。例如，开发人员可以在不改变原来业务逻辑模型的基础可以进行动态的增加日志，安全或异常处理功能。</p>
 <p>​    AOP实现的关键在于代理模式，AOP代理主要分为<strong>静态代理和动态代理</strong>。静态代理的代表为AspectJ；动态代理则以Spring AOP为代表。</p>
-<p>​    （1）AspectJ是静态代理的增强，所谓静态代理，所谓静态也就是在程序运行前就已经存在代理类的字节码文件，代理类和委托类的关系在运行前就确定了。</p>
+<p>​    （1）AspectJ是静态代理的增强，所谓静态代理，其实就是事先写好代理类，可以手工编写也可以使用工具生成，但它的缺点是每个业务类都要对应一个代理类，特别不灵活也不方便。</p>
 <p>​    （2）Spring AOP使用的动态代理，动态代理类的源码是在程序运行期间由JVM根据反射等机制动态的生成，所以不存在代理类的字节码文件。代理类和委托类的关系是在程序运行时确定。 </p>
 <p>​    Spring AOP的动态代理主要由两种方式，<strong>JDK动态代理和CGLib动态代理</strong></p>
-<p>（1）JDK动态代理只提供接口的代理，不支持类的代理。核心InvocationHandler接口和Proxy类，InvocationHandler 通过invoke()方法反射来调用目标类中的代码，动态地将横切逻辑和业务编织在一起；接着Proxy利用 InvocationHandler动态创建一个符合某一接口的的实例,  生成目标类的代理对象。</p>
-<p> （2）如果代理类没有实现 InvocationHandler 接口，那么Spring AOP会选择使用CGLIB来动态代理目标类。CGLIB（Code Generation Library），是一个代码生成的类库，可以在运行时动态的生成指定类的一个子类对象，并覆盖其中特定方法并添加增强代码，从而实现AOP。CGLIB是通过<strong>继承</strong>的方式做的动态代理，因此如果某个类被标记为final，那么它是无法使用CGLIB做动态代理的。</p>
+<p>（1）JDK动态代理只提供接口的代理，不支持类的代理。是java自带的功能，无需通过加载第三方类，只需要实现InvocationHandler接口，重写invoke()方法即可。InvocationHandler 通过invoke()方法反射来调用目标类中的代码，动态地将横切逻辑和业务编织在一起；接着Proxy利用 InvocationHandler动态创建一个符合某一接口的的实例,  生成目标类的代理对象。</p>
+<p> （2）如果代理类没有实现 InvocationHandler 接口，那么Spring AOP会选择使用CGLIB来动态代理目标类。CGLIB（Code Generation Library），是一个代码生成的类库，基于ASM(一个Java字节码操作框架)而非反射实现的，可以在运行时动态的生成指定类的一个子类对象，并覆盖其中特定方法并添加增强代码，从而实现AOP。CGLIB是通过继承的方式做的动态代理，因此如果某个类被标记为final，那么它是无法使用CGLIB做动态代理的。</p>
 <table>
 <thead>
 <tr>
@@ -219,14 +231,14 @@
 </tr>
 <tr>
 <td>JDK动态代理</td>
-<td>需要有顶层接口才能使用。利用反射完成。使用动态字节码技。是mybaits的mapper文件代理模式</td>
+<td>只能代理继承接口的类。利用<strong>反射</strong>完成。使用动态字节码技。是mybaits的mapper文件代理模式</td>
 </tr>
 <tr>
 <td>CGLib动态代理</td>
-<td>可以直接代理类，不能对final类进行继承。使用动态字节码技术</td>
+<td>无需通过接口来实现，它是通过实现子类的方式来完成调用的，不能对final类进行继承。基于<strong>ASM</strong>(一个Java字节码操作框架)而非反射实现的，性能较高。</td>
 </tr>
 </tbody></table>
-<p><strong>4.BeanFactory和ApplicationContext的区别</strong></p>
+<p><strong>4. BeanFactory和ApplicationContext的区别</strong></p>
 <p>​     BeanFactory和ApplicationContext是Spring的两大核心接口，都可以当做Spring的容器。其中ApplicationContext是BeanFactory的子接口。</p>
 <p><img src="/2020/06/03/Spring/%E6%8E%A5%E5%8F%A3.png" alt="接口"></p>
 <p>（1）BeanFactory：是Spring里面最底层的接口，包含了各种Bean的定义，读取bean配置文档，管理bean的加载、实例化，控制bean的生命周期，维护bean之间的依赖关系。ApplicationContext接口作为BeanFactory的派生，除了提供BeanFactory所具有的功能外，还提供了更完整的框架功能：</p>
@@ -239,7 +251,40 @@
 <pre><code>② **ApplicationContext，它是在容器启动时，一次性创建了所有的Bean**。这样，在容器启动时，我们就可以发现Spring中存在的配置错误，这样有利于检查所依赖属性是否注入。 ApplicationContext启动后预载入所有的单实例Bean，通过预载入单实例bean ,确保当你需要的时候，你就不用等待，因为它们已经创建好了。</code></pre><p>​     ③相对于基本的BeanFactory，ApplicationContext 唯一的不足是占用内存空间。当应用程序配置Bean较多时，程序启动较慢。</p>
 <p>（3）BeanFactory通常以编程的方式被创建，ApplicationContext还能以声明的方式创建，如使用ContextLoader。</p>
 <p>（4）BeanFactory和ApplicationContext都支持BeanPostProcessor、BeanFactoryPostProcessor的使用，但两者之间的区别是：BeanFactory需要手动注册，而ApplicationContext则是自动注册。</p>
-<p><strong>5.Spring Bean的生命周期</strong></p>
+<p><strong>5. Spring Bean的介绍</strong></p>
+<p><strong>（1）Bean的三种注册方式</strong></p>
+<ul>
+<li><p>XML 配置文件的注册方式</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;bean id=<span class="string">"person"</span> <span class="class"><span class="keyword">class</span></span>=<span class="string">"org.springframework.beans.Person"</span>&gt;</span><br><span class="line">   &lt;property name=<span class="string">"id"</span> value=<span class="string">"1"</span>/&gt;</span><br><span class="line">   &lt;property name=<span class="string">"name"</span> value=<span class="string">"Java"</span>/&gt;</span><br><span class="line">&lt;/bean&gt;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>Java 注解的注册方式</p>
+<p>可以使用@Component注解方式来注册Bean，代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Person</span> </span>&#123;</span><br><span class="line">   <span class="keyword">private</span> Integer id;</span><br><span class="line">   <span class="keyword">private</span> String name</span><br><span class="line">   <span class="comment">// 忽略其他方法</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>也可以使用@Bean注解方式来注册Bean，代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Person</span> </span>&#123;</span><br><span class="line">   <span class="meta">@Bean</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> Person  <span class="title">person</span><span class="params">()</span></span>&#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="keyword">new</span> Person();</span><br><span class="line">   &#125;</span><br><span class="line">   <span class="comment">// 忽略其他方法</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>Java API 的注册方式</p>
+<p>使用 BeanDefinitionRegistry.registerBeanDefinition() 方法的方式注册 Bean，代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CustomBeanDefinitionRegistry</span> <span class="keyword">implements</span> <span class="title">BeanDefinitionRegistryPostProcessor</span> </span>&#123;</span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">postProcessBeanFactory</span><span class="params">(ConfigurableListableBeanFactory beanFactory)</span> <span class="keyword">throws</span> BeansException </span>&#123;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">postProcessBeanDefinitionRegistry</span><span class="params">(BeanDefinitionRegistry registry)</span> <span class="keyword">throws</span> BeansException </span>&#123;</span><br><span class="line">		RootBeanDefinition personBean = <span class="keyword">new</span> RootBeanDefinition(Person<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">		<span class="comment">// 新增 Bean</span></span><br><span class="line">		registry.registerBeanDefinition(<span class="string">"person"</span>, personBean);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<p><strong>（2）解释Spring支持的几种bean的作用域</strong></p>
+<p>​    Spring容器中的bean可以分为5个范围，后三种只有在Web应用中使用Spring时，作用域才有效</p>
+<ol>
+<li><p>singleton：单例模式，<strong>bean默认的作用域</strong>，每个容器中只有一个bean的实例，单例的模式由BeanFactory自身来维护。</p>
+</li>
+<li><p>prototype：原型模式，每次调用Bean时都会创建一个新实例，也就是说每次调用getBean（）方法时，相当于执行了new Bean（）。</p>
+</li>
+<li><p>request：对于每次 HTTP 请求，使用 request 定义的 bean 都将产生一个新实例，即每次 HTTP 请求将会产生不同的 bean 实例。在请求完成以后，bean会失效并被垃圾回收器回收。</p>
+</li>
+<li><p>session：与request范围类似，同一个 Session 共享一个 bean 实例。</p>
+</li>
+<li><p>application：全局作用域，同 session 作用域不同的是，所有的session共享一个Bean实例。</p>
+</li>
+</ol>
+<p><strong>（3）Spring Bean的生命周期</strong></p>
 <p><img src="/2020/06/03/Spring/bean.jpg" alt="bean"></p>
 <p>首先说一下Servlet的生命周期：实例化，初始init，接收请求service，销毁destroy；</p>
 <p> Spring上下文中的Bean生命周期也类似，总结起来就4个：<strong>实例化 -&gt; 属性赋值 -&gt; 初始化 -&gt;销毁</strong> 但是扩展开来分为以下几个</p>
@@ -263,14 +308,7 @@
 <p>当Bean不再需要时，会经过清理阶段，如果Bean实现了DisposableBean这个接口，会调用其实现的destroy()方法；</p>
 <p>（8）destroy-method：</p>
 <p>最后，如果这个Bean的Spring配置中配置了destroy-method属性，会自动调用其配置的销毁方法。</p>
-<p><strong>6.解释Spring支持的几种bean的作用域</strong></p>
-<p>Spring容器中的bean可以分为5个范围，后三种只有在Web应用中使用Spring时，作用域才有效</p>
-<p>（1）singleton：单例模式，bean默认的作用域，每个容器中只有一个bean的实例，单例的模式由BeanFactory自身来维护。</p>
-<p>（2）prototype：原型模式，为每一个bean请求提供一个实例。</p>
-<p>（3）request：对于每次 HTTP 请求，使用 request 定义的 bean 都将产生一个新实例，即每次 HTTP 请求将会产生不同的 bean 实例。在请求完成以后，bean会失效并被垃圾回收器回收。</p>
-<p>（4）session：与request范围类似，同一个 Session 共享一个 bean 实例。</p>
-<p>（5）global-session：全局作用域，同 session 作用域不同的是，所有的session共享一个Bean实例。</p>
-<p><strong>7.Spring的自动装配</strong></p>
+<p><strong>6. Spring的自动装配</strong></p>
 <p>基于xml配置文件的方式：</p>
 <p>​    在spring框架xml 配置文件中 &lt; bean&gt;节点的 autowire 参数可以控制 bean 自动装配的方式,总共5种方式</p>
 <ul>
@@ -295,13 +333,13 @@
 <p>注：@Autowired和@Resource之间的区别</p>
 <p>(1) @Autowired默认是按照类型装配注入的，默认情况下它要求依赖对象必须存在（可以设置它required属性为false）。</p>
 <p>(2) @Resource默认是按照名称来装配注入的，只有当找不到与名称匹配的bean才会按照类型来装配注入。</p>
-<p><strong>8.Spring框架中用到的设计模式</strong></p>
+<p><strong>7. Spring框架中用到的设计模式</strong></p>
 <p>（1）工厂模式：BeanFactory就是简单工厂模式的体现，用来创建对象的实例；</p>
 <p>（2）单例模式：Bean默认为单例模式。</p>
 <p>（3）代理模式：Spring的AOP功能用到了JDK的动态代理和CGLIB字节码生成技术；</p>
 <p>（4）模板方法：用来解决代码重复的问题。比如:RestTemplate, JmsTemplate, JpaTemplate。</p>
 <p>（5）观察者模式：定义对象键一种一对多的依赖关系，当一个对象的状态发生改变时，所有依赖于它的对象都会得到通知被制动更新，如Spring中listener的实现–ApplicationListener。</p>
-<p><strong>9.Spring事务的实现方式和实现原理</strong></p>
+<p><strong>8. Spring事务的实现方式和实现原理</strong></p>
 <p>​     Spring事务的本质其实就是数据库对事务的支持，没有数据库的事务支持，spring是无法提供事务功能的。真正的数据库层的事务提交和回滚是通过binlog或者redo log实现的。</p>
 <p>（1）Spring事务的种类：</p>
 <p>spring支持编程式事务管理和声明式事务管理两种方式：</p>
@@ -327,7 +365,7 @@
 <p>​    ③ ISOLATION_READ_COMMITTED：读已提交，保证一个事务修改的数据提交后才能被另一事务读取，而且能看到该事务对已有记录的更新。</p>
 <p>​    ④ ISOLATION_REPEATABLE_READ：可重复读，保证一个事务修改的数据提交后才能被另一事务读取，但是不能看到该事务对已有记录的更新。</p>
 <p>​    ⑤ ISOLATION_SERIALIZABLE：一个事务在执行的过程中完全看不到其他事务对数据库所做的更新。</p>
-<p><strong>10.Spring框架中不同类型的事件</strong></p>
+<p><strong>9. Spring框架中不同类型的事件</strong></p>
 <p>Spring 提供了以下5种标准的事件：</p>
 <p>（1）上下文更新事件（ContextRefreshedEvent）：在调用ConfigurableApplicationContext 接口中的refresh()方法时被触发。</p>
 <p>（2）上下文开始事件（ContextStartedEvent）：当容器调用ConfigurableApplicationContext的Start()方法开始/重新开始容器时触发该事件。</p>
@@ -335,7 +373,7 @@
 <p>（4）上下文关闭事件（ContextClosedEvent）：当ApplicationContext被关闭时触发该事件。容器被关闭时，其管理的所有单例Bean都被销毁。</p>
 <p>（5）请求处理事件（RequestHandledEvent）：在Web应用中，当一个http请求（request）结束触发该事件。</p>
 <p>如果一个bean实现了ApplicationListener接口，当一个ApplicationEvent 被发布以后，bean会自动被通知。</p>
-<p><strong>11、解释一下Spring AOP里面的几个名词</strong></p>
+<p><strong>10. 解释一下Spring AOP里面的几个名词</strong></p>
 <p>（1）切面（Aspect）：被抽取的公共模块，可能会横切多个对象。 在Spring AOP中，切面可以使用通用类（基于模式的风格） 或者在普通类中以 @AspectJ 注解来实现。</p>
 <p>（2）连接点（Join point）：指方法，在Spring AOP中，一个连接点 总是 代表一个方法的执行。 </p>
 <p>（3）通知（Advice）：在切面的某个特定的连接点（Join point）上执行的动作。通知有各种类型，其中包括“around”、“before”和“after”等通知。许多AOP框架，包括Spring，都是以拦截器做通知模型， 并维护一个以连接点为中心的拦截器链。</p>
@@ -344,7 +382,7 @@
 <p>（6）目标对象（Target Object）： 被一个或者多个切面（aspect）所通知（advise）的对象。也有人把它叫做 被通知（adviced） 对象。 既然Spring AOP是通过运行时代理实现的，这个对象永远是一个 被代理（proxied） 对象。</p>
 <p>（7）织入（Weaving）：指把增强应用到目标对象来创建新的代理对象的过程。Spring是在运行时完成织入。</p>
 <p>切入点（pointcut）和连接点（join point）匹配的概念是AOP的关键，这使得AOP不同于其它仅仅提供拦截功能的旧技术。 切入点使得定位通知（advice）可独立于OO层次。 例如，一个提供声明式事务管理的around通知可以被应用到一组横跨多个对象中的方法上（例如服务层的所有业务操作）。<br><img src="/2020/06/03/Spring/AOP.png" alt="AOP"></p>
-<p><strong>12.Spring通知的类型</strong></p>
+<p><strong>11. Spring通知的类型</strong></p>
 <p>（1）前置通知（Before advice）：在某连接点（join point）之前执行的通知，但这个通知不能阻止连接点前的执行（除非它抛出一个异常）。</p>
 <p>（2）返回后通知（After returning advice）：在某连接点（join point）正常完成后执行的通知：例如，一个方法没有抛出任何异常，正常返回。 </p>
 <p>（3）抛出异常后通知（After throwing advice）：在方法抛出异常退出时执行的通知。 </p>
@@ -516,7 +554,7 @@
   <div class="outer">
     <div id="footer-info">
     	<div class="footer-left">
-    		&copy; 2020 John Doe
+    		&copy; 2020 Solomon
     	</div>
       	<div class="footer-right">
       		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
@@ -620,6 +658,10 @@ MathJax.Hub.Queue(function() {
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">网络</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">Redis</a>
               </li>
              
@@ -640,11 +682,15 @@ MathJax.Hub.Queue(function() {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">操作系统</a>
+                <a href="javascript:void(0)" class="js-tag color1">redis</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">redis</a>
+                <a href="javascript:void(0)" class="js-tag color3">MQ</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">操作系统</a>
               </li>
             
             <div class="clearfix"></div>

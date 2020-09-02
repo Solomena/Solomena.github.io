@@ -6,27 +6,27 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>redis面试汇总 | Hexo</title>
+  <title>Redis面试汇总 | Blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="1.redis支持的数据类型以及使用场景 支持多种类型的数据结构，如字符串（String），散列（Hash），列表（List），集合（Set），有序集合（Sorted Set或者是ZSet）与范围查询，Bitmaps，Hyperloglogs 和地理空间（Geospatial）索引半径查询。其中常见的数据结构类型有以下5种  String ​        这个其实没啥好说的，最常规的set&#x2F;ge">
+  <meta name="description" content="1.redis支持的数据类型以及使用场景 ​        redis支持多种类型的数据结构，如字符串（String），散列（Hash），列表（List），集合（Set），有序集合（Sorted Set或者是ZSet）等五种最常用的基础数据类型，还有管道类型（Pipeline）、地理位置类型（GEO）、基数统计类型（HyperLogLog）和流类型（Stream），并且还提供了消息队列的功能。其中">
 <meta property="og:type" content="article">
-<meta property="og:title" content="redis面试汇总">
+<meta property="og:title" content="Redis面试汇总">
 <meta property="og:url" content="http://yoursite.com/2020/06/08/redis/index.html">
-<meta property="og:site_name" content="Hexo">
-<meta property="og:description" content="1.redis支持的数据类型以及使用场景 支持多种类型的数据结构，如字符串（String），散列（Hash），列表（List），集合（Set），有序集合（Sorted Set或者是ZSet）与范围查询，Bitmaps，Hyperloglogs 和地理空间（Geospatial）索引半径查询。其中常见的数据结构类型有以下5种  String ​        这个其实没啥好说的，最常规的set&#x2F;ge">
+<meta property="og:site_name" content="Blog">
+<meta property="og:description" content="1.redis支持的数据类型以及使用场景 ​        redis支持多种类型的数据结构，如字符串（String），散列（Hash），列表（List），集合（Set），有序集合（Sorted Set或者是ZSet）等五种最常用的基础数据类型，还有管道类型（Pipeline）、地理位置类型（GEO）、基数统计类型（HyperLogLog）和流类型（Stream），并且还提供了消息队列的功能。其中">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="http://yoursite.com/2020/06/08/redis/1.png">
 <meta property="og:image" content="http://yoursite.com/2020/06/08/redis/IO%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8.jpg">
 <meta property="og:image" content="http://yoursite.com/2020/06/08/redis/redis%E6%AD%A3%E5%B8%B8%E7%BC%93%E5%AD%98.jpg">
 <meta property="og:image" content="http://yoursite.com/2020/06/08/redis/%E7%BC%93%E5%AD%98%E9%9B%AA%E5%B4%A9.jpg">
 <meta property="article:published_time" content="2020-06-08T02:43:52.000Z">
-<meta property="article:modified_time" content="2020-06-08T07:32:37.933Z">
-<meta property="article:author" content="John Doe">
+<meta property="article:modified_time" content="2020-07-08T06:34:33.853Z">
+<meta property="article:author" content="Solomon">
 <meta property="article:tag" content="redis">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://yoursite.com/2020/06/08/redis/1.png">
   
-    <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
+    <link rel="alternative" href="/atom.xml" title="Blog" type="application/atom+xml">
   
   
     <link rel="icon" href="/favicon.jpg">
@@ -56,7 +56,7 @@
 			<img src="/photos/dog.jpg" class="js-avatar">
 		</a>
 		<hgroup>
-		  <h1 class="header-author"><a href="/">John Doe</a></h1>
+		  <h1 class="header-author"><a href="/">Solomon</a></h1>
 		</hgroup>
 		
 
@@ -112,7 +112,7 @@
 				<img src="/photos/dog.jpg" class="js-avatar">
 			</div>
 			<hgroup>
-			  <h1 class="header-author js-header-author">John Doe</h1>
+			  <h1 class="header-author js-header-author">Solomon</h1>
 			</hgroup>
 			
 			
@@ -163,7 +163,7 @@
         
   
     <h1 class="article-title" itemprop="name">
-      redis面试汇总
+      Redis面试汇总
     </h1>
   
 
@@ -177,7 +177,7 @@
     <div class="article-entry" itemprop="articleBody">
       
         <p>1.<strong>redis支持的数据类型以及使用场景</strong></p>
-<p>支持多种类型的数据结构，如字符串（String），散列（Hash），列表（List），集合（Set），有序集合（Sorted Set或者是ZSet）与范围查询，Bitmaps，Hyperloglogs 和地理空间（Geospatial）索引半径查询。<strong>其中常见的数据结构类型有以下5种</strong></p>
+<p>​        redis支持多种类型的数据结构，如字符串（String），散列（Hash），列表（List），集合（Set），有序集合（Sorted Set或者是ZSet）等五种最常用的基础数据类型，还有管道类型（Pipeline）、地理位置类型（GEO）、基数统计类型（HyperLogLog）和流类型（Stream），并且还提供了消息队列的功能。<strong>其中常见的数据结构类型有以下5种</strong></p>
 <ul>
 <li><p>String</p>
 <p>​        这个其实没啥好说的，最常规的set/get操作，value可以是String也可以是数字。一般做一些复杂的计数功能的缓存。</p>
@@ -220,28 +220,35 @@
 <p>5.<strong>redis的过期策略以及内存淘汰机制</strong></p>
 <p>redis过期键的删除策略有三种：</p>
 <p>​    （1）定时删除：在设置键的过期时间的同时，创建一个定时器，达到过期时间，执行键的删除操作</p>
-<p>​    （2）惰性删除：不主动删除过期键，从键空间中获取键时，都检查取得的键是否过期，过期则删除；没过期则返回</p>
+<p>​    （2）惰性删除： Redis 服务器不主动删除过期的键值，而是当访问键值时，再检查当前的键值是否过期，如果过期则执行删除并返回 null 给客户端；如果没过期则正常返回值信息给客户端。</p>
 <p>​    （3）定期删除：每隔一段时间对数据库进行一次检查，删除里面的过期键。删除多少过期键、检查多少个数据库，由算法决定。</p>
+<blockquote>
+<p>tips:定期删除的扫描并不是遍历所有的键值对，这样的话比较费时且太消耗系统资源。Redis 服务器采用的是随机抽取形式，每次从过期字典中，取出 20 个键进行过期检测，过期字典中存储的是所有设置了过期时间的键值对。如果这批随机检查的数据中有 25% 的比例过期，那么会再抽取 20 个随机键值进行检测和删除，并且会循环执行这个流程，直到抽取的这批数据中过期键值小于 25%，此次检测才算完成。</p>
+</blockquote>
 <p>redis采用的是<strong>定期删除+惰性删除</strong>策略。</p>
 <p>那为什么不用定时删除策略？</p>
 <p>​        定时删除，用一个定时器俩负责监视key，过期则自动删除。虽然内存及时释放，但是十分消耗CPU资源。在大并发请求下，CPU要将时间应用在处理请求，而不是删除key，因此没有采用这一策略。</p>
 <p>定期删除+惰性删除是如何工作的呢?</p>
 <p>​        定期删除，redis默认每个100ms检查，是否有过期的key,有过期key则删除。需要说明的是，redis不是每个100ms将所有的key检查一次，而是<strong>随机抽取</strong>进行检查(如果每隔100ms,全部key进行检查，redis岂不是卡死)。因此，如果只采用定期删除策略，会导致很多key到时间没有删除。<br>​        于是，惰性删除派上用场。也就是说在你获取某个key的时候，redis会检查一下，这个key如果设置了过期时间那么是否过期了？如果过期了此时就会删除。</p>
-<p>采用定期删除+惰性删除就没其他问题了么?</p>
-<p>​        不是的，如果定期删除没删除key。然后你也没即时去请求key，也就是说惰性删除也没生效。这样，redis的内存会越来越高。那么就应该采用内存淘汰机制。</p>
-<p>内存淘汰机制总共有6种：</p>
-<p>​    （1）noenviction：redis 的默认策略，不回收数据，当达到最大内存时，新增数据返回 error</p>
-<p>​    （2）allkeys-lru：当内存不足以容纳新写入数据时，在键空间中，移除最近最少使用的key。推荐使用，目前项目在用这种。</p>
-<p>​    （3）allkeys-random：当内存不足以容纳新写入数据时，在键空间中，随机移除某个key。应该也没人用吧，你不删最少使用Key,去随机删。</p>
+<p>​        以上是 Redis 服务器对待过期键的处理方案，当 Redis 的内存超过最大允许的内存之后，Redis 会触发内存淘汰策略，这和过期策略是完全不同的两个概念，经常有人把二者搞混，这两者一个是在正常情况下清除过期键，一个是在非正常情况下为了保证 Redis 顺利运行的保护策略。</p>
+<p>​        当 Redis 内存不够用时，Redis 服务器会根据服务器设置的淘汰策略，删除一些不常用的数据，以保证 Redis 服务器的顺利运行。</p>
+<p>在 4.0 版本之前 Redis 的内存淘汰策略有以下 6 种：</p>
+<p>​    （1）noenviction：redis 的<strong>默认策略</strong>，不回收数据，当达到最大内存时，新增数据返回 error</p>
+<p>​    （2）allkeys-lru：当内存不足以容纳新写入数据时，在键空间中，移除最近最少使用的key。<strong>推荐使用</strong></p>
+<p>​    （3）allkeys-random：当内存不足以容纳新写入数据时，在键空间中，随机移除某个key。</p>
 <p>​    （4）volatile-lru：当内存不足以容纳新写入数据时，在设置了过期时间的键空间中，移除最近最少使用的key。这种情况一般是把redis既当缓存，又做持久化存储的时候才用。不推荐</p>
-<p>​    （5）volatile-random：当内存不足以容纳新写入数据时，在设置了过期时间的键空间中，随机移除某个key。依然不推荐</p>
-<p>​    （6）volatile-ttl：当内存不足以容纳新写入数据时，在设置了过期时间的键空间中，有更早过期时间的key优先移除。不推荐</p>
+<p>​    （5）volatile-random：当内存不足以容纳新写入数据时，在设置了过期时间的键空间中，随机移除某个key。</p>
+<p>​    （6）volatile-ttl：当内存不足以容纳新写入数据时，在设置了过期时间的键空间中，有更早过期时间的key优先移除。</p>
+<p>而在 Redis 4.0 版本中又新增了 2 种淘汰策略：</p>
+<p>​    (7)  volatile-lfu，淘汰所有设置了过期时间的键值中最少使用的键值；</p>
+<p>​    (8)  allkeys-lfu，淘汰整个键值中最少使用的键值。</p>
 <p>注：</p>
 <ul>
 <li>volatile 是对已设置过期时间的数据集淘汰数据</li>
 <li>allkeys 是从全部数据集淘汰数据</li>
 <li>lru 是 Least Recently Used 的缩写，即最近最少使用</li>
 <li>ttl 指令可以获取键到期的剩余时间(秒)，这里的意思是淘汰最早会过期的数据</li>
+<li>lfu是 Least Frequently Used的缩写，即最不常用</li>
 <li>如果没有设置 expire 的key, 不满足先决条件(prerequisites); 那么 volatile-lru, volatile-random 和 volatile-ttl 策略的行为, 和 noeviction(不删除) 基本上一致。</li>
 </ul>
 <p>6.<strong>redis和数据库双写一致性问题</strong></p>
@@ -447,7 +454,7 @@
   <div class="outer">
     <div id="footer-info">
     	<div class="footer-left">
-    		&copy; 2020 John Doe
+    		&copy; 2020 Solomon
     	</div>
       	<div class="footer-right">
       		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
@@ -551,6 +558,10 @@ MathJax.Hub.Queue(function() {
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">网络</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">Redis</a>
               </li>
              
@@ -571,11 +582,15 @@ MathJax.Hub.Queue(function() {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">操作系统</a>
+                <a href="javascript:void(0)" class="js-tag color1">redis</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">redis</a>
+                <a href="javascript:void(0)" class="js-tag color3">MQ</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">操作系统</a>
               </li>
             
             <div class="clearfix"></div>

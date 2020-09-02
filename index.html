@@ -6,17 +6,17 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>Hexo</title>
+  <title>Blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta property="og:type" content="website">
-<meta property="og:title" content="Hexo">
+<meta property="og:title" content="Blog">
 <meta property="og:url" content="http://yoursite.com/index.html">
-<meta property="og:site_name" content="Hexo">
+<meta property="og:site_name" content="Blog">
 <meta property="og:locale" content="en_US">
-<meta property="article:author" content="John Doe">
+<meta property="article:author" content="Solomon">
 <meta name="twitter:card" content="summary">
   
-    <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
+    <link rel="alternative" href="/atom.xml" title="Blog" type="application/atom+xml">
   
   
     <link rel="icon" href="/favicon.jpg">
@@ -46,7 +46,7 @@
 			<img src="/photos/dog.jpg" class="js-avatar">
 		</a>
 		<hgroup>
-		  <h1 class="header-author"><a href="/">John Doe</a></h1>
+		  <h1 class="header-author"><a href="/">Solomon</a></h1>
 		</hgroup>
 		
 
@@ -102,7 +102,7 @@
 				<img src="/photos/dog.jpg" class="js-avatar">
 			</div>
 			<hgroup>
-			  <h1 class="header-author js-header-author">John Doe</h1>
+			  <h1 class="header-author js-header-author">Solomon</h1>
 			</hgroup>
 			
 			
@@ -147,6 +147,814 @@
           </div>
           <div id="js-content" class="content-ll">
             
+  
+    <article id="post-TCP与UDP" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/07/06/TCP%E4%B8%8EUDP/">TCP与UDP</a>
+    </h1>
+  
+
+        
+        <a href="/2020/07/06/TCP%E4%B8%8EUDP/" class="archive-article-date">
+  	<time datetime="2020-07-06T11:41:13.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-07-06</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <blockquote>
+<p>文章主要内容转载自<a href="https://blog.csdn.net/qq_38950316/article/details/81087809" target="_blank" rel="noopener">https://blog.csdn.net/qq_38950316/article/details/81087809</a></p>
+</blockquote>
+<p>[TOC]</p>
+<h4 id="1-什么是TCP？"><a href="#1-什么是TCP？" class="headerlink" title="1.什么是TCP？"></a>1.什么是TCP？</h4><p>​        TCP（Transmission Control Protocol，传输控制协议）是一个面向连接的、可靠的、基于字节流的传输层协议。从它的概念中我们可以看出 TCP 的三个特点：<strong>面向连接、可靠性和面向字节流</strong>。</p>
+<p>​    面向连接：是指 TCP 是面向客户端和服务器端连接的通讯协议，使用它可以将客户端和服务器端进行连接。</p>
+<p>​    可靠性：是指无论网络环境多差，TCP 都可以保证信息一定能够传递到接收端。TCP 之所以可以保证可靠性主要得益于两个方面，一个                    是“状态性”，另一个是“可控制性”。所谓状态性是指 TCP 会记录信息的发送状态，例如，哪些数据收到了、哪些数据没收到等                    状态信息都会被记录；可控制性是指 TCP 会根据状态情况控制自己的行为，比如当 TCP 意识到丢包了就会控制重发此包，这                    样就实现了 TCP 的可靠性。</p>
+<p>​    面向字节流：是指 TCP 是以字节流的方式进行数据传输的。</p>
+<h4 id="2-TCP三次握手和四次挥手"><a href="#2-TCP三次握手和四次挥手" class="headerlink" title="2.TCP三次握手和四次挥手"></a>2.TCP三次握手和四次挥手</h4><h5 id="2-1TCP报头介绍"><a href="#2-1TCP报头介绍" class="headerlink" title="2.1TCP报头介绍"></a>2.1TCP报头介绍</h5><p>在介绍三次握手和四次挥手前，我们先来了解一下TCP的报头信息。TCP报头如下所示：</p>
+<p><img src="/2020/07/06/TCP%E4%B8%8EUDP/TCP%E6%8A%A5%E5%A4%B4.jpg" alt="TCP报头"></p>
+<p> 序列号seq：占4个字节，用来标记数据段的顺序，TCP把连接中发送的所有数据字节都编上一个序号，第一个字节的编号由本地随机产                        生；给字节编上序号后，就给每一个报文段指派一个序号；序列号seq就是这个报文段中的第一个字节的数据编号。</p>
+<p>  确认号ack：占4个字节，期待收到对方下一个报文段的第一个数据字节的序号；序列号表示报文段携带数据的第一个字节的编号；而确                        认号指的是期望接收到下一个字节的编号；因此当前报文段最后一个字节的编号+1即为确认号。</p>
+<p>  确认ACK：占1位，仅当ACK=1时，确认号字段才有效。ACK=0时，确认号无效</p>
+<p>  同步SYN：连接建立时用于同步序号。当SYN=1，ACK=0时表示：这是一个连接请求报文段。若同意连接，则在响应报文段中使得                    SYN=1，ACK=1。因此，SYN=1表示这是一个连接请求，或连接接受报文。SYN这个标志位只有在TCP建产连接时才会被置                    1，握手完成后    SYN标志位被置0。</p>
+<p>  终止FIN：用来释放一个连接。FIN=1表示：此报文段的发送方的数据已经发送完毕，并要求释放运输连接</p>
+<blockquote>
+<p>  tips：ACK、SYN和FIN这些大写的单词表示标志位，其值要么是1，要么是0；ack、seq小写的单词表示序号。</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>URG</td>
+<td>紧急指针是否有效。为1，表示某一位需要被优先处理</td>
+</tr>
+<tr>
+<td>ACK</td>
+<td>确认号是否有效，一般置为1</td>
+</tr>
+<tr>
+<td>PSH</td>
+<td>提示接收端应用程序立即从TCP缓冲区把数据读走</td>
+</tr>
+<tr>
+<td>RST</td>
+<td>对方要求重新建立连接，复位</td>
+</tr>
+<tr>
+<td>SYN</td>
+<td>请求建立连接，并在其序列号的字段进行序列号的初始值设定。建立连接，设置为1</td>
+</tr>
+<tr>
+<td>FIN</td>
+<td>希望断开连接</td>
+</tr>
+</tbody></table>
+<h5 id="2-2-三次握手"><a href="#2-2-三次握手" class="headerlink" title="2.2 三次握手"></a>2.2 三次握手</h5><p>三次握手的执行流程如下：</p>
+<h5 id><a href="#" class="headerlink" title></a><img src="/2020/07/06/TCP%E4%B8%8EUDP/%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B.png" alt="三次握手"></h5><p>最开始时客户端和服务端都处于 CLOSED 状态，然后服务端先主动监听某个端口，此时服务器端就变成了 LISTEN（监听）状态；</p>
+<p>第一次握手：建立连接时，客户端发送syn包（syn=x）到服务器，并进入SYN_SENT状态，等待服务器确认；SYN：同步序列编号    （Synchronize Sequence Numbers）。</p>
+<p>第二次握手：服务器收到syn包，必须确认客户的SYN（ack=x+1），同时自己也发送一个SYN包（syn=y），即SYN+ACK包，此时服务器进入SYN_RECV状态；</p>
+<p>第三次握手：客户端收到服务器的SYN+ACK包，向服务器发送确认包ACK(ack=y+1），此包发送完毕，客户端和服务器进入ESTABLISHED（TCP连接成功）状态，完成三次握手。</p>
+<h5 id="2-3-四次挥手"><a href="#2-3-四次挥手" class="headerlink" title="2.3 四次挥手"></a>2.3 四次挥手</h5><p>四次挥手的流程如下：</p>
+<p><img src="/2020/07/06/TCP%E4%B8%8EUDP/%E5%9B%9B%E6%AC%A1%E6%8C%A5%E6%89%8B.png" alt="四次挥手"></p>
+<p>1）客户端进程发出连接释放报文，并且停止发送数据。释放数据报文首部，FIN=1，其序列号为seq=u（等于前面已经传送过来的数据的最后一个字节的序号加1），此时，客户端进入FIN-WAIT-1（终止等待1）状态。 TCP规定，FIN报文段即使不携带数据，也要消耗一个序号。<br>2）服务器收到连接释放报文，发出确认报文，ACK=1，ack=u+1，并且带上自己的序列号seq=v，此时，服务端就进入了CLOSE-WAIT（关闭等待）状态。TCP服务器通知高层的应用进程，客户端向服务器的方向就释放了，这时候处于半关闭状态，即客户端已经没有数据要发送了，但是服务器若发送数据，客户端依然要接受。这个状态还要持续一段时间，也就是整个CLOSE-WAIT状态持续的时间。<br>3）客户端收到服务器的确认请求后，此时，客户端就进入FIN-WAIT-2（终止等待2）状态，等待服务器发送连接释放报文（在这之前还需要接受服务器发送的最后的数据）。<br>4）服务器将最后的数据发送完毕后，就向客户端发送连接释放报文，FIN=1，ack=u+1，由于在半关闭状态，服务器很可能又发送了一些数据，假定此时的序列号为seq=w，此时，服务器就进入了LAST-ACK（最后确认）状态，等待客户端的确认。<br>5）客户端收到服务器的连接释放报文后，必须发出确认，ACK=1，ack=w+1，而自己的序列号是seq=u+1，此时，客户端就进入了TIME-WAIT（时间等待）状态。注意此时TCP连接还没有释放，必须经过2MSL（最长报文段寿命）的时间后，当客户端撤销相应的TCP后，才进入CLOSED状态。<br>6）服务器只要收到了客户端发出的确认，立即进入CLOSED状态。同样，撤销TCB后，就结束了这次的TCP连接。可以看到，服务器结束TCP连接的时间要比客户端早一些。</p>
+<h4 id="3-TCP常见面试题"><a href="#3-TCP常见面试题" class="headerlink" title="3.TCP常见面试题"></a>3.TCP常见面试题</h4><p>【问题1】为什么连接的时候是三次握手，关闭的时候却是四次握手？</p>
+<p>答：因为当Server端收到Client端的SYN连接请求报文后，可以直接发送SYN+ACK报文。其中ACK报文是用来应答的，SYN报文是用来同步的。但是关闭连接时，当Server端收到FIN报文时，很可能并不会立即关闭SOCKET，所以只能先回复一个ACK报文，告诉Client端，”你发的FIN报文我收到了”。<strong>只有等到我Server端所有的报文都发送完了</strong>，我才能发送FIN报文，因此不能一起发送。故需要四步握手。</p>
+<p>【问题2】为什么TIME_WAIT状态需要经过2MSL(最大报文段生存时间)才能返回到CLOSED状态？</p>
+<p>答：我们必须假象网络是不可靠的，有可能最后一个ACK丢失。<strong>所以TIME_WAIT状态就是用来重发可能丢失的ACK报文。</strong>在Client发送出最后的ACK回复，但该ACK可能丢失。Server如果没有收到ACK，将不断重复发送FIN片段。所以Client不能立即关闭，它必须确认Server接收到了该ACK。Client会在发送出ACK之后进入到TIME_WAIT状态。Client会设置一个计时器，等待2MSL的时间。<strong>如果在该时间内再次收到FIN，那么Client会重发ACK并再次等待2MSL</strong>。所谓的2MSL是两倍的MSL(Maximum Segment Lifetime)。MSL指一个片段在网络中最大的存活时间，2MSL就是一个发送和一个回复所需的最大时间。如果直到2MSL，Client都没有再次收到FIN，那么Client推断ACK已经被成功接收，则结束TCP连接。</p>
+<p>【问题3】为什么需要用三次握手进行连接？</p>
+<p>答：3次握手完成两个重要的功能</p>
+<p><strong>原因一：防止重复连接</strong></p>
+<p>比如在网络状况比较复杂或者网络状况比较差的情况下，发送方可能会连续发送多次建立连接的请求。如果 TCP 握手的次数只有两次，那么接收方只能选择接受请求或者拒绝接受请求，但它并不清楚这次的请求是正常的请求，还是由于网络环境问题而导致的过期请求，如果是过期请求的话就会造成错误的连接。</p>
+<p>所以如果 TCP 是三次握手的话，那么客户端在接收到服务器端的消息之后，就可以根据报文中ACK的序列号判断当前的连接是否为历史连接，如果判断为历史连接的话就会发送终止报文（RST）给服务器端终止连接；如果判断当前连接不是历史连接的话就会发送指令给服务器端来建立连接。</p>
+<p><strong>原因二：同步初始化序列化</strong></p>
+<p>通过上面的概念我们知道 TCP 的一个重要特征就是可靠性，而 TCP 为了保证在不稳定的网络环境中构建一个稳定的数据连接，它就需要一个“序列号”字段来保证自己的稳定性，而这个序列号的作用就是防止数据包重复发送，以及有效的解决数据包接收时顺序颠倒的问题。</p>
+<p>那么在建立 TCP 连接时就需要同步初始化一个序列号来保证 TCP 的稳定性，因此它需要执行以下过程：</p>
+<ul>
+<li><p>首先客户端发送一个携带了初始序列号的 SYN 报文给服务器端；</p>
+</li>
+<li><p>服务端接收到消息之后会回复一个 ACK 的应答报文，表示客户端的 SYN 报文已被服务端成功接收了；</p>
+</li>
+<li><p>而客户端收到消息之后也会发送一个 ACK 给服务端，服务器端拿到这个消息之后，我们就可以得到一个可靠的初始化序列号了。</p>
+</li>
+</ul>
+<p>而如果是两次握手的话，就无法进行序列号的确认工作了，因此也就无法得到一个可靠的序列号了，所以 TCP 连接至少需要三次握手。</p>
+<p>以上两种原因就是 TCP 连接为什么需要三次握手的主要原因，当然 TCP 连接还可以四次握手，甚至是五次握手，也能实现 TCP 连接的稳定性，但三次握手是最节省资源的连接方式，因此 TCP 连接应该为三次握手。</p>
+<p>【问题4】如果已经建立了连接，但是客户端突然出现故障了怎么办？</p>
+<p>TCP还设有一个保活计时器，显然，客户端如果出现故障，服务器不能一直等下去，白白浪费资源。服务器每收到一次客户端的请求后都会重新复位这个计时器，时间通常是设置为2小时，若两小时还没有收到客户端的任何数据，服务器就会发送一个探测报文段，以后每隔75秒钟发送一次。若一连发送10个探测报文仍然没反应，服务器就认为客户端出了故障，接着就关闭连接。</p>
+<h4 id="4-UDP介绍"><a href="#4-UDP介绍" class="headerlink" title="4.UDP介绍"></a>4.UDP介绍</h4><p>​        UDP（User Data Protocol，用户数据报协议）是无连接的、简单的、面向数据报的传输层协议。也就是 UDP 在发送数据之前，无须建立客户端与服务端的连接，直接发送消息即可。</p>
+<p>​        UDP 的协议头有 8 个字节（64 位），如下图所示：</p>
+<p>​    <img src="/2020/07/06/TCP%E4%B8%8EUDP/UDP.png" alt="UDP协议头"></p>
+<p>​        其中源端口和目标端口是指记录发送方和接收方端口；UDP 包长度是指 UDP 头部加上 UDP 数据的总长度；UDP 校验和用于效验 UDP 的内容是否可靠。</p>
+<p>​        UDP 常见的使用场景有：语音、视频等多媒体通信、DNS（域名转化）、TFTP 等。</p>
+<h4 id="5-TCP和UDP的区别"><a href="#5-TCP和UDP的区别" class="headerlink" title="5.TCP和UDP的区别"></a>5.TCP和UDP的区别</h4><p>TCP 和 UDP 的区别主要体现在以下 7 个方面：</p>
+<ul>
+<li><p>可靠性，TCP 有“状态性”和“可控制性”可以保证消息不重复、按顺序、不丢失的发送和接收，而 UDP 则不能保证消息的可靠性；</p>
+</li>
+<li><p>连接，TCP 是面向连接的传输层协议，传输数据前先要建立连接，而 UDP 发送数据之前无需建立连接；</p>
+</li>
+<li><p>服务对象，TCP 服务的对象为一对一的双端应用，而 UDP 可以应用于一对一、一对多和多对多的通信场景；</p>
+</li>
+<li><p>效率和实时性，TCP 的传输效率较低，而UDP具有较好的实时性，工作效率比TCP高，适用于对高速传输和实时性比较高的通信或广播通信；</p>
+</li>
+<li><p>流量控制，TCP 有滑动窗口可以用来控制流量，而 UDP 则不具备流量控制的能力；</p>
+</li>
+<li><p>报文，TCP 是面向字节流的传输层协议，而 UDP 是面向报文的传输层协议；</p>
+</li>
+<li><p>系统资源，TCP对系统资源的要求较高，而UDP则较少；</p>
+</li>
+<li><p>应用场景，TCP 的应用场景是对消息准确性和顺序要求较高的场景，而 UDP 则是应用于对通信效率较高、准确性要求相对较低的场景。</p>
+</li>
+</ul>
+<p>TCP 和 UDP 的使用场景如下图所示：<img src="/2020/07/06/TCP%E4%B8%8EUDP/TCP%E5%92%8CUDP%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF.png" alt="TCP和UDP使用场景"></p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">网络</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2020/07/06/TCP%E4%B8%8EUDP/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-HTTP2.0" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/07/04/HTTP2.0/">HTTP2.0</a>
+    </h1>
+  
+
+        
+        <a href="/2020/07/04/HTTP2.0/" class="archive-article-date">
+  	<time datetime="2020-07-04T07:35:24.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-07-04</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>​        最近提前批面试字节跳动，面试官问到了HTTP2.0的相关知识，因此特地查询资料做一个简单的总结。</p>
+<p>[TOC]</p>
+<h4 id="什么是HTTP2-0"><a href="#什么是HTTP2-0" class="headerlink" title="什么是HTTP2.0"></a>什么是HTTP2.0</h4><p>​        想要了解一个事物，首先就要知道它是什么。</p>
+<p>​        简单来说，HTTP/2（超文本传输协议第2版，最初命名为HTTP2.0），是HTTP协议的第二个主要版本。HTTP/2是HTTP协议自1999年HTTP1.1发布后的首个更新，主要基于<strong>SPDY协议</strong>。<br>​        HTTP2.0的特点是：在不改动HTTP语义、方法、状态码、URI及首部字段的情况下，<strong>大幅度提高了web性能</strong>。</p>
+<h4 id="什么是SPDY协议？"><a href="#什么是SPDY协议？" class="headerlink" title="什么是SPDY协议？"></a>什么是SPDY协议？</h4><p>​        SPDY是Speedy的昵音，意为“更快”。它是Google开发的基于TCP协议的应用层协议。目标是优化HTTP协议的性能，<strong>通过压缩、多路复用和优先级等技术</strong>，缩短网页的加载时间并提高安全性。SPDY协议的核心思想是<strong>尽量减少TCP连接数</strong>。SPDY并不是一种用于替代HTTP的协议，而是对HTTP协议的增强。</p>
+<h4 id="HTTP1-x的缺点"><a href="#HTTP1-x的缺点" class="headerlink" title="HTTP1.x的缺点"></a>HTTP1.x的缺点</h4><p>任何事物的更新都是为了弥补或修复上个版本的某些问题，那么我们来看看HTTP1.x都有哪些缺点以至于我们要使用HTTP2.0。</p>
+<p>HTTP1.x有以下几个主要缺点：</p>
+<ul>
+<li>HTTP/1.0一次只允许在一个TCP连接上发起一个请求，HTTP/1.1使用的流水线技术也只能部分处理请求并发，仍然会存在队列头阻塞问题，因此客户端在需要发起多次请求时，通常会采用建立多连接来减少延迟。</li>
+<li>单向请求，只能由客户端发起。</li>
+<li>请求报文与响应报文首部信息冗余量大。</li>
+<li>数据未压缩，导致数据的传输量大。</li>
+</ul>
+<hr>
+<h4 id="HTTP2-0特点"><a href="#HTTP2-0特点" class="headerlink" title="HTTP2.0特点"></a>HTTP2.0特点</h4><h5 id="1-二进制传输"><a href="#1-二进制传输" class="headerlink" title="1.二进制传输"></a>1.二进制传输</h5><p>​        HTTP2.0中所有加强性能的核心是二进制传输，在HTTP1.x中，我们是通过文本的方式传输数据。基于文本的方式传输数据存在很多缺陷，文本的表现形式有多样性，因此要做到健壮性考虑的场景必然有很多，但是二进制则不同，只有0和1的组合，因此选择了二进制传输，实现方便且健壮。</p>
+<p>​        在HTTP2.0中引入了新的编码机制，所有传输的数据都会被分割，并采用二进制格式编码。</p>
+<p><img src="/2020/07/04/HTTP2.0/HTTP2.0.png" alt="HTTP2.0"></p>
+<p>​        为了保证HTTP不受影响，那就需要在应用层（HTTP2.0）和传输层（TCP or UDP）之间增加一个二进制分帧层。在二进制分帧层上，HTTP2.0会将所有传输的信息分为更小的消息和帧，并采用二进制格式编码，其中HTTP1.x的首部信息会被封装到Headers帧，而Request Body则封装到Data帧。</p>
+<h5 id="2-多路复用"><a href="#2-多路复用" class="headerlink" title="2.多路复用"></a>2.多路复用</h5><p>​        在HTTP1.0中，我们经常会使用到雪碧图、使用多个域名等方式来进行优化，都是因为浏览器限制了同一个域名下的请求数量，当页面需要请求很多资源的时候，队头阻塞（Head of line blocking）会导致在达到最大请求时，资源需要等待其他资源请求完成后才能继续发送。<br>​        HTTP2.0中，有两个概念非常重要：帧（frame）和流（stream）。<br>​        帧是最小的数据单位，每个帧会标识出该帧属于哪个流，流是多个帧组成的数据流。<br>​        所谓多路复用，即在一个TCP连接中存在多个流，即可以同时发送多个请求，对端可以通过帧中的表示知道该帧属于哪个请求。在客户端，这些帧乱序发送，到对端后再根据每个帧首部的流标识符重新组装。通过该技术，可以避免HTTP旧版本的队头阻塞问题，极大提高传输性能。</p>
+<p><img src="/2020/07/04/HTTP2.0/2.png" alt="2"></p>
+<h5 id="3-Header压缩"><a href="#3-Header压缩" class="headerlink" title="3.Header压缩"></a>3.Header压缩</h5><p>​        在HTTP1.0中，我们使用文本的形式传输header，在header中携带cookie的话，每次都需要重复传输几百到几千的字节，这着实是一笔不小的开销。<br>​        在HTTP2.0中，我们使用了HPACK（HTTP2头部压缩算法）压缩格式对传输的header进行编码，减少了header的大小。并在两端维护了索引表，用于记录出现过的header，后面在传输过程中就可以传输已经记录过的header的键名，对端收到数据后就可以通过键名找到对应的值。</p>
+<h5 id="4-服务器Push"><a href="#4-服务器Push" class="headerlink" title="4.服务器Push"></a>4.服务器Push</h5><p>​        在HTTP2.0中，服务端可以在客户端某个请求后，主动推送其他资源。<br>​        可以想象一下，某些资源客户端是一定会请求的，这时就可以采取服务端push的技术，提前给客户端推送必要的资源，就可以相对减少一点延迟时间。在浏览器兼容的情况下也可以使用prefetch。</p>
+<h5 id="5-更安全"><a href="#5-更安全" class="headerlink" title="5.更安全"></a>5.更安全</h5><p>HTTP2.0使用了tls的拓展ALPN做为协议升级，除此之外，HTTP2.0对tls的安全性做了近一步加强，通过黑名单机制禁用了几百种不再安全的加密算法。</p>
+<h4 id="额外补充：QUIC"><a href="#额外补充：QUIC" class="headerlink" title="额外补充：QUIC"></a>额外补充：QUIC</h4><p>​        这里额外给大家介绍一个协议，是由Google基于UDP实现的同为传输层的协议，目标是希望替代TCP协议。<br>​        该协议支持多路复用，虽然说HTTP2.0也支持多路复用，但是下层仍然是TCP，因为TCP的重传机制，只要一个包丢失就得判断丢包并且重传，导致发生队头阻塞的问题，但是UDP没有这个限制。除此之外，它还有如下特点：</p>
+<ul>
+<li>实现了自己的加密协议，通过类似TCP的TFO机制实现0-RTT，当然TLS1.3已经实现了0-RTT。</li>
+<li>支持重传和纠错机制，在只丢失一个包的情况下不需要重传，使用纠错机制恢复丢失的包。<ul>
+<li>纠错机制：通过异或的方式，算出发出去的数据的异或值并单独发出一个包，服务端在发现有一个包丢失的情况下，通过其他数据包的异或值包算出丢失包。</li>
+<li>在丢失两个包及以上的情况就是用重传机制，因为算不出来了。</li>
+</ul>
+</li>
+</ul>
+<p>参考链接</p>
+<p><a href="https://segmentfault.com/a/1190000016656529?utm_source=tag-newest#item-4" target="_blank" rel="noopener">https://segmentfault.com/a/1190000016656529?utm_source=tag-newest#item-4</a></p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">网络</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2020/07/04/HTTP2.0/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-Redis中实现消息队列" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/07/01/Redis%E4%B8%AD%E5%AE%9E%E7%8E%B0%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/">Redis中实现消息队列</a>
+    </h1>
+  
+
+        
+        <a href="/2020/07/01/Redis%E4%B8%AD%E5%AE%9E%E7%8E%B0%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/" class="archive-article-date">
+  	<time datetime="2020-07-01T06:23:41.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-07-01</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <blockquote>
+<p>本文主要内容转载自<a href="https://kaiwu.lagou.com/course/courseInfo.htm?courseId=59#/detail/pc?id=1781" target="_blank" rel="noopener">https://kaiwu.lagou.com/course/courseInfo.htm?courseId=59#/detail/pc?id=1781</a></p>
+</blockquote>
+<p>​        目前在redis 5.0版本之后使用Redis实现消息队列的方式有4种：</p>
+<ul>
+<li>使用List方式</li>
+<li>使用ZSet方式</li>
+<li>发布订阅者模式</li>
+<li>Stream 方式</li>
+</ul>
+<h4 id="List类型实现消息队列"><a href="#List类型实现消息队列" class="headerlink" title="List类型实现消息队列"></a><strong>List类型实现消息队列</strong></h4><p>​        其中使用List 类型实现的方式最为简单和直接，它主要是通过 <strong>lpush、rpop</strong> 存入和读取实现消息队列的，如下图所示：<img src="/2020/07/01/Redis%E4%B8%AD%E5%AE%9E%E7%8E%B0%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/List%E5%AE%9E%E7%8E%B0%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97.png" alt="List实现消息队列">             </p>
+<p>​        lpush 可以把最新的消息存储到消息队列（List 集合）的尾部，而 rpop 可以读取消息队列的首部，这样就实现了先进先出，如下图所示：<img src="/2020/07/01/Redis%E4%B8%AD%E5%AE%9E%E7%8E%B0%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/1.png" alt="1"></p>
+<p>命令行的实现如下：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:6379&gt; lpush mq "java" #推送消息 java</span><br><span class="line">(integer) 1</span><br><span class="line">127.0.0.1:6379&gt; lpush mq "msg" #推送消息 msg</span><br><span class="line">(integer) 2</span><br><span class="line">127.0.0.1:6379&gt; rpop mq #接收到消息 java</span><br><span class="line">"java"</span><br><span class="line">127.0.0.1:6379&gt; rpop mq #接收到消息 msg</span><br><span class="line">"mq"</span><br></pre></td></tr></table></figure>
+
+<p>​        其中，mq 相当于消息队列的名称，而 lpush 用于生产并添加消息，而 rpop 用于拉取并消费消息。<br>​        使用 List 实现消息队列的优点是消息可以被持久化，List 可以借助 Redis 本身的持久化功能，<strong>AOF 或者是 RDB 或混合持久化</strong>的方式，用于把数据保存至磁盘，这样当 Redis 重启之后，消息不会丢失。</p>
+<p>​        但使用 List 同样存在一定的问题，比如消息不支持重复消费、没有按照主题订阅的功能、不支持消费消息确认等。</p>
+<h4 id="ZSet类型实现消息队列"><a href="#ZSet类型实现消息队列" class="headerlink" title="ZSet类型实现消息队列"></a><strong>ZSet类型实现消息队列</strong></h4><p>​        ZSet 实现消息队列的方式和 List 类似，它是利用 <strong>zadd 和 zrangebyscore</strong> 来实现存入和读取消息的，这里就不重复叙述了。但 ZSet 的实现方式更为复杂一些，因为 ZSet 多了一个分值（score）属性，我们可以使用它来实现更多的功能，比如用它来存储时间戳，以此来实现延迟消息队列等。</p>
+<p>​        ZSet 同样具备持久化的功能，List 存在的问题它也同样存在，不但如此，使用 ZSet 还不能存储相同元素的值。因为它是有序集合，有序集合的存储元素值是不能重复的，但分值可以重复，也就是说当消息值重复时，只能存储一条信息在 ZSet 中。</p>
+<h4 id="发布订阅者模式实现消息队列"><a href="#发布订阅者模式实现消息队列" class="headerlink" title="发布订阅者模式实现消息队列"></a><strong>发布订阅者模式实现消息队列</strong></h4><p>​    在 Redis 2.0 之前，消息队列的实现方式就List和 Zset。而在这之后 Redis 就新增了专门的发布和订阅的类型，Publisher（发布者）和 Subscriber（订阅者）来实现消息队列了，它们对应的执行命令如下：</p>
+<ul>
+<li>发布消息，publish channel “message”</li>
+<li>订阅消息，subscribe channel</li>
+</ul>
+<p>​        使用发布和订阅的类型，我们可以实现主题订阅的功能，也就是 Pattern Subscribe 的功能。因此我们可以使用一个消费者 ”queue_* ” 来订阅所有以  “ queue_ ”  开头的消息队列，如下图所示：<img src="/2020/07/01/Redis%E4%B8%AD%E5%AE%9E%E7%8E%B0%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/Redis%E4%B8%AD%E5%AE%9E%E7%8E%B0%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97%5C2.png" alt="2"></p>
+<p>发布订阅模式的优点很明显，但同样存在以下 3 个问题：</p>
+<ul>
+<li>无法持久化保存消息，如果 Redis 服务器宕机或重启，那么所有的消息将会丢失；</li>
+<li>发布订阅模式是“发后既忘”的工作模式，如果有订阅者离线重连之后就不能消费之前的历史消息；</li>
+<li>不支持消费者确认机制，稳定性不能得到保证，例如当消费者获取到消息之后，还没来得及执行就宕机了。因为没有消费者确认机制，Redis 就会误以为消费者已经执行了，因此就不会重复发送未被正常消费的消息了，这样整体的 Redis 稳定性就被没有办法得到保障了。</li>
+</ul>
+<h4 id="Stream类型实现消息队列"><a href="#Stream类型实现消息队列" class="headerlink" title="Stream类型实现消息队列"></a>Stream类型实现消息队列</h4><p>​        在 Redis 5.0 之后新增了 Stream 类型，我们就可以使用 Stream 的 <strong>xadd 和 xrange</strong> 来实现消息的存入和读取了，并且 Stream 提供了 <strong>xack</strong> 手动确认消息消费的命令，用它我们就可以实现消费者确认的功能了，使用命令如下：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:6379&gt; xack mq group1 1580959593553-0</span><br><span class="line">(integer) 1</span><br></pre></td></tr></table></figure>
+
+<p>​        相关语法如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">xack key group-key ID [ID ...]</span><br></pre></td></tr></table></figure>
+
+<p>​        消费确认增加了消息的可靠性，一般在业务处理完成之后，需要执行 ack 确认消息已经被消费完成，整个流程的执行如下图所示：<img src="/2020/07/01/Redis%E4%B8%AD%E5%AE%9E%E7%8E%B0%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/4.png" alt="4"></p>
+<p>​    其中“Group”为群组，消费者也就是接收者需要订阅到群组才能正常获取到消息。</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">Redis</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2020/07/01/Redis%E4%B8%AD%E5%AE%9E%E7%8E%B0%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-Redis如何实现分布式锁" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/07/01/Redis%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/">Redis如何实现分布式锁</a>
+    </h1>
+  
+
+        
+        <a href="/2020/07/01/Redis%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/" class="archive-article-date">
+  	<time datetime="2020-07-01T02:15:06.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-07-01</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <blockquote>
+<p>文章内容主要转载自<a href="https://kaiwu.lagou.com/course/courseInfo.htm?courseId=59#/detail/pc?id=1780" target="_blank" rel="noopener">https://kaiwu.lagou.com/course/courseInfo.htm?courseId=59#/detail/pc?id=1780</a></p>
+</blockquote>
+<p>​        分布式锁是控制分布式系统之间同步访问共享资源的一种方式。是为了解决分布式系统中，不同的系统或是同一个系统的不同主机共享同一个资源的问题，它通常会采用互斥来保证程序的一致性，这就是分布式锁的用途以及执行原理。</p>
+<p>​        分布式锁示意图，如下图所示：<img src="/2020/07/01/Redis%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81.png" alt="分布式锁"></p>
+<p>​    分布式锁的常见实现方式有四种：</p>
+<ul>
+<li>​    基于MySQL的悲观锁来实现，这种方式使用的最少，因为这种实现方式的性能不好，而且容易造成死锁；</li>
+<li>基于Mencached实现，可使用add方法来实现，如果添加成功了则表示分布式锁创建成功；</li>
+<li>基于Redis实现，可以使用setnx方法来实现；</li>
+<li>基于zookeeper实现，利用Zookeeper顺序临时节点来实现。    </li>
+</ul>
+<p>​        之所以可以使用以上四种方式来实现分布式锁，是因为以上四种方式都属于程序调用的“外部系统”，而分布式的程序是需要共享“外部系统”的，这就是分布式锁得以实现的基本前提。</p>
+<p>​        由于 MySQL 的执行效率问题和死锁问题，所以这种实现方式会被我们先排除掉，而 Memcached 和 Redis 的实现方式比较类似，但因为 Redis 技术比较普及，所以会优先使用 Redis 来实现分布式锁，而 ZooKeeper 确实可以很好的实现分布式锁。但此技术在中小型公司的普及率不高，尤其是非 Java 技术栈的公司使用的较少，如果只是为了实现分布式锁而重新搭建一套 ZooKeeper 集群，显然实现成本和维护成本太高。所以综合以上因素，我们本文会采用 Redis 来实现分布式锁。</p>
+<h5 id="使用-Redis-实现分布式锁"><a href="#使用-Redis-实现分布式锁" class="headerlink" title="使用 Redis 实现分布式锁"></a>使用 Redis 实现分布式锁</h5><p>​        使用 Redis 实现分布式锁主要需要使用 <strong>setnx</strong> 方法，也就是 set if not exists（不存在则创建），具体的实现代码如下：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:6379&gt; setnx lock true</span><br><span class="line">(integer) 1 <span class="comment">#创建锁成功</span></span><br><span class="line"><span class="comment">#逻辑业务处理...</span></span><br><span class="line">127.0.0.1:6379&gt; del lock</span><br><span class="line">(integer) 1 <span class="comment">#释放锁</span></span><br></pre></td></tr></table></figure>
+
+<p>​        当执行 setnx 命令之后返回值为 1 的话，则表示创建锁成功，否则就是失败。释放锁使用 del 删除即可，当其他程序 setnx 失败时，则表示此锁正在使用中，这样就可以实现简单的分布式锁了。</p>
+<p>​        但是以上代码有一个问题，就是没有设置锁的超时时间，因此如果出现异常情况，会导致锁未被释放，而其他线程又在排队等待此锁就会导致程序不可用。</p>
+<p>​        有人可能会想到使用 expire 来设置键值的过期时间来解决这个问题，例如以下代码：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:6379&gt; setnx lock true</span><br><span class="line">(integer) 1 <span class="comment">#创建锁成功</span></span><br><span class="line">127.0.0.1:6379&gt; expire lock 30 #设置锁的(过期)超时时间为 30s</span><br><span class="line">(integer) 1 </span><br><span class="line"><span class="comment">#逻辑业务处理...</span></span><br><span class="line">127.0.0.1:6379&gt; del lock</span><br><span class="line">(integer) 1 <span class="comment">#释放锁</span></span><br></pre></td></tr></table></figure>
+
+<p>​        但这样执行仍然会有问题，因为 setnx lock true 和 expire lock 30 命令是非原子的，也就是一个执行完另一个才能执行。但如果在 setnx 命令执行完之后，发生了异常情况，那么就会导致 expire 命令不会执行，因此依然没有解决死锁的问题。</p>
+<p>​        这个问题在 Redis 2.6.12 之前一直没有得到有效的处理，当时的解决方案是在客户端进行原子合并操作，于是就诞生了很多客户端类库来解决此原子问题，不过这样就增加了使用的成本。因为你不但要添加 Redis 的客户端，还要为了解决锁的超时问题，需额外的增加新的类库，这样就增加了使用成本，但这个问题在 Redis 2.6.12 版本中得到了有效的处理。</p>
+<p>​        在 Redis 2.6.12 中我们可以使用一条 set 命令来执行键值存储，并且可以判断键是否存在以及设置超时时间了，如下代码所示：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:6379&gt; set lock true ex 30 nx</span><br><span class="line">OK <span class="comment">#创建锁成功</span></span><br></pre></td></tr></table></figure>
+
+<p>​        其中，ex 是用来设置超时时间的，而 nx 是 not exists 的意思，用来判断键是否存在。如果返回的结果为“OK”则表示创建锁成功，否则表示此锁有人在使用。</p>
+<h5 id="锁超时"><a href="#锁超时" class="headerlink" title="锁超时"></a>锁超时</h5><p>​        从上面的内容可以看出，使用 set 命令之后好像一切问题都解决了，但在这里我要告诉你，其实并没有。例如，我们给锁设置了超时时间为 10s，但程序的执行需要使用 15s，那么在第 10s 时此锁因为超时就会被释放，这时候线程二在执行 set 命令时正常获取到了锁，于是在很短的时间内 2s 之后（此时线程一执行了15s）线程一删除了此锁，这就造成了锁被误删的情况，如下图所示：<img src="/2020/07/01/Redis%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/%E9%94%81%E8%B6%85%E6%97%B6.png" alt="锁超时"></p>
+<p>​        锁被误删的解决方案是在使用 set 命令创建锁时，给 value 值设置一个归属标识。例如，在 value 中插入一个 UUID，每次在删除之前先要判断 UUID 是不是属于当前的线程，如果属于再删除，这样就避免了锁被误删的问题。</p>
+<p>​        注意：在锁的归属判断和删除的过程中，不能先判断锁再删除锁，如下代码所示：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(uuid.equals(uuid))&#123; <span class="comment">// 判断是否是自己的锁</span></span><br><span class="line">	del(luck); <span class="comment">// 删除锁</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>​        应该把判断和删除放到一个原子单元中去执行，因此需要借助 Lua 脚本来执行，在 Redis 中执行 Lua 脚本可以保证这批命令的原子性，它的实现代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 释放分布式锁</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> jedis Redis客户端</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> lockKey 锁的 key</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> flagId 锁归属标识</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@return</span> 是否释放成功</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">unLock</span><span class="params">(Jedis jedis, String lockKey, String flagId)</span> </span>&#123;</span><br><span class="line">    String script = <span class="string">"if redis.call('get', KEYS[1]) == ARGV[1] then return redis.call('del', KEYS[1]) else return 0 end"</span>;</span><br><span class="line">    Object result = jedis.eval(script, Collections.singletonList(lockKey), Collections.singletonList(flagId));</span><br><span class="line">    <span class="keyword">if</span> (<span class="string">"1L"</span>.equals(result)) &#123; <span class="comment">// 判断执行结果</span></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>​        其中，Collections.singletonList() 方法是将 String 转成 List，因为 jedis.eval() 最后两个参数要求必须是 List 类型。</p>
+<p>​        锁超时可以通过两种方案来解决：</p>
+<ul>
+<li>把执行耗时的方法从锁中剔除，减少锁中代码的执行时间，保证锁在超时之前，代码一定可以执行完；</li>
+<li>把锁的超时时间设置的长一些，正常情况下我们在使用完锁之后，会调用删除的方法手动删除锁，因此可以把超时时间设置的稍微长一些。</li>
+</ul>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">Redis</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2020/07/01/Redis%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-非关系型数据库" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/06/29/%E9%9D%9E%E5%85%B3%E7%B3%BB%E5%9E%8B%E6%95%B0%E6%8D%AE%E5%BA%93/">非关系型数据库</a>
+    </h1>
+  
+
+        
+        <a href="/2020/06/29/%E9%9D%9E%E5%85%B3%E7%B3%BB%E5%9E%8B%E6%95%B0%E6%8D%AE%E5%BA%93/" class="archive-article-date">
+  	<time datetime="2020-06-29T02:10:42.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-06-29</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <blockquote>
+<p>本文主要内容转载自<a href="https://kaiwu.lagou.com/course/courseInfo.htm?courseId=59#/detail/pc?id=1778" target="_blank" rel="noopener">https://kaiwu.lagou.com/course/courseInfo.htm?courseId=59#/detail/pc?id=1778</a></p>
+</blockquote>
+<p>非关系型数据通常包含 3 种数据库类型：文档型数据库、键值型数据库和全文搜索型数据库，下面分别来看每种类型的具体用途。</p>
+<p><strong>一、文档型数据库</strong></p>
+<p>​        文档型数据库以 MongoDB 和 Apache CouchDB 为代表，文档型数据库通常以 JSON 或者 XML 为格式进行数据存储。</p>
+<p>​        以 MongoDB 为例，它是由 C++ 编写的一种面向文档的数据库管理系统，在 2007 年 10 月 由 10gen 团队所开发，并在 2009 年 2 月首度推出。MongoDB 是以二进制 JSON 格式存储数据的，MongoDB 对 JSON 做了一些优化，它支持了更多的数据类型，这种二进制存储的 JSON 我们也可以称之为 BSON（Binary JSON）。</p>
+<p>​        BSON 具备三个特点：轻量、可遍历以及高效，它的缺点是空间利用率不是很理想。MongoDB 使用 BSON 进行存储的另一个重要原因是 BSON 具备可遍历性。</p>
+<p>​        MongoDB 存储结构示例如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;&quot;_id&quot;:ObjectId(“57ce2d4cce8685a6fd9df3a3&quot;),&quot;name&quot;:&quot;老王&quot;,&quot;email&quot;:[&#39;java@qq.com&#39;,&#39;java@163.com&#39;]&#125;</span><br></pre></td></tr></table></figure>
+
+<p>​        其中，“_id”为 MongoDB 默认的主键字段，它会为我们生成一起全局唯一的 id 值，并且这个值在做数据分片时非常有用。</p>
+<p>​        文档型数据库的使用场景如下:</p>
+<ul>
+<li><strong>敏捷开发</strong>，因为 MongoDB 拥有比关系型数据库更快的开发速度，因此很多敏捷开发组织，包括纽约时报等都采用了 MongoDB 数据库。使用它可以有效地避免在增加和修改数据库带来的沟通成本，以及维护和创建数据库模型成本，使用 MongoDB 只需要在程序层面严格把关就行，程序提交的数据结构可以直接更新到数据库中，并不需要繁杂的设计数据库模型再生成修改语句等过程。</li>
+<li><strong>日志系统</strong>，使用 MongoDB 数据库非常适合存储日志，日志对应到数据库中就是很多个文件，而 MongoDB 更擅长存储和查询文档，它提供了更简单的存储和更方便的查询功能。</li>
+<li><strong>社交系统</strong>，使用 MongoDB 可以很方便的存储用户的位置信息，可以方便的实现查询附近的人以及附近的地点等功能。</li>
+</ul>
+<p>​        MongoDB 在 4.0 之前是不支持事务的，不支持的原因也很简单，因为文档型数据库和传统的关系型数据库不一样，不需要满足三范式。文档型数据库之所以性能比较高的另一个主要原因，就是使用<strong>文档型数据库不用进行多表关联性查询</strong>，因为文档型数据库会把相关的信息存放到一张表中。因此，无需关联多表查询的 MongoDB，在这种情况下的查询性能是比较高的。</p>
+<p>​        把所有相关的数据都放入一个表中，这也是 MongoDB 之前很长一段时间内不支持事务的原因，它可以保证单表操作的原子性，一条记录要么成功插入，要么插入失败，不会存在插入了一半的数据。因此，在这种设计思路下，MongoDB 官方认为“事务功能”的实现没有那么紧迫。</p>
+<p>​        但在 MongoDB 4.0 之中正式添加了事务的功能，并且在 MongoDB 4.2 中实现了分布式事务的功能，至此 MongoDB 开启了支持事务之旅。</p>
+<p><strong>二、键值型数据库</strong></p>
+<p>​        键值数据库也就是 Key-Value 数据库，它的典型代表数据库是 Redis 和 Memcached，而它们通常被当做非持久化的内存型数据库缓存来使用。当然 Redis 数据库是具备可持久化的能力的，但是开启持久化会降低系统的运行效率，因此在使用时需要根据实际的情况，选择开启或者关闭持久化的功能。</p>
+<p>​        键值型数据库以极高的性能著称，且除了 Key-Value 字符串类型之外，还包含一些其他的数据类型。以 Redis 为例，它提供了字符串类型（String）、列表类型（List）、哈希表类型（Hash）、集合类型（Set）、有序集合类型（ZSet）等五种最常用的基础数据类型，还有管道类型（Pipeline）、地理位置类型（GEO）、基数统计类型（HyperLogLog）和流类型（Stream），并且还提供了消息队列的功能。</p>
+<p>​        此数据库的优点是性能比较高，缺点是对事务的支持不是很好。</p>
+<p><strong>三、全文搜索型数据库</strong></p>
+<p>​        传统的关系型数据库主要是依赖索引来实现快速查询功能的，而在全文搜索的业务下，索引很难满足查询的需求。<strong>因为全文搜索需要支持模糊匹配的，当数据量比较大的情况下，传递的关系型数据库的查询效率是非常低的；另一个原因是全文搜索需要支持多条件随意组合排序，如果要通过索引来实现的话，则需要创建大量的索引，而传统型数据库也很难实现</strong>，因此需要专门全文搜索引擎和相关的数据库才能实现此功能。</p>
+<p>​        全文搜索型数据库以 ElasticSearch 和 Solr 为代表，它们的出现解决了关系型数据库全文搜索功能较弱的问题。</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">数据库</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2020/06/29/%E9%9D%9E%E5%85%B3%E7%B3%BB%E5%9E%8B%E6%95%B0%E6%8D%AE%E5%BA%93/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-消息队列" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/06/28/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/">消息队列</a>
+    </h1>
+  
+
+        
+        <a href="/2020/06/28/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/" class="archive-article-date">
+  	<time datetime="2020-06-28T08:26:05.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-06-28</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <blockquote>
+<p>本文主要内容转载自<a href="https://kaiwu.lagou.com/course/courseInfo.htm?courseId=59" target="_blank" rel="noopener">https://kaiwu.lagou.com/course/courseInfo.htm?courseId=59</a></p>
+</blockquote>
+<p>MQ(Message Queue，消息队列)，看着名字高大上，其实也就是数据结构中先进先出的一种队列。</p>
+<p><strong>一、消息队列的应用场景</strong></p>
+<p><strong>1.商品秒杀</strong></p>
+<p>​        我们在做秒杀活动时，会发生短时间内出现爆发式的用户请求，如果不采取相关的措施，会导致服务器忙不过来，响应超时的问题，轻则会导致服务假死，重则会让服务器直接宕机，给用户带来的体验也非常不好。如果这个时候加上了消息队列，服务器接收到用户的所有请求后，先把这些请求全部写入到消息队列中再排队处理，这样就不会导致同时处理多个请求的情况；如果消息队列长度超过可以承载的最大数量，那么我们可以抛弃当前用户的请求，通知前台用户“页面出错啦，请重新刷新”等提示，这样就会有更好的交互体验。</p>
+<p><img src="/2020/06/28/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/%E5%95%86%E5%93%81%E7%A7%92%E6%9D%80.png" alt="商品秒杀"></p>
+<p><strong>2.系统解耦</strong></p>
+<p>​    使用了消息队列之后，我们可以把系统的业务功能模块化，实现系统的解耦。例如，在没有使用消息队列之前，当前台用户完善了个人信息之后，首先我们需要更新用户的资料，再添加一条用户信息修改日志。但突然有一天产品经理提了一个需求，在前台用户信息更新之后，需要给此用户的增加一定的积分奖励，然后没过几天产品经理又提了一个需求，在前台用户信息更新之后，不但要增加积分奖励，还要增加用户的经验值，但没过几天产品经理的需求又变了，他要求完善资料无需增加用户的积分了，这样反反复复、来来回回的折腾，我想研发的同学一定受不了，但这是互联网公司的常态，那我们有没有一劳永逸的办法呢？</p>
+<p>​    没错，这个时候我们想到了使用消息队列来实现系统的解耦，每个功能的实现独立开，只需要一个订阅或者取消订阅的开关就可以了，当需要增加功能时，只需要打开订阅“用户信息完善”的队列就行，如果过两天不用了，再把订阅的开关关掉就行了，这样我们就不用来来回回的改业务代码了，也就轻松的实现了系统模块间的解耦。</p>
+<p><strong>3.日志记录</strong></p>
+<p>​    我们大部分的日志记录行为其实是和前台用户操作的主业务没有直接关系的，只是我们的运营人和经营人员需要拿到这部分用户操作的日志信息，来进行用户行为分析或行为监控。在我们没有使用消息队列之前，笼统的做法是当有用户请求时，先处理用户的请求再记录日志，这两个操作是放在一起的，而前台用户也需要等待日志添加完成之后才能拿到后台的响应信息，这样其实浪费了前台用户的部分时间。此时我们可以使用消息队列，当响应完用户请求之后，只需要把这个操作信息放入消息队列之后，就可以直接返回结果给前台用户了，无需等待日志处理和日志添加完成，从而缩短了前台用户的等待时间。</p>
+<p><strong>4.消息通讯</strong></p>
+<p>使用 MQ 可以作为消息通讯的实现手段，利用它可以实现点对点的通讯或者多对多的聊天室功能。<img src="/2020/06/28/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/%E6%B6%88%E6%81%AF%E9%80%9A%E8%AE%AF.png" alt="消息通讯"></p>
+<p>​        </p>
+<p>​        常用的 MQ 中间件有 RabbitMQ、Kafka 和 Redis 等，其中 Redis 属于轻量级的消息队列，而 RabbitMQ、Kafka 属于比较成熟且比较稳定和高效的 MQ 中间件。</p>
+<p><strong>二、MQ的特点以及引入带来的问题</strong></p>
+<p>MQ具有以下5个特点。</p>
+<ul>
+<li><p><strong>先进先出</strong>：消息队列的顺序一般在入列时就基本确定了，最先到达消息队列的信息，一般情况下也会先转发给订阅的消费者，我们把这种实现了先进先出的数据结构称之为队列。</p>
+</li>
+<li><p><strong>发布、订阅工作模式</strong>：<strong>生产者</strong>也就是消息的创建者，负责创建和推送数据到消息服务器；<strong>消费者</strong>也就是消息的接收方，用于处理数据和确认消息的消费；<strong>消息队列</strong>也是 MQ 服务器中最重要的组成元素之一，它负责消息的存储，这三者是 MQ 中的三个重要角色。而它们之间的消息传递与转发都是通过发布以及订阅的工作模式来进行的，即生产者把消息推送到消息队列，消费者订阅到相关的消息后进行消费，在消息非阻塞的情况下，此模式基本可以实现同步操作的效果。并且此种工作模式会把请求的压力转移给 MQ 服务器，以减少了应用服务器本身的并发压力。</p>
+</li>
+<li><p><strong>持久化</strong>：持久化是把消息从内存存储到磁盘的过程，并且在服务器重启或者发生宕机的情况下，重新启动服务器之后是保证数据不会丢失的一种手段，也是目前主流 MQ 中间件都会提供的重要功能。</p>
+</li>
+<li><p><strong>分布式</strong>：MQ 的一个主要特性就是要应对大流量、大数据的高并发环境，一个单体的 MQ 服务器是很难应对这种高并发的压力的，所以 MQ 服务器都会支持分布式应用的部署，以分摊和降低高并发对 MQ 系统的冲击。</p>
+</li>
+<li><p><strong>消息确认</strong>：消息消费确认是程序稳定性和安全性的一个重要考核指标，假如消费者在拿到消息之后突然宕机了，那么 MQ 服务器会误认为此消息已经被消费者消费了，从而造成消息丢失的问题，而目前市面上的主流 MQ 都实现了消息确认的功能，保证了消息不会丢失，从而保证了系统的稳定性。</p>
+</li>
+</ul>
+<p>  但是任何系统的引入都是有两面性的，MQ 也不例外，在引入 MQ 之后，可能会带来以下两个问题。</p>
+<ul>
+<li><p>增加了系统的运行风险：引入 MQ 系统，则意味着新增了一套系统，并且其他的业务系统会对 MQ 系统进行深度依赖，系统部署的越多则意味着发生故障的可能性就越大，如果 MQ 系统挂掉的话可能会导致整个业务系统瘫痪。</p>
+</li>
+<li><p>增加了系统的复杂度：引入 MQ 系统后，需要考虑消息丢失、消息重复消费、消息的顺序消费等问题，同时还需要引入新的客户端来处理 MQ 的业务，增加了编程的运维门槛，增加了系统的复杂性。</p>
+</li>
+</ul>
+<p>​    使用 MQ 需要注意的问题，不要过度依赖 MQ，比如发送短信验证码或邮件等功能，这种低频但有可能比较耗时的功能可以使用多线程异步处理即可，不用任何的功能都依赖 MQ 中间件来完成，但像秒杀抢购可能会导致超卖（也就是把货卖多了，库存变成负数了）等短时间内高并发的请求，此时建议使用 MQ 中间件。</p>
+<p><strong>三、常用的MQ中间件</strong></p>
+<p>​        常用的 MQ 中间件有 RabbitMQ、Kafka 和 Redis 等，其中 Redis 属于轻量级的消息队列，而 RabbitMQ、Kafka 属于比较成熟且比较稳定和高效的 MQ 中间件。</p>
+<p><strong>1.Redis轻量级的消息中间件</strong></p>
+<p>​        Redis 是一个高效的内存性数据库中间件，但使用 Redis 也可以实现消息队列的功能。</p>
+<p>​        早期的 Redis（Redis 5.0 之前）是不支持消息确认的，那时候我们可以通过 List 数据类型的 lpush 和 rpop 方法来实现队列消息的存入和读取功能，或者使用 Redis 提供的发布订阅（pub/sub）功能来实现消息队列，但这种模式不支持持久化，List 虽然支持持久化但不能设置复杂的路由规则来匹配多个消息，并且他们二者都不支持消息消费确认。</p>
+<p>​        于是在 Redis 5.0 之后提供了新的数据类型 Stream 解决了消息确认的问题，但它同样不能提供复杂的路由匹配规则，因此<strong>在业务不复杂的场景下</strong>可以尝试性的使用 Redis 提供的消息队列。</p>
+<p><strong>2.RabbitMQ</strong></p>
+<p>​        RabbitMQ 是一个老牌开源的消息中间件，它实现了标准的 AMQP（Advanced Message Queuing Protocol，高级消息队列协议）消息中间件，使用 Erlang 语言开发，支持集群部署，和多种客户端语言混合调用</p>
+<p>​        RabbitMQ中有3个重要的概念：生产者、消费者和代理。</p>
+<ul>
+<li>生产者：消息的创建者，负责创建和推送数据到消息服务器。</li>
+<li>消费者：消息的接收方，用于处理数据和确认消息。</li>
+<li>代理：也就是 RabbitMQ 服务本身，它用于扮演“快递”的角色，因为它本身并不生产消息，只是扮演了“快递”的角色，把消息进行暂存和传递。</li>
+</ul>
+<p>它们的运行流程，如下图所示：<img src="/2020/06/28/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/Rabbit%E8%BF%90%E8%A1%8C%E6%B5%81%E7%A8%8B%E5%9B%BE.png" alt="Rabbit运行流程图"></p>
+<p>RabbitMQ具备以下几个优点：</p>
+<ul>
+<li><strong>支持持久化</strong>，RabbitMQ支持磁盘持久化功能，保证了消息不会丢失；</li>
+<li><strong>高并发</strong>，RabbitMQ使用了Erlang语言开发，Erlang是为电话交换机开发的语言，自带高并发和高可用特性；</li>
+<li><strong>支持分布式集群</strong>，正是因为 Erlang 语言实现的，因此 RabbitMQ 集群部署也非常简单，只需要启动每个节点并使用 –link 把节点加入到集群中即可，并且 RabbitMQ 支持自动选主和自动容灾；</li>
+<li><strong>支持多种语言</strong>，比如 Java、.NET、PHP、Python、JavaScript、Ruby、Go 等；</li>
+<li><strong>支持消息确认</strong>，支持消息消费确认（ack）保证了每条信息可以被正常消费；</li>
+<li><strong>支持多种插件</strong>，比如网页控制台消息管理插件、消息延迟插件等，RabbitMQ 的插件很多并且使用都很方便。</li>
+</ul>
+<p>RabbitMQ 的消息类型，分为以下四种：</p>
+<ul>
+<li><p><strong>direct</strong>(默认类型)模式，此模式为一对一的发送方式，也就是一条消息智慧发送给一个消费者；</p>
+</li>
+<li><p><strong>headers</strong>模式，允许你匹配消息的header而非路由键（RoutingKey）,除此之外headers和direct的使用完全一致，但因为headers匹配的性能很差，几乎不会被用到；</p>
+</li>
+<li><p><strong>fanout</strong> 模式，为多播的方式，会把一个消息分发给所有的订阅者；</p>
+</li>
+<li><p><strong>topic</strong> 模式，为主题订阅模式，允许使用通配符（#、*）匹配一个或者多个消息，我可以使用“cn.mq.#”匹配到多个前缀是“cn.mq.xxx”的消息，比如可以匹配到“cn.mq.rabbit”、“cn.mq.kafka”等消息。</p>
+<p>介绍了 RabbitMQ 的基础功能，接下来我们重点来看 RabbitMQ 集群相关的内容。</p>
+</li>
+</ul>
+<p>​        RabbitMQ 集群是由多个节点组成，但默认情况下每个节点并不是存储所有队列的完整拷贝，这是出于存储空间和性能的考虑，因为如果存储了队列的完整拷贝，那么就会有很多冗余的重复数据，并且在新增节点的情况下，不但没有新增存储空间，反而需要更大的空间来存储旧的数据；同样的道理，如果每个节点都保存了所有队列的完整信息，那么非查询操作的性能就会很慢，就会需要更多的网络带宽和磁盘负载来存储这些数据。</p>
+<p>​        为了能兼顾性能和稳定性，RabbitMQ 集群的节点分为两种类型，即<strong>磁盘节点和内存节点</strong>，对于磁盘节点来说显然它的优势就是稳定，可以把相关数据保存下来，若 RabbitMQ 因为意外情况宕机，重启之后保证了数据不丢失；而内存节点的优势是快，因为是在内存中进行数据交换和操作，因此性能比磁盘节点要高出很多倍。</p>
+<p>​        如果是单个 RabbitMQ 那么就必须要求是磁盘节点，否则当 RabbitMQ 服务器重启之后所有的数据都会丢失，这样显然是不能接受的。在 RabbitMQ 的集群中，至少需要一个磁盘节点，这样至少能保证集群数据的相对可靠性。</p>
+<p>​        如果集群中的某一个磁盘节点崩溃了，此时整个 RabbitMQ 服务也不会处于崩溃的状态，不过部分操作会受影响，比如不能创建队列、交换器、也不能添加用户及修改用户权限，更不能添加和删除集群的节点等功能。</p>
+<p>tips：对于 RabbitMQ 集群来说，我们启动集群节点的顺序应该是先启动磁盘节点再启动内存节点，而关闭的顺序正好和启动的顺序相反，不然可能会导致 RabbitMQ 集群启动失败或者是数据丢失等异常问题。</p>
+<p><strong>3.Kafka</strong></p>
+<p>​        Kafka 是 LinkedIn 公司开发的基于 ZooKeeper 的多分区、多副本的分布式消息系统，它于 2010 年贡献给了 Apache 基金会，并且成为了 Apache 的顶级开源项目。其中 ZooKeeper 的作用是用来为 Kafka 提供集群元数据管理以及节点的选举和发现等功能。</p>
+<p>​        与 RabbitMQ 比较类似，一个典型的 Kafka 是由<strong>多个 Broker、多个生产者和消费者，以及 ZooKeeper 集群</strong>组成的，其中 Broker 可以理解为一个代理，Kafka 集群中的一台服务器称之为一个 Broker，其组成框架图如下所示：<img src="/2020/06/28/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/Kafka.png" alt="Kafka"></p>
+<p><strong>四、Kafka 和 RabbitMQ对比</strong></p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th align="left">Kafka</th>
+<th align="left">RabbitMQ</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>消息回溯</td>
+<td align="left">支持消息回溯，它可以根据 Offset（消息偏移量）、TimeStamp（时间戳）等维度进行消息回溯</td>
+<td align="left">不支持</td>
+</tr>
+<tr>
+<td>消息消费模式</td>
+<td align="left">基于拉取数据的模式，也就是消费者主动向服务器端发送拉取消息请求</td>
+<td align="left">支持拉取数据模式和主动推送数据的模式，也就说 RabbitMQ 服务器会主动把消息推送给订阅的消费者；</td>
+</tr>
+<tr>
+<td>吞吐量</td>
+<td align="left">在相同配置下，Kafka 的吞吐量通常会比 RabbitMQ 高一到两个级别，比如在单机模式下，Kafka 则可以到达十万甚至是百万的吞吐级别；</td>
+<td align="left">比如在单机模式下，RabbitMQ 的吞吐量大概是万级别的处理能力</td>
+</tr>
+<tr>
+<td>幂等性</td>
+<td align="left">支持，</td>
+<td align="left">不支持</td>
+</tr>
+<tr>
+<td>多租户的功能</td>
+<td align="left">不支持</td>
+<td align="left">RabbitMQ 支持多租户的功能，也就是常说的 Virtual Host（vhost），每一个 vhost 相当于一个独立的小型 RabbitMQ 服务器，它们拥有自己独立的交换器、消息队列及绑定关系等，并且拥有自己独立权限，而且多个 vhost 之间是绝对隔离的</td>
+</tr>
+</tbody></table>
+<p>​    tips:幂等性指的是对单个生产者在单分区上的单会话的幂等操作，但对于全局幂等性则还需要结合业务来处理，比如，消费者在消费完一条消息之后没有来得及确认就发生异常了，等到恢复之后又得重新消费原来消费过的消息，类似这种情况，是无法在消息中间件层面来保证的，这个时候则需要引入更多的外部资源来保证全局幂等性，比如唯一的订单号、消费之前先做去重判断等。</p>
+<p>​        Kafka 和 RabbitMQ 都支持分布式集群部署，并且都支持数据持久化和消息消费确认等 MQ 的核心功能，对于 MQ 的选型要结合自己团队本身的情况，从性能、稳定性及二次开发的难易程度等维度来进行综合的考量并选择。</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">MQ</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2020/06/28/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
   
     <article id="post-synchronized和ReentrantLock" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
@@ -204,8 +1012,8 @@
 <p>则说明当前线程已经拥有此锁，否则，则说明此锁已经被其他线程占用了。当两个以上的线程争抢此锁时，轻量级锁就膨胀为重量级锁，</p>
 <p>这就是锁升级的过程，也是 JDK 1.6 锁优化的内容。</p>
 <h5 id="乐观锁和悲观锁"><a href="#乐观锁和悲观锁" class="headerlink" title="乐观锁和悲观锁"></a>乐观锁和悲观锁</h5><p>​        悲观锁指的是数据对外界的修改采取保守策略，它认为线程很容易会把数据修改掉，因此再整个数据被修改的过程中都会采用锁定状</p>
-<p>态，直到一个线程使用完，其他线程才可以继续使用。</p>
-<p>​        乐观锁和悲观锁的概念恰好相反，乐观锁认为一般情况下数据在修改时不会出现冲突，所以在数据访问之前不会加锁，只是在数据提交更改时，才会对数据进行检测。</p>
+<p>态，直到一个线程使用完，其他线程才可以继续使用。典型应用是synchronized。</p>
+<p>​        乐观锁和悲观锁的概念恰好相反，乐观锁认为一般情况下数据在修改时不会出现冲突，所以在数据访问之前不会加锁，只是在数据提交更改时，才会对数据进行检测。典型应用是ReadWriteLock读写锁。</p>
 <p>​        Java 中的乐观锁大部分都是通过 <strong>CAS</strong>（Compare And Swap，比较并交换）操作实现的，CAS 是一个多线程同步的原子指令，CAS </p>
 <p>操作包含三个重要的信息，即内存位置、预期原值和新值。如果内存位置的值和预期的原值相等的话，那么就可以把该位置的值更新为新</p>
 <p>值，否则不做任何修改。</p>
@@ -222,7 +1030,7 @@
 <p>​        可重入锁的实现原理，是在锁内部存储了一个线程标识，用于判断当前的锁属于哪个线程，并且锁的内部维护了一个计数器，当锁空</p>
 <p>闲时此计数器的值为 0，当被线程占用和重入时分别加 1，当锁被释放时计数器减 1，直到减到 0 时表示此锁为空闲状态。</p>
 <h5 id="排他锁和共享锁"><a href="#排他锁和共享锁" class="headerlink" title="排他锁和共享锁"></a>排他锁和共享锁</h5><p>​        排他锁，又称为写锁、独占锁。获准排他锁后，<strong>既能读数据，又能修改数据</strong>。在任何时候最多只能有<strong>一个线程持有该锁</strong>，比如 </p>
-<p>synchronized 就是排他锁</p>
+<p>synchronized，ReentrantLock 就是排他锁</p>
 <p>​        共享锁，又称为读锁，可以被多线程持有，获得共享锁之后，<strong>可以查看但无法修改和删除数据</strong>。ReadWriteLock 读写锁允许同一时</p>
 <p>间内有<strong>多个线程进行读操作，但是写锁只能被独占</strong>，它就属于共享锁。</p>
 
@@ -414,15 +1222,11 @@
 </ul>
 <p>实例对象：存放类的属性数据信息，包括父类的属性信息</p>
 <p>填充数据：由于虚拟机要求对象起始对象地址必须是8字节的整数倍，填充数据不是必须存在的，仅仅是为了字节对齐</p>
-<p>​        当在对象上加锁时，数据是记录在对象头中。当执行 <em>synchronized</em> 同步方法或同步代码块时，会在对象头中记录锁标记，锁标记指向的是 <em>monitor</em> 对象（也</p>
-<p>称为管程或监视器锁）的起始地址。<strong>每个对象都存在着一个 <em>monitor</em> 与之关联</strong>，对象与其 <em>monitor</em> 之间的关系有存在多种实现方式，如 <em>monitor</em> 可以与对象一</p>
-<p>起创建销毁或当线程试图获取对象锁时自动生成，但当一个 <em>monitor</em> 被某个线程持有后，它便处于锁定状态。</p>
-<p>​        在Java虚拟机中，monitor是由ObjectMonitor实现的。ObjectMonitor中有两个队列， <strong>_WaitSet</strong>  （等待队列）和  <strong>_EntryList</strong>（锁池队列，也有叫同步队</p>
-<p>列），以及 <strong>_Owner</strong> 标记。其中<strong>_WaitSet</strong>  是用于管理等待队列线程的，<strong>_EntryList</strong>是用于管理锁池阻塞线程的，<strong>_WaitSet</strong> 标记用于记录当前执行线程的对象。</p>
+<p>​        当在对象上加锁时，数据是记录在对象头中。当执行 <em>synchronized</em> 同步方法或同步代码块时，会在对象头中记录锁标记，锁标记指向的是 <em>monitor</em> 对象（也称为管程或监视器锁）的起始地址。<strong>每个对象都存在着一个 <em>monitor</em> 与之关联</strong>，对象与其 <em>monitor</em> 之间的关系有存在多种实现方式，如 <em>monitor</em> 可以与对象一起创建销毁或当线程试图获取对象锁时自动生成，但当一个 <em>monitor</em> 被某个线程持有后，它便处于锁定状态。</p>
+<p>​       在Java虚拟机中，monitor是由ObjectMonitor实现的。ObjectMonitor中有两个队列， <strong>_WaitSet</strong>  （等待队列）和  <strong>_EntryList</strong>（锁池队列，也有叫同步队列），以及 <strong>_Owner</strong> 标记。其中<strong>_WaitSet</strong>  是用于管理等待队列线程的，<strong>_EntryList</strong>是用于管理锁池阻塞线程的，<strong>_WaitSet</strong> 标记用于记录当前执行线程的对象。</p>
 <p>线程状态图如下：</p>
 <p>​    <img src="/2020/06/22/%E9%94%81%E7%9A%84%E5%BA%95%E5%B1%82%E5%AE%9E%E7%8E%B0/%E7%BA%BF%E7%A8%8B%E7%8A%B6%E6%80%81%E5%9B%BE.png" alt="线程状态图"></p>
-<p>​    当多线程并发访问同一个同步代码时，<strong>首先会进入_EntryList</strong>，锁池队列中的线程才可以竞争锁。当线程获取锁标记后，<strong>monitor中的_Owner记录此线程</strong>，并</p>
-<p>在monitor中的计数器执行递增计算（+1）,代表锁定，其他线程在_EntryList中继续阻塞。</p>
+<p>​        当多线程并发访问同一个同步代码时，<strong>首先会进入_EntryList</strong>，锁池队列中的线程才可以竞争锁。当线程获取锁标记后，<strong>monitor中的_Owner记录此线程</strong>，并在monitor中的计数器执行递增计算（+1）,代表锁定，其他线程在_EntryList中继续阻塞。</p>
 <ul>
 <li>若执行线程调用wait方法，则monitor中的计数器赋值为0，并将 _Owner标记为null，代表放弃锁，执行线程进入 _WaitSet中等待，只有执行线程调用notify/notifyAll方法， _WaitSet中的线程才会被唤醒，进入 _EntryList中阻塞，等待获取锁标记。</li>
 <li>若执行线程的同步代码执行结束，同样会释放锁标记，monitor 中的 _Owner标记赋值为 <em>null*，且计数器赋值为 *0</em> 计算。</li>
@@ -592,1029 +1396,6 @@
 
 
   
-    <article id="post-Redis持久化策略" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2020/06/10/Redis%E6%8C%81%E4%B9%85%E5%8C%96%E7%AD%96%E7%95%A5/">Redis持久化策略</a>
-    </h1>
-  
-
-        
-        <a href="/2020/06/10/Redis%E6%8C%81%E4%B9%85%E5%8C%96%E7%AD%96%E7%95%A5/" class="archive-article-date">
-  	<time datetime="2020-06-10T08:51:25.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-06-10</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p> 因为Redis将数据保存在内存中，内存中的数据时很容易变更丢失的，这时就需要对数据进行持久化，将数据保存到硬盘上来。而Redis 提供两种持久化机制： RDB 和 AOF。</p>
-<p>一.RDB (Redis DataBase )</p>
-<p>​       指用数据集快照的方式半持久化模式，记录 redis 数据库的所有键值对，在某个时间点将数据写入一个临时文件，持久化结束后，用这个临时文件替换上次持久化的文件，可恢复数据。</p>
-<p>优点：</p>
-<ul>
-<li>只有一个文件 dump.rdb，<strong>恢复操作简单，适用于数据备份，灾难恢复</strong>。</li>
-<li>性能较高，生成RDB文件的时候，redis主进程会fork一个子进程来处理所有保存工作，主进程不需要进行任何磁盘IO操作，可以继续处理命令。</li>
-<li>Redis加载RDB恢复数据速度远远快于AOF的方式。</li>
-</ul>
-<p>缺点：</p>
-<ul>
-<li><p><strong>数据安全性低</strong>。因为bgsave每次运行都要执行fork操作创建子进程，开销大，属于重量级操作，频繁执行成本过高，所以数据<strong>没办法做到实时持久化/秒级持久化</strong>。若期间 redis 发生故障，可能会发生数据丢失。</p>
-</li>
-<li><p>RDB文件存在兼容性问题。RDB使用特定二进制格式保存，Redis版本演进过程中有多个格式 的RDB版本，存在老版本Redis服务无法兼容新版RDB格式的问题。</p>
-</li>
-</ul>
-<p>二.AOF (Append Only File)</p>
-<p>​        对每条写入命令作为日志，以append-only的模式写入一个日志文件中，在redis重启的时候，可以通过执行AOF日志中的写入指令来重新构建整个数据集。类似于MySQL的binlog。AOF的主要作用是<strong>解决了数据持久化的实时性</strong>，目前已经是Redis持久化的主流方式。</p>
-<p>优点：</p>
-<ul>
-<li>数据安全，aof 持久化可以配置 appendfsync 属性为 always，记录每个命令操作到 aof 文件中一次；通过 append 模式写文件，即使中途服务器宕机，也可以通过 redis-check-aof 工具解决数据一致性问题。</li>
-<li>AOF日志文件的命令通过非常可读的方式进行记录，这个特性非常适合做灾难性的误删除的紧急恢复。比如某人不小心用flushall命令清空了所有数据，只要这个时候后台rewrite还没有发生，那么就可以立即拷贝AOF文件，将最后一条flushall命令给删了，然后再将该AOF文件放回去，就可以通过恢复机制，自动恢复所有数据。</li>
-</ul>
-<p>缺点：</p>
-<ul>
-<li>AOF 的持久化文件比 RDB 大，恢复速度慢。</li>
-</ul>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">Redis</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2020/06/10/Redis%E6%8C%81%E4%B9%85%E5%8C%96%E7%AD%96%E7%95%A5/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-redis" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2020/06/08/redis/">redis面试汇总</a>
-    </h1>
-  
-
-        
-        <a href="/2020/06/08/redis/" class="archive-article-date">
-  	<time datetime="2020-06-08T02:43:52.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-06-08</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>1.<strong>redis支持的数据类型以及使用场景</strong></p>
-<p>支持多种类型的数据结构，如字符串（String），散列（Hash），列表（List），集合（Set），有序集合（Sorted Set或者是ZSet）与范围查询，Bitmaps，Hyperloglogs 和地理空间（Geospatial）索引半径查询。<strong>其中常见的数据结构类型有以下5种</strong></p>
-<ul>
-<li><p>String</p>
-<p>​        这个其实没啥好说的，最常规的set/get操作，value可以是String也可以是数字。一般做一些复杂的计数功能的缓存。</p>
-</li>
-<li><p>hash</p>
-<p>​        这里value存放的是结构化的对象，比较方便的就是操作其中的某个字段。博主在做单点登录的时候，就是用这种数据结构存储用户信息，以cookieId作为key，设置30分钟为缓存过期时间，能很好的模拟出类似session的效果。</p>
-</li>
-<li><p>list</p>
-<p>​    使用list的数据结构，可以做简单的消息队列的功能。另外还有一个就是，可以利用Irange命令，做基于redis的分页功能，性能极佳，用户体验好。还有一个场景，很适合–取行情信息。就是个生产者和消费者的场景。list可以很好的完成排队，先进先出的原则。</p>
-</li>
-<li><p>set</p>
-<p>​    因为set堆放的是一堆不重复值的集合，所以可以做全局去重的功能。另外，就是利用交集，并集，差集等操作，可以计算出共同喜好，全部的喜好，自己独有的喜好等功能。</p>
-</li>
-<li><p>sorted set</p>
-<p>​    sorted set多了一个权重参数score,集合中的元素能够按score进行排列。可以做排行榜应用，取TOP N操作。</p>
-</li>
-</ul>
-<p>2.<strong>为什么使用redis</strong></p>
-<p>​        主要是从两个角度去考虑:性能和并发。当然，redis还具备可以做分布式锁等其他功能，但是如果只是为了分布式锁这些其他功能，完全还有其他中间件(如zookpeer等)代替，并不是非要使用redis。因此，这个问题主要从性能和并发两个角度去答。</p>
-<p>​        （1）性能</p>
-<p>​            如下图所示，我们在碰到需要执行耗时特别久，且结果不频繁变动的SQL，就特别适合将运行结果放入缓存。这样，后面的请求就    去缓存中读取，使得请求能够迅速响应。</p>
-<p><img src="/2020/06/08/redis/1.png" alt="1"></p>
-<p>​        （2）并发</p>
-<p>​            在大并发的情况下，所有的请求直接访问数据库，数据库会出现连接异常。这个时候，就需要使用redis做一个缓冲操作，让请求    先访问到redis，而不是直接访问数据库。</p>
-<p>3.<strong>使用redis存在什么问题</strong></p>
-<p>​    （1）缓存和数据库双写一致性问题</p>
-<p>​    （2）缓存穿透，缓存雪崩和缓存击穿问题</p>
-<p>​    （3）缓存的并发竞争问题</p>
-<p>4.<strong>单线程的redis速度为什么那么快</strong></p>
-<p>总结了主要以下5点，加粗的影响最大：</p>
-<p>（1）<strong>纯内存操作</strong>，读写速度非常快</p>
-<p>（2）<strong>单线程操作</strong>，避免了频繁的线程切换的资源消耗，并且不存在资源共享与竞争，不需要考虑锁</p>
-<p>（3）数据存储进行了压缩优化</p>
-<p>（4）使用了高性能数据结构，如Hash,跳表等</p>
-<p>（5）<strong>采用了非阻塞I/O多路复用机制</strong></p>
-<p>​        多路I/O复用模型是利用 select、poll、epoll 可以同时监察多个流的 I/O 事件的能力，在空闲的时候，会把当前线程阻塞掉，当有一个或多个流有 I/O 事件时，就从阻塞态中唤醒，于是程序就会轮询一遍所有的流（epoll 是只轮询那些真正发出了事件的流），并且只依次顺序的处理就绪的流，这种做法就避免了大量的无用操作。</p>
-<p>​        这里“多路”指的是多个网络连接，“复用”指的是复用同一个线程。**采用多路 I/O 复用技术可以让单个线程高效的处理多个连接请求（尽量减少网络 IO 的时间消耗），且 Redis 在内存中操作数据的速度非常快，也就是说内存内的操作不会成为影响Redis性能的瓶颈，主要由以上几点造就了 Redis 具有很高的吞吐量。</p>
-<p><img src="/2020/06/08/redis/IO%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8.jpg" alt="IO多路复用"></p>
-<p>​        参照上图，简单来说，就是。我们的redis-client在操作的时候，会产生具有不同事件类型的socket。在服务端，有一段I/0多路复用程序，将其置入队列之中。然后，文件事件分派器，依次去队列中取，转发到不同的事件处理器中</p>
-<p>5.<strong>redis的过期策略以及内存淘汰机制</strong></p>
-<p>redis过期键的删除策略有三种：</p>
-<p>​    （1）定时删除：在设置键的过期时间的同时，创建一个定时器，达到过期时间，执行键的删除操作</p>
-<p>​    （2）惰性删除：不主动删除过期键，从键空间中获取键时，都检查取得的键是否过期，过期则删除；没过期则返回</p>
-<p>​    （3）定期删除：每隔一段时间对数据库进行一次检查，删除里面的过期键。删除多少过期键、检查多少个数据库，由算法决定。</p>
-<p>redis采用的是<strong>定期删除+惰性删除</strong>策略。</p>
-<p>那为什么不用定时删除策略？</p>
-<p>​        定时删除，用一个定时器俩负责监视key，过期则自动删除。虽然内存及时释放，但是十分消耗CPU资源。在大并发请求下，CPU要将时间应用在处理请求，而不是删除key，因此没有采用这一策略。</p>
-<p>定期删除+惰性删除是如何工作的呢?</p>
-<p>​        定期删除，redis默认每个100ms检查，是否有过期的key,有过期key则删除。需要说明的是，redis不是每个100ms将所有的key检查一次，而是<strong>随机抽取</strong>进行检查(如果每隔100ms,全部key进行检查，redis岂不是卡死)。因此，如果只采用定期删除策略，会导致很多key到时间没有删除。<br>​        于是，惰性删除派上用场。也就是说在你获取某个key的时候，redis会检查一下，这个key如果设置了过期时间那么是否过期了？如果过期了此时就会删除。</p>
-<p>采用定期删除+惰性删除就没其他问题了么?</p>
-<p>​        不是的，如果定期删除没删除key。然后你也没即时去请求key，也就是说惰性删除也没生效。这样，redis的内存会越来越高。那么就应该采用内存淘汰机制。</p>
-<p>内存淘汰机制总共有6种：</p>
-<p>​    （1）noenviction：redis 的默认策略，不回收数据，当达到最大内存时，新增数据返回 error</p>
-<p>​    （2）allkeys-lru：当内存不足以容纳新写入数据时，在键空间中，移除最近最少使用的key。推荐使用，目前项目在用这种。</p>
-<p>​    （3）allkeys-random：当内存不足以容纳新写入数据时，在键空间中，随机移除某个key。应该也没人用吧，你不删最少使用Key,去随机删。</p>
-<p>​    （4）volatile-lru：当内存不足以容纳新写入数据时，在设置了过期时间的键空间中，移除最近最少使用的key。这种情况一般是把redis既当缓存，又做持久化存储的时候才用。不推荐</p>
-<p>​    （5）volatile-random：当内存不足以容纳新写入数据时，在设置了过期时间的键空间中，随机移除某个key。依然不推荐</p>
-<p>​    （6）volatile-ttl：当内存不足以容纳新写入数据时，在设置了过期时间的键空间中，有更早过期时间的key优先移除。不推荐</p>
-<p>注：</p>
-<ul>
-<li>volatile 是对已设置过期时间的数据集淘汰数据</li>
-<li>allkeys 是从全部数据集淘汰数据</li>
-<li>lru 是 Least Recently Used 的缩写，即最近最少使用</li>
-<li>ttl 指令可以获取键到期的剩余时间(秒)，这里的意思是淘汰最早会过期的数据</li>
-<li>如果没有设置 expire 的key, 不满足先决条件(prerequisites); 那么 volatile-lru, volatile-random 和 volatile-ttl 策略的行为, 和 noeviction(不删除) 基本上一致。</li>
-</ul>
-<p>6.<strong>redis和数据库双写一致性问题</strong></p>
-<p>分析:一致性问题是分布式常见问题，还可以再分为最终一致性和强一致性。数据库和缓存双写，就必然会存在不一致的问题。答这个问题，先明白一个前提。就是如果对数据有强一致性要求，不能放缓存。我们所做的一切，只能保证最终一致性。另外，我们所做的方案其实从根本上来说，只能说降低不一致发生的概率，无法完全避免。因此，有强一致性要求的数据，不能放缓存。</p>
-<p>首先，采取正确更新策略，先更新数据库，再删缓存。其次，因为可能存在删除缓存失败的问题，提供一个补偿措施即可，例如利用消息队列。</p>
-<p>7.<strong>请讲下redis的缓存穿透，缓存雪崩和缓存击穿</strong></p>
-<p>（1）缓存穿透</p>
-<p>概念：用户想要查询一个数据，发现redis内存数据库没有，也就是缓存没有命中，于是向持久层数据库查询，发现也没有，于是本次查询失败。当用户很多的时候，缓存都没有命中，于是都去请求了持久层数据库。这会给持久层数据库造成很大的压力，这时候就相当于出现了缓存穿透。</p>
-<p>简单来说就是黑客故意去请求缓存中不存在的数据，导致所有的请求都怼到数据库上，从而数据库连接异常。</p>
-<p>解决方案：</p>
-<ul>
-<li><p>利用互斥锁，缓存失效的时候，先去获得锁，得到锁了，再去请求数据库。没得到锁，则休眠一段时间重试。</p>
-</li>
-<li><p>最常用的是提供一个能迅速判断请求是否有效地拦截机制，比如，利用<strong>布隆过滤器</strong>，内部维护一系列合法有效的key。迅速判断出，请求所携带的Key是否合法有效。如果不合法，则直接返回。</p>
-</li>
-<li><p>简单粗暴的方法：如果一个查询返回的数据为空（不管是数据不存在，还是系统故障），我们仍然把这个空结果进行缓存，但它的过期时间会很短，最长不超过五分钟。</p>
-</li>
-</ul>
-<p>（2）缓存雪崩</p>
-<p>概念：即缓存同一时间大面积的失效，这个时候又来了一波请求，结果请求都怼到数据库上，从而导致数据库连接异常。</p>
-<p>缓存正常从Redis中获取，示意图如下：</p>
-<p><img src="/2020/06/08/redis/redis%E6%AD%A3%E5%B8%B8%E7%BC%93%E5%AD%98.jpg" alt="redis正常缓存"></p>
-<p>redis缓存雪崩瞬间示意图如下：</p>
-<p><img src="/2020/06/08/redis/%E7%BC%93%E5%AD%98%E9%9B%AA%E5%B4%A9.jpg" alt="缓存雪崩"></p>
-<p>解决方案：</p>
-<ul>
-<li>大多数系统设计者考虑用加锁或者队列的方式保证来保证不会有大量的线程对数据库一次性进行读写，从而避免失效时大量的并发请求落到底层存储系统上。但是系统的吞吐量会下降</li>
-<li>还有一个简单方案就时讲缓存失效时间分散开，比如我们可以在原有的失效时间基础上增加一个随机值，比如1-5分钟随机，这样每一个缓存的过期时间的重复率就会降低，就很难引发集体失效的事件。</li>
-</ul>
-<p>（3）缓存击穿</p>
-<p>概念：指一个key值非常热点，在不停的扛着大并发，大并发集中对这一个点进行访问，当这个key在失效的瞬间，持续的大并发就穿破缓存，直接请求数据库，就像在一个屏障上凿开了一个洞。</p>
-<p>解决方案：</p>
-<ul>
-<li>利用互斥锁，缓存失效的时候，先去获得锁，得到锁了，再去请求数据库。其他没得到锁，则休眠一段时间重试，再次得到锁后已经有缓存了就直接走缓存</li>
-</ul>
-<p>8.<strong>redis持久化机制有哪些？</strong></p>
-<p>Redis 提供两种持久化机制： RDB 和 AOF</p>
-<p>RDB（Redis DataBase）：</p>
-<p>​        指用数据集快照的方式半持久化模式，记录 redis 数据库的所有键值对，在某个时间点将数据写入一个临时文件，持久化结束后，用这个临时文件替换上次持久化的文件，可恢复数据。</p>
-<p>AOF（Append-only file）：</p>
-<p>​        指所有的命令行记录以 redis 命令请求协议的格式完全持久化存储，保存为 aof 文件</p>
-<p>具体可以看我另外一篇博客</p>
-<p>[]: <a href="http://baidu.com" target="_blank" rel="noopener">http://baidu.com</a>    “redis的持久化策略”</p>
-<p>参考相关链接：</p>
-<p><a href="https://blog.csdn.net/hukaijun/article/details/81010279" target="_blank" rel="noopener">https://blog.csdn.net/hukaijun/article/details/81010279</a></p>
-<p><a href="https://www.cnblogs.com/midoujava/p/11277096.html" target="_blank" rel="noopener">https://www.cnblogs.com/midoujava/p/11277096.html</a></p>
-<p><a href="https://zhuanlan.zhihu.com/p/34438275" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/34438275</a></p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">redis</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2020/06/08/redis/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-MySQL" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2020/06/04/MySQL/">MySQL面试题</a>
-    </h1>
-  
-
-        
-        <a href="/2020/06/04/MySQL/" class="archive-article-date">
-  	<time datetime="2020-06-04T07:55:51.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-06-04</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>1.MySQL索引采用B+树的原因</p>
-<p>​    首先MySQL中的数据一般是放在磁盘中的，读取数据的时候肯定会有访问磁盘的操作。而磁盘的定位是非常消耗时间的，树的深度越深，对应的定位次数也就越多，而B-/B+树因为“矮胖”,可以减少访问的层数，从而减少I/O支出。而B+树在提高了磁盘IO性能的同时，也解决了B-树遍历元素效率低下的问题。（B+树只要遍历叶子节点就可以实现整棵树的遍历。在内存中直接遍历是很快的，而B树的话需要跨层中序遍历，涉及到I/O操作，所以慢）</p>
-<p>2.MyISAM与InnoDB的区别</p>
-<p>常见的Mysql存储引擎就MyISAM，InnoDB,Memory,NDB。之前MyISAM是默认的数据引擎，但从MySQL-5.5.5版本开始，InnoDB成为默认的数据引擎。</p>
-<table>
-<thead>
-<tr>
-<th>名称</th>
-<th align="center">MyISAM</th>
-<th align="center">InnoDB</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>事务</td>
-<td align="center">不支持</td>
-<td align="center">支持事务</td>
-</tr>
-<tr>
-<td>外键</td>
-<td align="center">不支持</td>
-<td align="center">支持外键</td>
-</tr>
-<tr>
-<td>行表锁</td>
-<td align="center">表锁，即使操作一条记录也会锁住整个表，不适合高并发的操作</td>
-<td align="center">行锁，操作时只锁某一行，不对其他行有影响，适合高并发的操作</td>
-</tr>
-<tr>
-<td>缓存</td>
-<td align="center">只缓存索引，不缓存真实数据</td>
-<td align="center">不仅缓存索引还要缓存真实数据，对内存要求较高，而且内存大小对性能有决定性的影响</td>
-</tr>
-<tr>
-<td>聚集索引</td>
-<td align="center">是非聚集索引，数据文件是分离的，索引保存的是数据文件的指针，主键索引和辅助索引是独立的</td>
-<td align="center">是聚集索引，数据文件和索引绑在一起，必须要有主键，通过主键索引效率很高。辅助索引需要两次查询，先查询到主键，再通过主键查询到数据，如果主键太大，其他索引也会很大。</td>
-</tr>
-<tr>
-<td>全文索引</td>
-<td align="center">支持全文索引</td>
-<td align="center">不支持</td>
-</tr>
-<tr>
-<td>总行数</td>
-<td align="center">用一个变量保存表的总行数，查总行数速度很快</td>
-<td align="center">不保存表的总行数，执行 select count(*) from table 时需要全表扫描</td>
-</tr>
-<tr>
-<td>表空间</td>
-<td align="center">小</td>
-<td align="center">大</td>
-</tr>
-<tr>
-<td>关注点</td>
-<td align="center">性能</td>
-<td align="center">事务</td>
-</tr>
-</tbody></table>
-<p>总结：</p>
-<ul>
-<li>InnoDB 存储引擎提供了具有提交、回滚、崩溃恢复能力的事务安全，与 MyISAM 比 InnoDB 写的效率差一些，并且会占用更多的磁盘空间以保留数据和索引</li>
-<li>MyISAM 不支持事务、也不支持外键，优势是访问的速度快。对事务的完整性没有要求、以 SELECT 和 INSERT 为主的应用可以使用这个存储引擎</li>
-</ul>
-<p>3.最左前缀原则</p>
-<p>​    例如对于下面这一张表</p>
-<p><img src="/2020/06/04/MySQL/1.png" alt="1"></p>
-<p>​    如果我们按照name字段建立索引的话，采用B+树的结构，大概的索引结构如下</p>
-<p><img src="/2020/06/04/MySQL/2.png" alt="2"></p>
-<p>​    如果我们要进行模糊查找，查找name 以“张”开头的所有人的ID，即 sql 语句为</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select ID from table where name like &#39;张%&#39;</span><br></pre></td></tr></table></figure>
-
-<p>​    由于在B+树结构的索引中，索引项是按照索引定义里面出现的字段顺序排序的，索引在查找的时候，可以快速定位到 ID 为 100的张一，然后直接向右遍历所有 “张” 开头的人，直到条件不满足为止。</p>
-<p>​    也就是说，我们找到第一个满足条件的人之后，直接向右遍历就可以了，由于索引是有序的，所有满足条件的人都会聚集在一起。</p>
-<p>​    而这种定位到最左边，然后向右遍历寻找，就是我们所说的<strong>最左前缀原则</strong>。</p>
-<p>4.主键索引和非主键索引的区别</p>
-<p><img src="/2020/06/04/MySQL/%E4%B8%BB%E9%94%AE%E7%B4%A2%E5%BC%95%E5%92%8C%E9%9D%9E%E4%B8%BB%E9%94%AE%E7%B4%A2%E5%BC%95.png" alt="主键索引和非主键索引"></p>
-<p>​    其中R代表一整行的值</p>
-<p>​    从图中不难看出，主键索引和非主键索引的区别是：非主键索引的叶子节点存放的是<strong>主键的值</strong>，而主键索引的叶子节点存放的是<strong>整行数据</strong>，其中非主键索引也被称为<strong>二级索引</strong>，而主键索引也被称为<strong>聚簇索引</strong>。</p>
-<p>​    根据这两种结构我们来进行下查询，看看他们在查询上有什么区别。</p>
-<p>​    1、如果查询语句是 select * from table where ID = 100,即主键查询的方式，则只需要搜索 ID 这棵 B+树。</p>
-<p>​    2、如果查询语句是 select * from table where k = 1，即非主键的查询方式，则先搜索k索引树，得到ID=100,再到ID索引树搜索一次，这个过程也被称为<strong>回表</strong>。</p>
-<p>5.为什么用B+树做索引而不用哈希表做索引</p>
-<p>​    （1）哈希表是把索引字段映射成对应的哈希码然后再存放在对应的位置，这样的话，如果我们要进行模糊查找的话，显然哈希表这种结构是不支持的，只能遍历这个表。而B+树则可以通过最左前缀原则快速找到对应的数据。</p>
-<p>​    （2）如果我们要进行范围查找，例如查找ID为100 ~ 400的人，哈希表同样不支持，只能遍历全表。</p>
-<p>​    （3）索引字段通过哈希映射成哈希码，如果很多字段都刚好映射到相同值的哈希码的话，那么形成的索引结构将会是一条很长的链表，这样的话，查找的时间就会大大增加。</p>
-<p>6.为什么采用主键自增的索引</p>
-<p>​        对于这颗主键索引的树</p>
-<p><img src="/2020/06/04/MySQL/4.png" alt="img"></p>
-<p>​        如果我们插入 ID = 650 的一行数据，那么直接在最右边插入就可以了</p>
-<p><img src="/2020/06/04/MySQL/5.png" alt="img"></p>
-<p>​        但是如果插入的是 ID = 350 的一行数据，由于 B+ 树是有序的，那么需要将下面的叶子节点进行移动，腾出位置来插入 ID = 350 的数据，这样就会比较消耗时间，如果刚好 R4 所在的数据页已经满了，需要进行<strong>页分裂</strong>操作，这样会更加糟糕。</p>
-<p>​        但是，如果我们的主键是自增的，每次插入的 ID 都会比前面的大，那么我们每次只需要在后面插入就行， 不需要移动位置、分裂等操作，这样可以提高性能。也就是为什么建议使用主键自增的索引。</p>
-<p>7.索引分类</p>
-<ul>
-<li><p><strong>普通索引</strong></p>
-</li>
-<li><p><strong>唯一索引</strong>：唯一索引不允许两行具有相同的索引值，索引值可以为nul</p>
-</li>
-<li><p><strong>主键索引</strong>：为表定义一个主键将自动创建主键索引，主键索引是唯一索引的特殊类型。主键索引要求主键中的每个值是唯一的，并且不能为空</p>
-</li>
-<li><p><strong>聚集索引</strong>(Clustered)：表中各行数据的物理存储顺序与键值的逻辑（索引）顺序相同，每个表只能有一个</p>
-</li>
-<li><p><strong>非聚集索引</strong>(Non-clustered)：非聚集索引指定表的逻辑顺序。数据存储在一个位置，索引存储在另一个位置，索引中包含指向数据存储位置的指针。可以有多个，小于249个。</p>
-<p>​        比如字典中，用‘拼音’查汉字，就是聚集索引。因为正文中字都是按照拼音排序的。而用‘偏旁部首’查汉字，就是非聚集索引，因为正文中的字并不是按照偏旁部首排序的，我们通过检字表得到正文中的字在索引中的映射，然后通过映射找到所需要的字。</p>
-</li>
-</ul>
-<p>8.事务的特性</p>
-<p>​    事务有四大特性——ACID</p>
-<p><strong>原子性</strong>（Atomicity）：意思就是说一个事务应当作为一个不可分割的最小单位，整个事务的操作要么全部执行成功要么全部执行失败（回滚）,像原子一样不可分割。</p>
-<p><strong>一致性</strong>（Consistency）:事务总是从一个一致性的状态跳到另外一个一致性的状态，也就是说一个事务执行之前和执行之后都必须处于一致性状态。拿转账来说，假设用户A和用户B两者的钱加起来一共是5000，那么不管A和B之间如何转账，转几次账，事务结束后两个用户的钱相加起来应该还得是5000，这就是事务的一致性。</p>
-<p><strong>隔离性</strong>（Isolation）:通常来说，一个事务的操作对于其他的事务是不可见的，也就是一般而言事务都是独立的。这具体和数据库的隔离级别有关。</p>
-<p><strong>持久性</strong>（Durability）：持久性是指一个事务一旦被提交了，那么对数据库中的数据的改变就是永久性的，即便是在数据库系统遇到故障的情况下也不会丢失提交事务的操作。</p>
-<p>​    </p>
-<p>9.MySQL的事务隔离级别和对应的问题</p>
-<p>数据库事务对应4个隔离级别</p>
-<p>（1）Read uncommitted（读取未提交的内容）【级别最低，什么都避免不了】</p>
-<p>​        最低的隔离级别，允许读取尚未提交的数据变更，可能会导致脏读、幻读或不可重复读。</p>
-<p>（2）Read committed（读取提交的内容）【可避免脏读】</p>
-<p>​        这是大多数数据库系统的默认隔离级别（但不是MySQL默认的），允许读取并发事务已经提交的数据，可以阻止脏读，但是幻读或不可重复读仍有可能发生。</p>
-<p>（3）Repeatable read（可重读）【可避免脏读，不可重复读】</p>
-<p>​        这是<strong>MySQL的默认事务隔离级别</strong>，对同一字段的多次读取结果都是一致的，除非数据是被本身事务自己所修改，可以阻止脏读和不可重复读，但幻读仍有可能发生。</p>
-<p>（4）Serializable（可串行化）【可避免脏读，不可重复读，幻读】</p>
-<p>​        这是数据库的最高隔离级别，它通过强制事务排序，使之不可能相互冲突，从而解决幻读问题。简而言之，就是在每个读的数据行上加上共享锁。在这个级别，可能会导致大量的超时现象和锁竞争。</p>
-<p><strong>并发事务处理带来的问题</strong></p>
-<p>​        脏读(Dirty Reads)：事务A读取了事务B更新的数据，然后B回滚操作，那么A读取到的数据是脏数据</p>
-<p>​        不可重复读（Non-Repeatable Reads)：事务 A 多次读取同一数据，事务B在事务A多次读取的过程中，对数据作了更新并提交，导致事务A多次读取同一数据时，结果不一致。</p>
-<p>​        幻读（Phantom Reads)：幻读与不可重复读类似。它发生在一个事务A读取了几行数据，接着另一个并发事务B插入了一些数据时。在随后的查询中，事务A就会发现多了一些原本不存在的记录，就好像发生了幻觉一样，所以称为幻读。</p>
-<p><strong>幻读和不可重复读的区别：</strong></p>
-<ul>
-<li><p><strong>不可重复读的重点是修改</strong>：在同一事务中，同样的条件，第一次读的数据和第二次读的数据不一样。（因为中间有其他事务提交了修改）</p>
-</li>
-<li><p><strong>幻读的重点在于新增或者删除</strong>：在同一事务中，同样的条件,，第一次和第二次读出来的记录数不一样。（因为中间有其他事务提交了插入/删除）</p>
-</li>
-</ul>
-<p><strong>并发事务处理带来的问题的解决办法：</strong></p>
-<p>“脏读” 、 “不可重复读”和“幻读” ，其实都是数据库读一致性问题，必须由数据库提供一定的事务隔离机制来解决：</p>
-<ul>
-<li><p>一种是加锁：在读取数据前，对其加锁，阻止其他事务对数据进行修改。</p>
-</li>
-<li><p>另一种是数据多版本并发控制（MultiVersion Concurrency Control，简称 <strong>MVCC</strong>），也称为多版本数据库：不用加任何锁， 通过一定机制生成一个数据请求时间点的一致性数据快照 （Snapshot)， 并用这个快照来提供一定级别 （语句级或事务级） 的一致性读取。从用户的角度来看，好象是数据库可以提供同一数据的多个版本。 MVCC只在 Read Committed 和 Repeatable Read两个隔离级别下工作。</p>
-<p>(tips:有关MVCC的详情可看<a href="https://blog.csdn.net/Waves___/article/details/105295060" target="_blank" rel="noopener">https://blog.csdn.net/Waves___/article/details/105295060</a>)</p>
-</li>
-</ul>
-<p>10.SQL的优化</p>
-<p>（1）尽量避免全表扫描，首先考虑在where以及order by涉及的列上建立索引，这样能过滤好多数据。</p>
-<p>（2）避免在where子句中对字段进行null值判断，否则会导致引擎放弃索引而进行全表扫描</p>
-<p>（3）避免在where子句中使用！=或者&lt; &gt;操作符，否则会导致引擎放弃索引而进行全表扫描</p>
-<p>（4）避免在where子句中使用or来连接条件，若果一个字段有索引，一个字段没有索引，否则会导致引擎放弃使用索引而进行全表扫描</p>
-<p>（5）like模糊全匹配，in 和 not in都要慎用，会导致全表扫描</p>
-<p>11.三个范式</p>
-<blockquote>
-<p>第一范式（1NF）：数据库表中的字段都是单一属性的，不可再分。这个单一属性由基本类型构成，包括整型、实数、字符型、逻辑型、日期型等。</p>
-<p>第二范式（2NF）：数据库表中不存在非关键字段对任一候选关键字段的部分函数依赖（部分函数依赖指的是存在组合关键字中的某些字段决定非关键字段的情况），也即所有非关键字段都完全依赖于任意一组候选关键字。</p>
-<p>第三范式（3NF）：在第二范式的基础上，数据表中如果不存在非关键字段对任一候选关键字段的传递函数依赖则符合第三范式。所谓传递函数依赖，指的是如 果存在”A → B → C”的决定关系，则C传递函数依赖于A。因此，满足第三范式的数据库表应该不存在如下依赖关系：关键字段 → 非关键字段 x → 非关键字段y</p>
-</blockquote>
-<p>内容解读：</p>
-<ul>
-<li><p>首先要明确的是：<strong>满足着第三范式，那么就一定满足第二范式、满足着第二范式就一定满足第一范式</strong></p>
-</li>
-<li><p>第一范式：<strong>字段是最小的的单元不可再分</strong></p>
-</li>
-<li><ul>
-<li>学生信息组成学生信息表，有年龄、性别、学号等信息组成。这些字段都不可再分，所以它是满足第一范式的</li>
-</ul>
-</li>
-<li><p>第二范式：满足第一范式,<strong>表中的字段必须完全依赖于全部主键而非部分主键。</strong></p>
-</li>
-<li><ul>
-<li><strong>其他字段组成的这行记录和主键表示的是同一个东西，而主键是唯一的，它们只需要依赖于主键，也就成了唯一的</strong></li>
-<li>学号为1024的同学，姓名为Timi，年龄是24岁。姓名和年龄字段都依赖着学号主键。</li>
-</ul>
-</li>
-<li><p>第三范式：满足第二范式，<strong>非主键外的所有字段必须互不依赖</strong></p>
-</li>
-<li><ul>
-<li><strong>就是数据只在一个地方存储，不重复出现在多张表中，可以认为就是消除传递依赖</strong></li>
-<li>比如，我们大学分了很多系（中文系、英语系、计算机系……），这个系别管理表信息有以下字段组成：系编号，系主任，系简介，系架构。那我们能不能在学生信息表添加系编号，系主任，系简介，系架构字段呢？不行的，因为这样就冗余了，非主键外的字段形成了依赖关系(依赖到学生信息表了)！正确的做法是：学生表就只能增加一个系编号字段。</li>
-</ul>
-</li>
-</ul>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">数据库</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2020/06/04/MySQL/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-Spring" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2020/06/03/Spring/">Spring</a>
-    </h1>
-  
-
-        
-        <a href="/2020/06/03/Spring/" class="archive-article-date">
-  	<time datetime="2020-06-03T02:54:10.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-06-03</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p><strong>1.Spring介绍</strong></p>
-<p>Spring是一个轻量级的IoC和AOP容器框架，是为Java应用程序提供基础性服务的一套框架，目的是用于简化企业应用程序的开发，它使得开发者只需要关心业务需求。常见的配置方式有三种：基于XML的配置、基于注解的配置、基于Java的配置。</p>
-<p>Spring模块主要由以下构成：</p>
-<p><img src="/2020/06/03/Spring/Spring.jpg" alt="Spring核心模块"></p>
-<p>Spring Core：核心类库，提供IOC服务；</p>
-<p>Spring Context：提供框架式的Bean访问方式，以及企业级功能（JNDI、定时任务等）；</p>
-<p>Spring AOP：AOP服务；</p>
-<p>Spring DAO：对JDBC的抽象，简化了数据访问异常的处理；</p>
-<p>Spring ORM：对现有的ORM框架的支持；</p>
-<p>Spring Web：提供了基本的面向Web的综合特性，例如多方文件上传；</p>
-<p>Spring MVC：提供面向Web应用的Model-View-Controller实现。</p>
-<p>Spring的优点：</p>
-<p>（1）spring属于低侵入式设计，代码的污染极低</p>
-<p>（2）spring的DI机制将对象之间的依赖交由框架处理，减低组件的耦合性</p>
-<p>（3）Spring提供了AOP技术，支持将一些通用任务，如安全、事务、日志、权限等进行集中式管理，从而提供更好的复用</p>
-<p>（4）spring对于主流的应用框架提供了集成支持</p>
-<p><strong>2.IoC介绍</strong></p>
-<p>​    IoC(Inversion of Control)控制反转，它是一种设计思想，在java开发中，将你设计好的对象交给容器控制器控制，而不是主动地用代码进行对象的创建。</p>
-<p>​    DI（Dependency Injection）依赖注入，就是由IOC容器在运行期间，动态地将某种依赖关系注入到对象之中。所以，依赖注入(DI)和控制反转(IOC)是从不同的角度的描述的同一件事情，就是指通过引入IOC容器，利用依赖关系注入的方式，实现对象之间的解耦。</p>
-<p>​    最直观的表达就是，IOC让对象的创建不用去new了，可以由spring自动生产，使用java的反射机制，根据配置文件在运行时动态的去创建对象以及管理对象，并调用对象的方法的。</p>
-<p>​    使用IoC的4种注入方式：构造器注入、setter方法注入、注解注入、接口注入</p>
-<p>​        </p>
-<p><strong>3.AOP介绍</strong></p>
-<p>​    AOP（Aspect Oriented Programming）面向切面编程，是面向对象开发的一种补充，它允许开发人员在不改变原有的逻辑的基础上，增加一些额外的功能。例如，开发人员可以在不改变原来业务逻辑模型的基础可以进行动态的增加日志，安全或异常处理功能。</p>
-<p>​    AOP实现的关键在于代理模式，AOP代理主要分为<strong>静态代理和动态代理</strong>。静态代理的代表为AspectJ；动态代理则以Spring AOP为代表。</p>
-<p>​    （1）AspectJ是静态代理的增强，所谓静态代理，所谓静态也就是在程序运行前就已经存在代理类的字节码文件，代理类和委托类的关系在运行前就确定了。</p>
-<p>​    （2）Spring AOP使用的动态代理，动态代理类的源码是在程序运行期间由JVM根据反射等机制动态的生成，所以不存在代理类的字节码文件。代理类和委托类的关系是在程序运行时确定。 </p>
-<p>​    Spring AOP的动态代理主要由两种方式，<strong>JDK动态代理和CGLib动态代理</strong></p>
-<p>（1）JDK动态代理只提供接口的代理，不支持类的代理。核心InvocationHandler接口和Proxy类，InvocationHandler 通过invoke()方法反射来调用目标类中的代码，动态地将横切逻辑和业务编织在一起；接着Proxy利用 InvocationHandler动态创建一个符合某一接口的的实例,  生成目标类的代理对象。</p>
-<p> （2）如果代理类没有实现 InvocationHandler 接口，那么Spring AOP会选择使用CGLIB来动态代理目标类。CGLIB（Code Generation Library），是一个代码生成的类库，可以在运行时动态的生成指定类的一个子类对象，并覆盖其中特定方法并添加增强代码，从而实现AOP。CGLIB是通过<strong>继承</strong>的方式做的动态代理，因此如果某个类被标记为final，那么它是无法使用CGLIB做动态代理的。</p>
-<table>
-<thead>
-<tr>
-<th>名称</th>
-<th>特征</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>静态代理</td>
-<td>简单，是动态代理的理论基础。代理模式中常见</td>
-</tr>
-<tr>
-<td>JDK动态代理</td>
-<td>需要有顶层接口才能使用。利用反射完成。使用动态字节码技。是mybaits的mapper文件代理模式</td>
-</tr>
-<tr>
-<td>CGLib动态代理</td>
-<td>可以直接代理类，不能对final类进行继承。使用动态字节码技术</td>
-</tr>
-</tbody></table>
-<p><strong>4.BeanFactory和ApplicationContext的区别</strong></p>
-<p>​     BeanFactory和ApplicationContext是Spring的两大核心接口，都可以当做Spring的容器。其中ApplicationContext是BeanFactory的子接口。</p>
-<p><img src="/2020/06/03/Spring/%E6%8E%A5%E5%8F%A3.png" alt="接口"></p>
-<p>（1）BeanFactory：是Spring里面最底层的接口，包含了各种Bean的定义，读取bean配置文档，管理bean的加载、实例化，控制bean的生命周期，维护bean之间的依赖关系。ApplicationContext接口作为BeanFactory的派生，除了提供BeanFactory所具有的功能外，还提供了更完整的框架功能：</p>
-<p>​        ①继承MessageSource，因此支持国际化。</p>
-<p>​        ②统一的资源文件访问方式。</p>
-<p>​        ③提供在监听器中注册bean的事件。</p>
-<p>​        ④同时加载多个配置文件。</p>
-<p>​        ⑤载入多个（有继承关系）上下文 ，使得每一个上下文都专注于一个特定的层次，比如应用的web层。</p>
-<p>（2）① <strong>BeanFactroy采用的是延迟加载形式来注入Bean的，</strong>即只有在使用到某个Bean时(调用getBean())，才对该Bean进行加载实例化。这样，我们就不能发现一些存在的Spring的配置问题。如果Bean的某一个属性没有注入，BeanFacotry加载后，直至第一次使用调用getBean方法才会抛出异常。</p>
-<pre><code>② **ApplicationContext，它是在容器启动时，一次性创建了所有的Bean**。这样，在容器启动时，我们就可以发现Spring中存在的配置错误，这样有利于检查所依赖属性是否注入。 ApplicationContext启动后预载入所有的单实例Bean，通过预载入单实例bean ,确保当你需要的时候，你就不用等待，因为它们已经创建好了。</code></pre><p>​     ③相对于基本的BeanFactory，ApplicationContext 唯一的不足是占用内存空间。当应用程序配置Bean较多时，程序启动较慢。</p>
-<p>（3）BeanFactory通常以编程的方式被创建，ApplicationContext还能以声明的方式创建，如使用ContextLoader。</p>
-<p>（4）BeanFactory和ApplicationContext都支持BeanPostProcessor、BeanFactoryPostProcessor的使用，但两者之间的区别是：BeanFactory需要手动注册，而ApplicationContext则是自动注册。</p>
-<p><strong>5.Spring Bean的生命周期</strong></p>
-<p><img src="/2020/06/03/Spring/bean.jpg" alt="bean"></p>
-<p>首先说一下Servlet的生命周期：实例化，初始init，接收请求service，销毁destroy；</p>
-<p> Spring上下文中的Bean生命周期也类似，总结起来就4个：<strong>实例化 -&gt; 属性赋值 -&gt; 初始化 -&gt;销毁</strong> 但是扩展开来分为以下几个</p>
-<p>如下：</p>
-<p>（1）实例化Bean：</p>
-<p>对于BeanFactory容器，当客户向容器请求一个尚未初始化的bean时，或初始化bean的时候需要注入另一个尚未初始化的依赖时，容器就会调用createBean进行实例化。对于ApplicationContext容器，当容器启动结束后，通过获取BeanDefinition对象中的信息，实例化所有的bean。</p>
-<p>（2）设置对象属性（依赖注入）：</p>
-<p>实例化后的对象被封装在BeanWrapper对象中，紧接着Spring根据BeanDefinition中的信息 以及 通过BeanWrapper提供的设置属性的接口完成依赖注入。</p>
-<p>（3）处理Aware接口：</p>
-<p>接着，Spring会检测该对象是否实现了xxxAware接口，并将相关的xxxAware实例注入给Bean：</p>
-<p>①如果这个Bean已经实现了BeanNameAware接口，会调用它实现的setBeanName(String beanId)方法，此处传递的就是Spring配置文件中Bean的id值；</p>
-<p>②如果这个Bean已经实现了BeanFactoryAware接口，会调用它实现的setBeanFactory()方法，传递的是Spring工厂自身。</p>
-<p>③如果这个Bean已经实现了ApplicationContextAware接口，会调用setApplicationContext(ApplicationContext)方法，传入Spring上下文；</p>
-<p>（4）BeanPostProcessor：</p>
-<p>如果想对Bean进行一些自定义的处理，那么可以让Bean实现了BeanPostProcessor接口，那将会调用postProcessBeforeInitialization(Object obj, String s)方法。</p>
-<p>（5）InitializingBean 与 init-method：</p>
-<p>如果Bean在Spring配置文件中配置了 init-method 属性，则会自动调用其配置的初始化方法。</p>
-<p>（6）如果这个Bean实现了BeanPostProcessor接口，将会调用postProcessAfterInitialization(Object obj, String s)方法；由于这个方法是在Bean初始化结束时调用的，所以可以被应用于内存或缓存技术；</p>
-<p>以上几个步骤完成后，Bean就已经被正确创建了，之后就可以使用这个Bean了。</p>
-<p>（7）DisposableBean：</p>
-<p>当Bean不再需要时，会经过清理阶段，如果Bean实现了DisposableBean这个接口，会调用其实现的destroy()方法；</p>
-<p>（8）destroy-method：</p>
-<p>最后，如果这个Bean的Spring配置中配置了destroy-method属性，会自动调用其配置的销毁方法。</p>
-<p><strong>6.解释Spring支持的几种bean的作用域</strong></p>
-<p>Spring容器中的bean可以分为5个范围，后三种只有在Web应用中使用Spring时，作用域才有效</p>
-<p>（1）singleton：单例模式，bean默认的作用域，每个容器中只有一个bean的实例，单例的模式由BeanFactory自身来维护。</p>
-<p>（2）prototype：原型模式，为每一个bean请求提供一个实例。</p>
-<p>（3）request：对于每次 HTTP 请求，使用 request 定义的 bean 都将产生一个新实例，即每次 HTTP 请求将会产生不同的 bean 实例。在请求完成以后，bean会失效并被垃圾回收器回收。</p>
-<p>（4）session：与request范围类似，同一个 Session 共享一个 bean 实例。</p>
-<p>（5）global-session：全局作用域，同 session 作用域不同的是，所有的session共享一个Bean实例。</p>
-<p><strong>7.Spring的自动装配</strong></p>
-<p>基于xml配置文件的方式：</p>
-<p>​    在spring框架xml 配置文件中 &lt; bean&gt;节点的 autowire 参数可以控制 bean 自动装配的方式,总共5种方式</p>
-<ul>
-<li><p>default - 默认的方式和 “no” 方式一样</p>
-</li>
-<li><p>no - 不自动装配，需要使用 &lt; ref/&gt;节点或参数</p>
-</li>
-<li><p>byName - 通过bean的名称进行自动装配，如果一个bean的 property 与另一bean 的name 相同，就进行自动装配</p>
-</li>
-<li><p>byType - 根通过参数的数据类型进行自动装配</p>
-</li>
-<li><p>constructor - 根据构造函数进行装配，并且构造函数的参数通过byType进行装配。</p>
-</li>
-<li><p>autodetect：自动探测，如果有构造方法，通过 construct的方式自动装配，否则使用 byType的方式自动装配。</p>
-</li>
-</ul>
-<p>基于注解的方式：</p>
-<p>​    使用@Autowired注解来自动装配指定的bean。在使用@Autowired注解之前需要在Spring配置文件进行配置&lt;context:annotation-config /&gt;。在启动spring IoC时，容器自动装载了一个AutowiredAnnotationBeanPostProcessor后置处理器，当容器扫描到@Autowied、@Resource或@Inject时，就会在IoC容器自动查找需要的bean，并装配给该对象的属性。在使用@Autowired时，首先在容器中查询对应类型的bean：</p>
-<p>​    如果查询结果刚好为一个，就将该bean装配给@Autowired指定的数据；</p>
-<p>​    如果查询的结果不止一个，那么@Autowired会根据名称来查找；</p>
-<p>​    如果上述查找的结果为空，那么会抛出异常。解决方法时，使用required=false。</p>
-<p>注：@Autowired和@Resource之间的区别</p>
-<p>(1) @Autowired默认是按照类型装配注入的，默认情况下它要求依赖对象必须存在（可以设置它required属性为false）。</p>
-<p>(2) @Resource默认是按照名称来装配注入的，只有当找不到与名称匹配的bean才会按照类型来装配注入。</p>
-<p><strong>8.Spring框架中用到的设计模式</strong></p>
-<p>（1）工厂模式：BeanFactory就是简单工厂模式的体现，用来创建对象的实例；</p>
-<p>（2）单例模式：Bean默认为单例模式。</p>
-<p>（3）代理模式：Spring的AOP功能用到了JDK的动态代理和CGLIB字节码生成技术；</p>
-<p>（4）模板方法：用来解决代码重复的问题。比如:RestTemplate, JmsTemplate, JpaTemplate。</p>
-<p>（5）观察者模式：定义对象键一种一对多的依赖关系，当一个对象的状态发生改变时，所有依赖于它的对象都会得到通知被制动更新，如Spring中listener的实现–ApplicationListener。</p>
-<p><strong>9.Spring事务的实现方式和实现原理</strong></p>
-<p>​     Spring事务的本质其实就是数据库对事务的支持，没有数据库的事务支持，spring是无法提供事务功能的。真正的数据库层的事务提交和回滚是通过binlog或者redo log实现的。</p>
-<p>（1）Spring事务的种类：</p>
-<p>spring支持编程式事务管理和声明式事务管理两种方式：</p>
-<p>​     ①编程式事务管理使用TransactionTemplate。</p>
-<p>​     ②声明式事务管理建立在AOP之上的。其本质是通过AOP功能，对方法前后进行拦截，将事务处理的功能编织到拦截的方法中，也就是在目标方法开始之前加入一个事务，在执行完目标方法之后根据执行情况提交或者回滚事务。</p>
-<blockquote>
-<p>   声明式事务最大的优点就是不需要在业务逻辑代码中掺杂事务管理的代码，只需在配置文件中做相关的事务规则声明或通过@Transactional注解的方式，便可以将事务规则应用到业务逻辑中。</p>
-<p>   声明式事务管理要优于编程式事务管理，这正是spring倡导的非侵入式的开发方式，使业务代码不受污染，只要加上注解就可以获得完全的事务支持。唯一不足地方是，最细粒度只能作用到方法级别，无法做到像编程式事务那样可以作用到代码块级别。</p>
-</blockquote>
-<p>（2）spring的事务传播行为：</p>
-<p>​        spring事务的传播行为说的是，当多个事务同时存在的时候，spring如何处理这些事务的行为(新建事务?在事务中执行?把事务挂起?报异常?) 。根据处理方式，事务的传播机制有7种。</p>
-<p>​    ① PROPAGATION_REQUIRED：如果当前没有事务，就创建一个新事务，如果当前存在事务，就加入该事务，该设置是最常用的设置。</p>
-<p>​    ② PROPAGATION_SUPPORTS：支持当前事务，如果当前存在事务，就加入该事务，如果当前不存在事务，就以非事务执行。‘</p>
-<p>​    ③ PROPAGATION_MANDATORY：支持当前事务，如果当前存在事务，就加入该事务，如果当前不存在事务，就抛出异常。</p>
-<p>​    ④ PROPAGATION_REQUIRES_NEW：创建新事务，无论当前存不存在事务，都创建新事务。</p>
-<p>​    ⑤ PROPAGATION_NOT_SUPPORTED：以非事务方式执行操作，如果当前存在事务，就把当前事务挂起。</p>
-<p>​    ⑥ PROPAGATION_NEVER：以非事务方式执行，如果当前存在事务，则抛出异常。</p>
-<p>​    ⑦ PROPAGATION_NESTED：如果当前存在事务，则在嵌套事务内执行。如果当前没有事务，则按REQUIRED属性执行。</p>
-<p>​     如果想事务一起执行可以用Required满足大部分场景，如果不想让执行的子事务的结果影响到父事务的提交可以将子事务设置为RequiresNew</p>
-<p>（3）Spring中的隔离级别：</p>
-<p>​    ① ISOLATION_DEFAULT：这是个 PlatfromTransactionManager 默认的隔离级别，使用数据库默认的事务隔离级别。</p>
-<p>​    ② ISOLATION_READ_UNCOMMITTED：读未提交，允许另外一个事务可以看到这个事务未提交的数据。</p>
-<p>​    ③ ISOLATION_READ_COMMITTED：读已提交，保证一个事务修改的数据提交后才能被另一事务读取，而且能看到该事务对已有记录的更新。</p>
-<p>​    ④ ISOLATION_REPEATABLE_READ：可重复读，保证一个事务修改的数据提交后才能被另一事务读取，但是不能看到该事务对已有记录的更新。</p>
-<p>​    ⑤ ISOLATION_SERIALIZABLE：一个事务在执行的过程中完全看不到其他事务对数据库所做的更新。</p>
-<p><strong>10.Spring框架中不同类型的事件</strong></p>
-<p>Spring 提供了以下5种标准的事件：</p>
-<p>（1）上下文更新事件（ContextRefreshedEvent）：在调用ConfigurableApplicationContext 接口中的refresh()方法时被触发。</p>
-<p>（2）上下文开始事件（ContextStartedEvent）：当容器调用ConfigurableApplicationContext的Start()方法开始/重新开始容器时触发该事件。</p>
-<p>（3）上下文停止事件（ContextStoppedEvent）：当容器调用ConfigurableApplicationContext的Stop()方法停止容器时触发该事件。</p>
-<p>（4）上下文关闭事件（ContextClosedEvent）：当ApplicationContext被关闭时触发该事件。容器被关闭时，其管理的所有单例Bean都被销毁。</p>
-<p>（5）请求处理事件（RequestHandledEvent）：在Web应用中，当一个http请求（request）结束触发该事件。</p>
-<p>如果一个bean实现了ApplicationListener接口，当一个ApplicationEvent 被发布以后，bean会自动被通知。</p>
-<p><strong>11、解释一下Spring AOP里面的几个名词</strong></p>
-<p>（1）切面（Aspect）：被抽取的公共模块，可能会横切多个对象。 在Spring AOP中，切面可以使用通用类（基于模式的风格） 或者在普通类中以 @AspectJ 注解来实现。</p>
-<p>（2）连接点（Join point）：指方法，在Spring AOP中，一个连接点 总是 代表一个方法的执行。 </p>
-<p>（3）通知（Advice）：在切面的某个特定的连接点（Join point）上执行的动作。通知有各种类型，其中包括“around”、“before”和“after”等通知。许多AOP框架，包括Spring，都是以拦截器做通知模型， 并维护一个以连接点为中心的拦截器链。</p>
-<p>（4）切入点（Pointcut）：切入点是指 我们要对哪些Join point进行拦截的定义。通过切入点表达式，指定拦截的方法，比如指定拦截add<em>、search</em>。</p>
-<p>（5）引入（Introduction）：（也被称为内部类型声明（inter-type declaration））。声明额外的方法或者某个类型的字段。Spring允许引入新的接口（以及一个对应的实现）到任何被代理的对象。例如，你可以使用一个引入来使bean实现 IsModified 接口，以便简化缓存机制。</p>
-<p>（6）目标对象（Target Object）： 被一个或者多个切面（aspect）所通知（advise）的对象。也有人把它叫做 被通知（adviced） 对象。 既然Spring AOP是通过运行时代理实现的，这个对象永远是一个 被代理（proxied） 对象。</p>
-<p>（7）织入（Weaving）：指把增强应用到目标对象来创建新的代理对象的过程。Spring是在运行时完成织入。</p>
-<p>切入点（pointcut）和连接点（join point）匹配的概念是AOP的关键，这使得AOP不同于其它仅仅提供拦截功能的旧技术。 切入点使得定位通知（advice）可独立于OO层次。 例如，一个提供声明式事务管理的around通知可以被应用到一组横跨多个对象中的方法上（例如服务层的所有业务操作）。<br><img src="/2020/06/03/Spring/AOP.png" alt="AOP"></p>
-<p><strong>12.Spring通知的类型</strong></p>
-<p>（1）前置通知（Before advice）：在某连接点（join point）之前执行的通知，但这个通知不能阻止连接点前的执行（除非它抛出一个异常）。</p>
-<p>（2）返回后通知（After returning advice）：在某连接点（join point）正常完成后执行的通知：例如，一个方法没有抛出任何异常，正常返回。 </p>
-<p>（3）抛出异常后通知（After throwing advice）：在方法抛出异常退出时执行的通知。 </p>
-<p>（4）后通知（After (finally) advice）：当某连接点退出的时候执行的通知（不论是正常返回还是异常退出）。 </p>
-<p>（5）环绕通知（Around Advice）：包围一个连接点（join point）的通知，如方法调用。这是最强大的一种通知类型。 环绕通知可以在方法调用前后完成自定义的行为。它也会选择是否继续执行连接点或直接返回它们自己的返回值或抛出异常来结束执行。 环绕通知是最常用的一种通知类型。大部分基于拦截的AOP框架，例如Nanning和JBoss4，都只提供环绕通知。 </p>
-<p>同一个aspect，不同advice的执行顺序：</p>
-<p>①没有异常情况下的执行顺序：</p>
-<p>around before advice<br>before advice<br>target method 执行<br>around after advice<br>after advice<br>afterReturning</p>
-<p>②有异常情况下的执行顺序：</p>
-<p>around before advice<br>before advice<br>target method 执行<br>around after advice<br>after advice<br>afterThrowing:异常发生<br>java.lang.RuntimeException: 异常发生</p>
-<p>参考链接：</p>
-<p><a href="https://blog.csdn.net/a745233700/article/details/80959716" target="_blank" rel="noopener">https://blog.csdn.net/a745233700/article/details/80959716</a></p>
-<p><a href="https://www.jianshu.com/p/1dec08d290c1" target="_blank" rel="noopener">https://www.jianshu.com/p/1dec08d290c1</a></p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">框架</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2020/06/03/Spring/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-SpringMVC" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2020/06/03/SpringMVC/">springMVC</a>
-    </h1>
-  
-
-        
-        <a href="/2020/06/03/SpringMVC/" class="archive-article-date">
-  	<time datetime="2020-06-03T01:38:49.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-06-03</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p><strong>1.什么是Spring MVC?</strong></p>
-<p>​        Spring MVC是一个基于MVC架构的用来简化web应用程序开发的应用开发框架,通过把Model, View, Controller分离，将web层进行职责解耦，把复杂的web应用分成逻辑清晰的几部分，简化开发，减少出错，方便组内开发人员之间的配合。</p>
-<p><strong>2.SpringMVC的执行流程？</strong></p>
-<p>流程图如下所示</p>
-<p><img src="/2020/06/03/SpringMVC/SpringMVC%E6%B5%81%E7%A8%8B%E5%9B%BE.png" alt="SpringMVC流程图"></p>
-<p>（1）用户发送url请求到前端控制器DispatcherServlet;</p>
-<p>（2）DIspatcherServlet收到请求后，调用HandlerMapping处理映射器，请求获取handler</p>
-<p>（3）HandlerMapping根据url找到具体的处理器，生成处理器对象以及处理器拦截器（如果有的话）一并返回给DispatcherServlet;</p>
-<p>（4）DispatcherServlet调用HandlerAdapter处理器适配器</p>
-<p>（5）HandlerAdapter经过适配调用后执行具体的Handler处理器（Handler是指包含了我们请求的Controller类和Method方法的对象）</p>
-<p>（6）Handler处理器执行完后返回ModelAndView</p>
-<p>（7）HandlerAdapter将Handler执行结果ModelAndView返回给DispatcherServlet</p>
-<p>（8）DispatcherServlet将ModelAndView传给ViewResolver视图解析器进行解析</p>
-<p>（9）视图解析器解析完后返回具体的View给DispatcherServlet</p>
-<p>（10）DispatcherServlet对View进行视图渲染（将模型数据填充到request域中）</p>
-<p>（11）DispatcherServlet响应用户</p>
-<p><strong>3.SpringMVC的主要组件</strong></p>
-<p>（1）前端控制器 DispatcherServlet（不需要程序员开发）</p>
-<p>作用：接收请求、响应结果，相当于转发器，有了DispatcherServlet 就减少了其它组件之间的耦合度。</p>
-<p>（2）处理器映射器HandlerMapping（不需要程序员开发）</p>
-<p>作用：根据请求的URL来查找Handler</p>
-<p>（3）处理器适配器HandlerAdapter</p>
-<p>注意：在编写Handler的时候要按照HandlerAdapter要求的规则去编写，这样适配器HandlerAdapter才可以正确的去执行Handler。</p>
-<p>（4）处理器Handler（需要程序员开发）</p>
-<p>（5）视图解析器 ViewResolver（不需要程序员开发）</p>
-<p>作用：进行视图的解析，根据视图逻辑名解析成真正的视图（view）</p>
-<p>（6）视图View（需要程序员开发jsp）</p>
-<p>View是一个接口， 它的实现类支持不同的视图类型（jsp，freemarker，pdf等等）</p>
-<p><strong>4.SpringMVC的优点</strong></p>
-<p>（1）可以支持各种视图，不仅仅局限于JSP,还可以是excel,jpg等</p>
-<p>（2）与Spring框架集成（如IoC容器，AOP等）</p>
-<p>（3）清晰的角色分配：前端控制器(dispatcherServlet) , 请求到处理器映射（handlerMapping), 处理器适配器（HandlerAdapter), 视图解析器（ViewResolver）。</p>
-<p>（4） 支持各种请求资源的映射策略。</p>
-<p><strong>5.SpringMVC设定重定向和转发</strong></p>
-<p>（1）转发：在返回值前面加”forward:”，譬如”forward:user.do?name=method4”</p>
-<p>（2）重定向：在返回值前面加”redirect:”，譬如”redirect:<a href="http://www.baidu.com&quot;" target="_blank" rel="noopener">http://www.baidu.com&quot;</a></p>
-<p><strong>6.SpringMVC常用的注解</strong></p>
-<p>@RequestMapping：用于处理请求 url 映射的注解，可用于类或方法上。用于类上，则表示类中的所有响应请求的方法都是以该地址作为父路径。</p>
-<p>@RequestBody：注解实现接收http请求的json数据，将json转换为java对象。</p>
-<p>@ResponseBody：注解实现将controller方法返回对象转化为json对象响应给客户。</p>
-<p>参考文献：</p>
-<p><a href="https://blog.csdn.net/a745233700/article/details/80963758" target="_blank" rel="noopener">https://blog.csdn.net/a745233700/article/details/80963758</a></p>
-<p><a href="https://blog.csdn.net/qq_28802119/article/details/82993266" target="_blank" rel="noopener">https://blog.csdn.net/qq_28802119/article/details/82993266</a></p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">框架</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2020/06/03/SpringMVC/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-进程" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2020/06/02/%E8%BF%9B%E7%A8%8B/">进程</a>
-    </h1>
-  
-
-        
-        <a href="/2020/06/02/%E8%BF%9B%E7%A8%8B/" class="archive-article-date">
-  	<time datetime="2020-06-02T08:58:09.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-06-02</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="一-进程和线程的区别"><a href="#一-进程和线程的区别" class="headerlink" title="一.进程和线程的区别"></a>一.进程和线程的区别</h3><p>​       讲到进程，一定会想到线程。那线程和进程区别是什么呢？</p>
-<p>​       <strong>进程是操作系统资源分配的基本单位</strong>，<strong>线程是操作系统调度资源的基本单位</strong>。进程是正在运行的程序的实例，其实就是系统中正在运行的一个应用程序，线程是进程的一个实体。举一个比喻：进程可以比喻成火车，线程是里面的车厢。</p>
-<h3 id="二-进程间的通信"><a href="#二-进程间的通信" class="headerlink" title="二.进程间的通信"></a>二.进程间的通信</h3><p>​       进程之间的交换数据必须通过内核，在内核中开辟一块缓冲区，进程A把数据从用户空间拷到内核缓冲区，进程B再从内核缓冲区把数据读走，内核提供的这种机制称为进程间通信。</p>
-<h4 id="进程间对白：管道和套接字"><a href="#进程间对白：管道和套接字" class="headerlink" title="进程间对白：管道和套接字"></a>进程间对白：管道和套接字</h4><p>1.<strong>管道</strong> </p>
-<p>​         一个进程向存储空间的一端写入信息，另一个进程存储空间的另外一端读取信息，这个就是管道。就像两个人对白的媒介是空气也可以是线缆一样，管道所占的空间既可以是内存也可以是磁盘。</p>
-<p><img src="/2020/06/02/%E8%BF%9B%E7%A8%8B/1.png" alt="进程间通信"></p>
-<p>　　例如在Linux下，我们通过Shell命令输入两个命令，中间通过符号“|”来创建两个命令之间的管道：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sort &lt; file1 | grep zou</span><br></pre></td></tr></table></figure>
-
-<p>​      上面一个命令表示：对file1的内容首先进行排序，排序完成后的结果将作为grep的输入，在结果里面找出所有包括字符串zou的文本行。也就是说，在两个任务“排序“（sort）和”查找”（grep）之间创建了一个管道，数据从sort流向了grep。</p>
-<p>2.<strong>Socket</strong></p>
-<p>   套接字是支持TCP/IP的网络通信的基本操作单元，可以看做是不同主机之间的进程进行双向通信的端点。</p>
-<p><img src="/2020/06/02/%E8%BF%9B%E7%A8%8B/2.jpg" alt="套接字"></p>
-<p>​        使用套接字进行通信需要双方均创建一个套接字，其中一方作为服务器方，另外一方作为客户方。服务器方必须首先创建一个服务区套接字，然后在该套接字上进行监听，等待远方的连接请求。客户方也要创建一个套接字，然后向服务器方发送连接请求。服务器套接字在受到连接请求之后，将在服务器方机器上新建一个客户套接字，与远方的客户方套接字形成点到点的通信通道。之后，客户方和服务器方便可以直接通过类似于send和recv的命令在这个创建的套接字管道上进行交流了。</p>
-<p>3.<strong>管道和socket的不足</strong>：</p>
-<p>​       （1）必须首先在通信的进程间建立连接（管道或套接字），这需要消耗系统资源；</p>
-<p>​       （2）通信是自愿的，而管道和套接字需要强制双方进行通信</p>
-<p>​      （3）由于建立连接需要消耗时间，一旦建立就应该尽可能多的通信，如果通信信息量很小，则就是“杀鸡用牛刀”了</p>
-<h4 id="进程电报与旗语：信号与信号量"><a href="#进程电报与旗语：信号与信号量" class="headerlink" title="进程电报与旗语：信号与信号量"></a>进程电报与旗语：信号与信号量</h4><p>1.<strong>信号</strong>:  </p>
-<p>​        类似于我们生活中的电报，如果你想给某人发一封电报，就拟好电文，然后将报文和收报人的信息都交给电报公司。电报公司则将电报发送到收报人所在地的邮局，并通知收报人来取电报。其中，<strong>发报文时无需收报人实现知道，也无需进行任何协调</strong>。如果对方选择不对信号做出响应，则将被OS终止运行。</p>
-<p>　　在计算机中，信号就是一个内核对象或者是一个内核数据结构。发送方将该数据结构的内容填好，并指明该信号的目标进程后，<strong>发出特定的软件中断</strong>（这就是一个发电报的操作）。OS接收到特定的中断请求后，知道是有进程要发送信号，于是到特定的内核数据结构里查找信号接收方，并进行通知。接到通知的进程则对信号进行相应处理。</p>
-<p>2.<strong>信号量</strong>：</p>
-<p>​        信号量来源于铁路的运行：在一条单轨铁路上，任何时候只允许有一列火车行驶在该铁路上，而管理这条铁路的系统就是信号量。任何一列火车必须等到表明该铁路可以行驶的信号后才能进入轨道。当列车进入后，需要将信号改为禁止状态进入来防止别的列车同时进入。而当列车驶出单轨后，则需要将信号变回允许进入状态，这很像以前的旗语。当然，通过联想到我们实际开发中经常用的锁，这就更容易理解了。</p>
-<p>   　在计算机中，信号量实际上就是一个简单整数。一个进程在信号变为0或1的情况下推进，并将信号变为1或0来防止别的进程同时推进。当该进程完成任务后，则将信号再改为0或1，从而允许其他进程执行。从而我们也可以看出，<strong>信号量已经不只是一种通信机制，更是一种同步机制</strong>。</p>
-<h4 id="进程拥抱：共享内存"><a href="#进程拥抱：共享内存" class="headerlink" title="进程拥抱：共享内存"></a>进程拥抱：共享内存</h4><p>​        前面通过对话、发电报、旗语已经满足了多种通信需要，但是当两个进程要共享大量数据时就没法十分满足需求。就如同两个坠入爱河的骚年，它们互相喜欢并想要在一起同居（共享大量数据），这时打电话、发电报、握手对话就显得不够了。这时候，它们需要的就是拥抱，只有紧紧拥抱才能尽可能地共享。</p>
-<p>​    1.<strong>共享内存</strong></p>
-<p><img src="/2020/06/02/%E8%BF%9B%E7%A8%8B/%E5%85%B1%E4%BA%AB%E5%86%85%E5%AD%98.jpg" alt="共享内存"></p>
-<p>​        进程的拥抱就是共享内存，<strong>两个进程共同拥有同一片内存</strong>。对于这片内存中的任何内容，二者均可以访问。要使用共享内存进行通信，进程1首先需要创建一片内存空间作为通信用，而其他进程2则将片内存映射到自己的（虚拟）地址空间。这样，进程1读写自己地址空间中对应共享内存的区域时，就是在和进程2进行通信。</p>
-<p>​    2.<strong>不足之处</strong></p>
-<p>​    （1）使用共享内存机制通信的两个进程必须在同一台物理机上；</p>
-<p>　（2）安全性脆弱，假如一个进程有病毒，会很容易传给另外一个进程</p>
-<h4 id="信件发送：消息队列"><a href="#信件发送：消息队列" class="headerlink" title="信件发送：消息队列"></a>信件发送：消息队列</h4><p>消息队列是一列具有头和尾的消息排列，新来的消息放在队列尾部，而读取消息则从队列头部开始，如下图所示：</p>
-<p><img src="/2020/06/02/%E8%BF%9B%E7%A8%8B/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97.jpg" alt="消息队列"></p>
-<p>这样看来，它和管道十分类似。但是两者还是有区别的</p>
-<p>（1）消息队列无固定的读写进程，任何进程都可以读写；而管道需要制定谁读谁写</p>
-<p>（2）消息队列可以同时支持多个进程，多个进程可以读写消息队列；即所谓的多对多，而管道是点对点</p>
-<p>（3）消息队列只在内存中实现，而管道还可以在磁盘上实现</p>
-<p>参考文献：</p>
-<p><a href="https://blog.csdn.net/lyn_00/article/details/84789508" target="_blank" rel="noopener">https://blog.csdn.net/lyn_00/article/details/84789508</a></p>
-<p><a href="https://www.cnblogs.com/edisonchou/p/5022508.html" target="_blank" rel="noopener">https://www.cnblogs.com/edisonchou/p/5022508.html</a></p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">操作系统</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2020/06/02/%E8%BF%9B%E7%A8%8B/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
   
     <nav id="page-nav">
       <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/">Next &amp;raquo;</a>
@@ -1629,7 +1410,7 @@
   <div class="outer">
     <div id="footer-info">
     	<div class="footer-left">
-    		&copy; 2020 John Doe
+    		&copy; 2020 Solomon
     	</div>
       	<div class="footer-right">
       		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
@@ -1733,6 +1514,10 @@ MathJax.Hub.Queue(function() {
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">网络</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">Redis</a>
               </li>
              
@@ -1753,11 +1538,15 @@ MathJax.Hub.Queue(function() {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">操作系统</a>
+                <a href="javascript:void(0)" class="js-tag color1">redis</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">redis</a>
+                <a href="javascript:void(0)" class="js-tag color3">MQ</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">操作系统</a>
               </li>
             
             <div class="clearfix"></div>
